@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CaneGuard – Plant Patrol Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ─── THEME TOKENS ────────────────────────────────────────────── */
+:root{
+  --primary:#445D48;
+  --primary-dark:#2e4031;
+  --primary-light:#6E8B74;
+  --accent:#D6CC99;
+  --accent-dark:#b8ad73;
+  --bg:#FFFFFF;
+  --surface:#F7F9F7;
+  --surface2:#EEF2EE;
+  --text:#1F2A21;
+  --muted:#6B7280;
+  --border:#DDE5DE;
+  --success:#3A7D44;
+  --warning:#C97B2E;
+  --danger:#B94040;
+  --info:#2E6FA3;
+  --radius:16px;
+  --radius-sm:10px;
+  --radius-xs:6px;
+  --shadow:0 2px 12px rgba(68,93,72,.10);
+  --shadow-md:0 4px 24px rgba(68,93,72,.14);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+  --nav-h:64px;
+  --status-h:28px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:24px 16px}
+
+/* ─── DEVICE SHELL ───────────────────────────────────────────── */
+#device{
+  width:390px;min-width:390px;
+  background:var(--bg);
+  border-radius:44px;
+  box-shadow:0 0 0 10px #111,0 0 0 12px #2a2a2a,0 40px 80px rgba(0,0,0,.6);
+  overflow:hidden;
+  position:relative;
+  display:flex;flex-direction:column;
+  max-height:844px;height:844px;
+}
+
+/* Notch */
+#device::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:130px;height:36px;background:#111;border-radius:0 0 22px 22px;z-index:100;
+}
+
+/* Status bar */
+.status-bar{
+  height:var(--status-h);padding:0 24px;
+  display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:4px;
+  font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;
+  background:var(--bg);z-index:90;position:relative;
+}
+.status-bar .time{font-variant-numeric:tabular-nums}
+.status-icons{display:flex;gap:6px;align-items:center}
+
+/* Screen area */
+#screen{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:transform .32s cubic-bezier(.4,0,.2,1),opacity .28s;
+  background:var(--bg);
+}
+.screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+.screen.slide-left{transform:translateX(-100%);opacity:0;pointer-events:none}
+
+/* Scrollable content */
+.scroll-content{flex:1;overflow-y:auto;padding-bottom:80px}
+.scroll-content::-webkit-scrollbar{display:none}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+.bottom-nav{
+  height:var(--nav-h);background:var(--bg);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;align-items:center;
+  flex-shrink:0;padding:0 4px;
+  position:relative;z-index:50;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:none;border:none;cursor:pointer;padding:8px 4px;
+  font-family:var(--font);font-size:10px;font-weight:500;color:var(--muted);
+  transition:color .2s;border-radius:12px;
+}
+.nav-btn.active{color:var(--primary)}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8}
+.nav-btn.active svg{stroke-width:2.2}
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+.app-header{
+  padding:12px 20px 10px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;background:var(--bg);position:sticky;top:0;z-index:40;
+}
+.app-header h2{font-size:16px;font-weight:700;color:var(--text);flex:1}
+.back-btn{
+  width:36px;height:36px;border:none;background:var(--surface);
+  border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.back-btn svg{width:18px;height:18px;stroke:var(--text)}
+
+/* ─── CHIPS / BADGES ─────────────────────────────────────────── */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;
+}
+.chip-online{background:#E6F4EA;color:#2e7d32}
+.chip-offline{background:#FFF3E0;color:#E65100}
+.chip-queued{background:#E3F2FD;color:#1565C0}
+.chip-sent{background:#E8F5E9;color:#2E7D32}
+.chip-failed{background:#FFEBEE;color:#C62828}
+.chip-healthy{background:#E8F5E9;color:#1B5E20}
+.chip-mildew{background:#E3F2FD;color:#0D47A1}
+.chip-smut{background:#F3E5F5;color:#4A148C}
+.chip-mosaic{background:#FFF8E1;color:#F57F17}
+.chip-rust{background:#FBE9E7;color:#BF360C}
+.chip-unclear{background:#ECEFF1;color:#37474F}
+
+/* ─── CARDS ──────────────────────────────────────────────────── */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:16px;border:1px solid var(--border);
+  box-shadow:var(--shadow);margin-bottom:12px;
+}
+.card h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.card p{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ─── BUTTONS ────────────────────────────────────────────────── */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:var(--radius);font-family:var(--font);
+  font-size:15px;font-weight:700;cursor:pointer;border:none;
+  transition:transform .15s,box-shadow .15s,background .15s;
+  transform-origin:center;
+  width:100%;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 16px rgba(68,93,72,.28)}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.btn-accent{background:var(--accent);color:var(--text)}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:10px 16px;font-size:13px;border-radius:var(--radius-sm)}
+
+@keyframes press-bounce{
+  0%{transform:scale(1)}
+  40%{transform:scale(.95)}
+  100%{transform:scale(1)}
+}
+.press-feedback{animation:press-bounce .18s ease-out}
+
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{transform:translateY(-1px)}
+  .btn-secondary:hover,.btn-ghost:hover{background:var(--surface2)}
+  .nav-btn:hover{background:rgba(68,93,72,.08);color:var(--primary)}
+  .back-btn:hover{background:var(--surface2)}
+  .toggle-btn:not(.active):hover{background:rgba(255,255,255,.25)}
+  .mao-nav-item:hover{transform:translateX(2px)}
+  .filter-pill:hover,.filter-pill-sm:hover{transform:translateY(-1px)}
+  .auth-link:hover{text-decoration:underline}
+}
+
+/* ─── STEP INDICATOR ─────────────────────────────────────────── */
+.step-bar{
+  display:flex;gap:6px;padding:10px 20px;
+  flex-shrink:0;background:var(--bg);
+}
+.step-dot{
+  height:4px;flex:1;border-radius:999px;background:var(--border);
+  transition:background .3s;
+}
+.step-dot.active{background:var(--primary)}
+.step-dot.done{background:var(--primary-light)}
+
+/* ─── SECTION ────────────────────────────────────────────────── */
+.section{padding:16px 20px}
+.section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+/* ─── SYMPTOM TOGGLE ─────────────────────────────────────────── */
+.symptom-card{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);
+  cursor:pointer;margin-bottom:10px;background:var(--bg);
+  transition:border-color .2s,background .2s;
+}
+.symptom-card.selected{border-color:var(--primary);background:rgba(68,93,72,.06)}
+.symptom-icon{
+  width:40px;height:40px;border-radius:10px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.symptom-text{flex:1}
+.symptom-text .label{font-size:13px;font-weight:600;color:var(--text)}
+.symptom-text .desc{font-size:11px;color:var(--muted);margin-top:2px}
+.check-circle{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+  flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center;
+}
+.symptom-card.selected .check-circle{background:var(--primary);border-color:var(--primary)}
+
+/* ─── DISEASE RESULT CARD ────────────────────────────────────── */
+.result-card{
+  border-radius:var(--radius);overflow:hidden;border:2px solid var(--primary);
+  box-shadow:0 4px 20px rgba(68,93,72,.15);margin-bottom:16px;
+}
+.result-header{
+  background:var(--primary);padding:16px;color:#fff;
+}
+.result-header .disease-name{font-size:18px;font-weight:800}
+.result-header .confidence{font-size:12px;opacity:.8;margin-top:2px}
+.result-body{padding:16px;background:var(--surface)}
+
+/* ─── ANALYSIS ANIMATION ─────────────────────────────────────── */
+@keyframes pulse-ring{
+  0%{transform:scale(1);opacity:.4}
+  50%{transform:scale(1.15);opacity:.1}
+  100%{transform:scale(1);opacity:.4}
+}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.pulse-ring{animation:pulse-ring 2s infinite}
+.spin{animation:spin 1.2s linear infinite}
+.fade-up{animation:fadeUp .5s ease forwards}
+
+/* ─── OFFLINE BANNER ─────────────────────────────────────────── */
+.offline-banner{
+  background:#FFF3E0;border-bottom:1px solid #FFD0A0;
+  padding:8px 20px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:#BF360C;font-weight:600;flex-shrink:0;
+}
+
+/* ─── PROGRESS BAR ───────────────────────────────────────────── */
+.progress-bar-wrap{background:var(--border);border-radius:999px;height:6px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:999px;background:var(--primary);transition:width .4s}
+
+/* ─── SWITCH ─────────────────────────────────────────────────── */
+.switch{
+  width:44px;height:24px;border-radius:999px;background:var(--border);
+  position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;
+}
+.switch.on{background:var(--primary)}
+.switch::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;background:#fff;
+  transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.switch.on::after{transform:translateX(20px)}
+
+/* ─── EMPTY STATE ────────────────────────────────────────────── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;flex:1;
+}
+.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.6}
+.empty-state h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-state p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ─── FORM FIELD ─────────────────────────────────────────────── */
+.field{margin-bottom:14px}
+.field label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.field input,.field select,.field textarea{
+  width:100%;padding:13px 16px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-family:var(--font);font-size:14px;color:var(--text);background:var(--bg);
+  outline:none;transition:border-color .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary)}
+.field textarea{resize:none;height:80px}
+
+/* ─── DIVIDER ────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1F2A21;color:#fff;padding:10px 20px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;
+  z-index:999;white-space:nowrap;max-width:320px;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── MAO DASHBOARD SHELL ────────────────────────────────────── */
+#mao-shell{
+  display:none;
+  width:100%;max-width:1100px;
+  background:var(--bg);border-radius:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+  overflow:hidden;
+  min-height:720px;
+}
+#mao-shell.active{display:flex;flex-direction:column}
+
+.mao-topbar{
+  background:var(--primary);color:#fff;
+  padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.mao-topbar .brand{font-size:16px;font-weight:800;letter-spacing:.02em}
+.mao-topbar .right{display:flex;align-items:center;gap:16px;font-size:13px}
+
+.mao-layout{display:flex;flex:1;overflow:hidden}
+
+.mao-sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  padding:16px 0;
+}
+.mao-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 20px;font-size:13px;font-weight:600;color:var(--muted);
+  cursor:pointer;border-left:3px solid transparent;transition:all .2s;
+}
+.mao-nav-item:hover{background:var(--surface2);color:var(--primary)}
+.mao-nav-item.active{color:var(--primary);border-left-color:var(--primary);background:rgba(68,93,72,.07)}
+.mao-nav-item svg{width:18px;height:18px;flex-shrink:0}
+
+.mao-content{flex:1;overflow-y:auto;padding:28px 32px;background:var(--bg)}
+.mao-content::-webkit-scrollbar{width:6px}
+.mao-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+
+.mao-panel{display:none}
+.mao-panel.active{display:block;animation:fadeUp .3s ease}
+
+/* MAO stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+}
+.stat-card .value{font-size:28px;font-weight:800;color:var(--primary)}
+.stat-card .label{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* MAO table */
+.mao-table{width:100%;border-collapse:collapse;font-size:13px}
+.mao-table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--border)}
+.mao-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.mao-table tr:hover td{background:var(--surface)}
+.mao-table tr{cursor:pointer}
+
+/* Mini bar */
+.mini-bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;width:100%;margin-top:4px}
+.mini-bar-fill{height:100%;border-radius:999px;background:var(--primary);transition:width .5s}
+
+/* ─── DEVICE/MAO TOGGLE ───────────────────────────────────────── */
+#view-toggle{
+  position:fixed;top:20px;right:20px;
+  display:flex;gap:8px;z-index:999;
+}
+.toggle-btn{
+  padding:8px 16px;border-radius:999px;font-family:var(--font);font-size:12px;font-weight:700;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.toggle-btn.active{background:var(--primary);color:#fff}
+.toggle-btn:not(.active){background:rgba(255,255,255,.15);color:#fff}
+
+/* ─── UTILITY ────────────────────────────────────────────────── */
+.flex{display:flex}.inline-flex{display:inline-flex}.flex-col{flex-direction:column}
+.items-center{align-items:center}.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}.justify-center{justify-content:center}
+.gap-8{gap:8px}.gap-10{gap:10px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}
+.p-16{padding:16px}.p-20{padding:20px}.p-24{padding:24px}
+.pt-8{padding-top:8px}.pt-32{padding-top:32px}
+.pb-8{padding-bottom:8px}.px-20{padding-left:20px;padding-right:20px}
+.text-sm{font-size:13px}.text-xs{font-size:11px}.text-lg{font-size:18px}.text-xl{font-size:22px}
+.font-bold{font-weight:700}.font-semibold{font-weight:600}
+.text-muted{color:var(--muted)}.text-primary{color:var(--primary)}.text-danger{color:var(--danger)}
+.text-center{text-align:center}
+.mt-8{margin-top:8px}.mt-10{margin-top:10px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}.mt-32{margin-top:32px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-24{margin-bottom:24px}.mb-32{margin-bottom:32px}
+.mb-0{margin-bottom:0}
+.w-full{width:100%}
+.btn-fit{width:fit-content !important;flex:0 0 auto !important}
+.btn-center{margin-left:auto;margin-right:auto}
+.filter-pill{width:auto;padding:6px 12px;font-size:11px;border-radius:999px;white-space:nowrap}
+.filter-pill-sm{width:auto;padding:6px 14px;font-size:12px;border-radius:999px;white-space:nowrap}
+.action-stack{display:flex;flex-direction:column;gap:10px}
+.action-row{display:flex;gap:10px;align-items:center}
+.action-row > .btn{flex:1;width:auto}
+.screen-footer{padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ─── DISEASE COLOR MAP ──────────────────────────────────────── */
+.disease-badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700}
+
+/* ─── AUTH + ANALYTICS HELPERS ───────────────────────────────── */
+.auth-shell{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:28px 20px;background:linear-gradient(145deg,#f5f8f5,#edf3ee)
+}
+.auth-card{
+  width:100%;max-width:430px;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow-md)
+}
+.auth-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.auth-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 16px}
+.auth-link{background:none;border:none;color:var(--primary);font-size:12px;font-weight:700;cursor:pointer;padding:0}
+.password-status{margin-top:6px;font-size:11px;line-height:1.4;color:var(--muted);font-weight:600;min-height:16px}
+.password-status.valid{color:#2e7d32}
+.password-status.invalid{color:var(--danger)}
+.account-form .field{margin-bottom:16px}
+.account-actions{display:flex;gap:10px;margin-top:6px}
+.account-actions .btn{flex:1;width:auto}
+.mao-profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.chart-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.chart-bars{display:flex;align-items:flex-end;gap:10px;height:130px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.chart-track{height:96px;width:100%;max-width:30px;border-radius:8px;background:var(--surface2);display:flex;align-items:flex-end;overflow:hidden}
+.chart-fill{width:100%;border-radius:8px 8px 0 0}
+.chart-meta{font-size:10px;color:var(--muted)}
+.chart-val{font-size:11px;font-weight:700;color:var(--text)}
+.trend-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.trend-label{width:110px;font-size:11px;color:var(--muted)}
+.trend-track{flex:1;height:10px;border-radius:999px;background:var(--surface2);overflow:hidden}
+.trend-fill{height:100%;border-radius:999px}
+.row-hidden{display:none}
+
+/* ─── BRANDING ──────────────────────────────────────────────── */
+.brand-logo{
+  display:block;width:100%;height:100%;object-fit:contain;
+  object-position:center 58%;
+  transform:translateY(4%) scale(2.5);transform-origin:center center;
+}
+.brand-logo-primary{filter:saturate(1.08) hue-rotate(-4deg) contrast(1.05)}
+.brand-logo-light{filter:saturate(.9) hue-rotate(-8deg) brightness(.95)}
+.brand-logo-white{filter:brightness(0) invert(1) drop-shadow(0 2px 5px rgba(0,0,0,.24))}
+.brand-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:28px;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(6px);box-shadow:0 12px 34px rgba(0,0,0,.2);
+  overflow:hidden;
+}
+.brand-badge-lg{width:184px;height:184px;margin:0 auto 24px}
+.brand-inline{display:flex;align-items:center;gap:10px}
+.brand-logo-chip{
+  width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  flex-shrink:0;overflow:hidden;
+}
+.brand-logo-chip img{width:100%;height:100%;object-fit:contain}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.auth-brand-mark{
+  width:50px;height:50px;border-radius:14px;
+  background:linear-gradient(145deg,#eef3ef,#e3ece4);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;
+}
+.auth-brand-mark img{width:100%;height:100%;object-fit:contain}
+.auth-brand-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- VIEW TOGGLE -->
+<div id="view-toggle">
+  <button class="toggle-btn active" onclick="switchView('mobile')">📱 Mobile App</button>
+  <button class="toggle-btn" onclick="switchView('mao')">🖥️ MAO Dashboard</button>
+</div>
+
+<!-- ════════════════════════ MOBILE DEVICE ════════════════════ -->
+<div id="device">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><rect x="0" y="3" width="3" height="7" rx="1" fill="currentColor" opacity=".4"/><rect x="4" y="2" width="3" height="8" rx="1" fill="currentColor" opacity=".7"/><rect x="8" y="0" width="3" height="10" rx="1" fill="currentColor"/><rect x="12" y="1" width="2" height="8" rx="1" fill="currentColor" opacity=".3"/></svg>
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M8 2C9.7 2 11.2 2.7 12.3 3.8L13.7 2.4C12.2 1 10.2 0 8 0S3.8 1 2.3 2.4L3.7 3.8C4.8 2.7 6.3 2 8 2z" fill="currentColor" opacity=".4"/><path d="M8 4C9.1 4 10 4.5 10.7 5.2L12.1 3.8C11 2.7 9.6 2 8 2S5 2.7 3.9 3.8L5.3 5.2C6 4.5 6.9 4 8 4z" fill="currentColor" opacity=".7"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
+      <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0" y="1" width="18" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="2.5" width="11" height="6" rx="1" fill="currentColor"/><path d="M20 3.5v4c.8-.5 1.3-1.2 1.3-2s-.5-1.5-1.3-2z" fill="currentColor" opacity=".5"/></svg>
+    </div>
+  </div>
+
+  <!-- Screen container -->
+  <div id="screen">
+
+    <!-- ══════════ SCREEN: SPLASH ══════════ -->
+    <div class="screen" id="s-splash" style="background:var(--primary);justify-content:center;align-items:center;gap:0">
+      <div style="text-align:center;padding:40px 32px">
+        <div class="brand-badge brand-badge-lg">
+          <img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-white"/>
+        </div>
+        <div style="color:#fff;font-size:30px;font-weight:800;letter-spacing:-.5px">Plant Patrol</div>
+        <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:6px;line-height:1.5">Smart Sugarcane Disease Detection<br>and Monitoring</div>
+        <div style="color:rgba(255,255,255,.5);font-size:11px;margin-top:32px">Nasugbu, Batangas</div>
+        <div style="margin-top:48px">
+          <button class="btn btn-accent" onclick="go('s-mobile-login')">Get Started →</button>
+        </div>
+        <div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:16px;font-family:var(--mono)">v1.0.0 · Capstone Prototype</div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: MOBILE LOGIN ══════════ -->
+    <div class="screen hidden" id="s-mobile-login">
+      <div class="app-header" style="border:none">
+        <h2>Sign In</h2>
+      </div>
+      <div class="auth-shell">
+        <div class="auth-card">
+          <div class="auth-brand">
+            <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+            <div class="auth-brand-label">CaneGuard Mobile</div>
+          </div>
+          <div class="auth-title">Welcome to CaneGuard</div>
+          <div class="auth-sub">Sign in to continue scanning, save reports, and sync records with MAO.</div>
+
+          <div class="field">
+            <label>Email</label>
+            <input id="mobile-login-email" type="email" placeholder="example@gmail.com"/>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="mobile-login-password" type="password" placeholder="Enter password"/>
+          </div>
+
+          <div class="auth-row">
+            <div class="flex items-center gap-8">
+              <div class="switch" id="mobile-remember-switch" onclick="this.classList.toggle('on')"></div>
+              <span class="text-xs text-muted">Remember me</span>
+            </div>
+            <button class="auth-link" onclick="go('s-mobile-forgot')">Forgot password?</button>
+          </div>
+
+          <button class="btn btn-primary" onclick="mobileLogin()">Sign In →</button>
+          <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-onboard')">Continue as Demo User</button>
+          <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.5">Prototype only: account validation is simulated.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: MOBILE FORGOT PASSWORD ══════════ -->
+    <div class="screen hidden" id="s-mobile-forgot">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-mobile-login')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Reset Password</h2>
+      </div>
+      <div class="auth-shell">
+        <div class="auth-card">
+          <div class="auth-brand">
+            <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+            <div class="auth-brand-label">Account Recovery</div>
+          </div>
+          <div class="auth-title" style="font-size:18px">Forgot your password?</div>
+          <div class="auth-sub">Enter your email and we will send a mock reset instruction for this static prototype.</div>
+          <div class="field">
+            <label>Email Address</label>
+            <input id="mobile-forgot-email" type="email" placeholder="you@example.com"/>
+          </div>
+          <button class="btn btn-primary" onclick="sendMobileReset()">Send Reset Link</button>
+          <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-mobile-login')">Back to Sign In</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: ONBOARDING ══════════ -->
+    <div class="screen hidden" id="s-onboard" style="background:var(--bg)">
+      <div class="flex-col justify-center p-24" style="flex:1">
+        <div id="onboard-slides">
+          <div id="ob1" class="text-center">
+            <div style="font-size:72px;margin-bottom:16px">🌿</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Detect Possible Diseases</div>
+            <div style="font-size:14px;color:var(--muted);line-height:1.7">Take or upload a photo of your sugarcane. Plant Patrol helps identify possible diseases quickly, even in the field.</div>
+          </div>
+          <div id="ob2" class="text-center" style="display:none">
+            <div style="font-size:72px;margin-bottom:16px">🔍</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Validate with Symptoms</div>
+            <div style="font-size:14px;color:var(--muted);line-height:1.7">Answer simple questions about what you see. Symptom checks improve confidence in possible disease detection.</div>
+          </div>
+          <div id="ob3" class="text-center" style="display:none">
+            <div style="font-size:72px;margin-bottom:16px">📡</div>
+            <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Works Offline Too</div>
+            <div style="font-size:14px;color:var(--muted);line-height:1.7">Save reports locally and sync later when connected. This supports fieldwork in low-signal areas.</div>
+          </div>
+        </div>
+        <div id="ob-dots" class="flex justify-center gap-8 mt-32">
+          <div id="od1" style="width:24px;height:6px;border-radius:999px;background:var(--primary)"></div>
+          <div id="od2" style="width:8px;height:6px;border-radius:999px;background:var(--border)"></div>
+          <div id="od3" style="width:8px;height:6px;border-radius:999px;background:var(--border)"></div>
+        </div>
+        <div class="action-stack mt-32">
+          <button class="btn btn-primary" id="ob-next-btn" onclick="onboardNext()">Next →</button>
+          <button class="btn btn-ghost btn-sm" onclick="go('s-role')">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: ROLE SELECTION ══════════ -->
+    <div class="screen hidden" id="s-role">
+      <div class="p-24 pt-32">
+        <div class="mb-32">
+          <div style="font-size:24px;font-weight:800;color:var(--text)">Who are you?</div>
+          <div style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.6">Select your role to get the right experience. This prototype supports assisted use by agricultural personnel.</div>
+        </div>
+        <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👨‍🌾</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--text)">Farmer</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Scan sugarcane plants and save reports from your farm.</div>
+          </div>
+        </div>
+        <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🔬</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--text)">Field Personnel</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Assist farmers and submit reports to the Agriculture Office.</div>
+          </div>
+        </div>
+        <div class="mt-24" style="padding:12px 16px;background:var(--surface);border-radius:var(--radius-sm);font-size:12px;color:var(--muted)">
+          You can change your role later in profile settings.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: HOME DASHBOARD ══════════ -->
+    <div class="screen hidden" id="s-home">
+      <div style="padding:16px 20px 14px;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;flex-shrink:0">
+        <div class="flex items-center justify-between">
+          <div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">Magandang umaga,</div>
+            <div style="font-size:20px;font-weight:800;color:#fff">Charish Bea 👋</div>
+          </div>
+          <div class="flex items-center gap-8">
+            <span class="chip chip-online" id="home-online-chip">Online</span>
+            <button class="icon-btn" onclick="go('s-profile')" style="background:rgba(255,255,255,.15)">
+              <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <button class="icon-btn" onclick="go('s-help')" style="background:rgba(255,255,255,.15)">
+              <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="mt-12" style="background:rgba(255,255,255,.12);border-radius:10px;padding:7px 12px;font-size:12px;color:rgba(255,255,255,.85)">
+          📍 Brgy. Cogunan, Nasugbu, Batangas
+        </div>
+      </div>
+
+      <div class="scroll-content">
+        <div class="section">
+          <div class="section-title">Quick Actions</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button class="btn btn-primary" onclick="go('s-guide')">📷 Start Scan</button>
+            <button class="btn btn-secondary" onclick="go('s-history')">🗂 My Records</button>
+            <button class="btn btn-ghost" onclick="go('s-queue')">📡 Sync Queue <span class="chip chip-queued">2</span></button>
+            <button class="btn btn-ghost" onclick="go('s-help')">❓ Help & FAQ</button>
+          </div>
+        </div>
+
+        <div style="margin:0 20px 12px;background:#FFF3E0;border:1px solid #FFD0A0;border-radius:var(--radius-sm);padding:12px 14px">
+          <div style="font-size:12px;font-weight:700;color:#BF360C">📡 2 unsent reports</div>
+          <div style="font-size:11px;color:#7F4000;margin-top:2px">Will sync automatically when online. <span style="text-decoration:underline;cursor:pointer" onclick="go('s-queue')">View queue</span></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Common Diseases - Quick Info</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Downy Mildew info - see Glossary')">
+              <div style="font-size:20px;margin-bottom:6px">🌫️</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Downy Mildew</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">White fuzz, yellow stripes</div>
+            </div>
+            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Sugarcane Smut info - see Glossary')">
+              <div style="font-size:20px;margin-bottom:6px">🖤</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Smut</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">Black whip-like growth</div>
+            </div>
+            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Mosaic Disease info - see Glossary')">
+              <div style="font-size:20px;margin-bottom:6px">🟡</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Mosaic Disease</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">Irregular color patterns</div>
+            </div>
+            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Sugarcane Rust info - see Glossary')">
+              <div style="font-size:20px;margin-bottom:6px">🔶</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Rust</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">Rust-colored spots on leaves</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Recent Activity</div>
+          <div class="card" onclick="go('s-history')" style="cursor:pointer">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-bold">Scan - Brgy. Wawa</div>
+                <div class="text-xs text-muted mt-8">July 12, 2025 - 10:23 AM</div>
+              </div>
+              <span class="chip chip-smut">Possible Smut</span>
+            </div>
+          </div>
+          <div class="card" onclick="go('s-history')" style="cursor:pointer">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-bold">Scan - Brgy. Cogunan</div>
+                <div class="text-xs text-muted mt-8">July 10, 2025 - 3:45 PM</div>
+              </div>
+              <span class="chip chip-healthy">Healthy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-btn active" onclick="goTab('home')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+        </button>
+        <button class="nav-btn" onclick="goTab('scan')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan
+        </button>
+        <button class="nav-btn" onclick="goTab('history')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records
+        </button>
+        <button class="nav-btn" onclick="goTab('settings')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+        </button>
+        <button class="nav-btn" onclick="mobileLogout()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: SCAN GUIDE ══════════ -->
+    <div class="screen hidden" id="s-guide">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Photo Guide</h2>
+        <button onclick="go('s-help')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px">Help</button>
+      </div>
+      <div class="step-bar"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <div style="background:var(--primary);border-radius:var(--radius);padding:20px;margin-bottom:16px;color:#fff;text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">📷</div>
+            <div style="font-size:16px;font-weight:700">Take a Clear Sugarcane Photo</div>
+            <div style="font-size:12px;opacity:.8;margin-top:4px">Get closer to the affected area for best results.</div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">✅ Do This</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="flex gap-12 items-center"><span style="font-size:18px">☀️</span><span class="text-sm">Take photo in good, natural lighting</span></div>
+              <div class="flex gap-12 items-center"><span style="font-size:18px">🔍</span><span class="text-sm">Focus on the leaf, stalk, or affected area</span></div>
+              <div class="flex gap-12 items-center"><span style="font-size:18px">📐</span><span class="text-sm">Hold phone 20–30 cm from the plant</span></div>
+              <div class="flex gap-12 items-center"><span style="font-size:18px">🖼️</span><span class="text-sm">Ensure the affected area fills most of the frame</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">❌ Avoid This</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="flex gap-12 items-center"><span style="font-size:18px">🌑</span><span class="text-sm text-danger">Dark or shadowy conditions</span></div>
+              <div class="flex gap-12 items-center"><span style="font-size:18px">💨</span><span class="text-sm text-danger">Blurry photos from moving the phone too fast</span></div>
+              <div class="flex gap-12 items-center"><span style="font-size:18px">↩️</span><span class="text-sm text-danger">Photo taken from too far away</span></div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--muted);border:1px dashed var(--border)">
+            💡 <strong>Tip:</strong> You can upload an existing photo from your gallery if you already took one.
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)">
+        <button class="btn btn-primary" onclick="go('s-capture')">Continue to Camera →</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: CAPTURE ══════════ -->
+    <div class="screen hidden" id="s-capture">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-guide')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Capture Photo</h2>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <!-- Mock Camera Frame -->
+          <div id="cam-preview" style="aspect-ratio:4/3;background:#1a1a1a;border-radius:var(--radius);overflow:hidden;position:relative;margin-bottom:12px;display:flex;align-items:center;justify-content:center;border:2px solid var(--border)">
+            <div id="cam-placeholder" style="text-align:center;color:rgba(255,255,255,.6)">
+              <div style="font-size:48px;margin-bottom:8px">📷</div>
+              <div style="font-size:12px">Camera preview</div>
+              <div style="font-size:10px;opacity:.5;margin-top:4px">(mock display)</div>
+            </div>
+            <img id="cam-img" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
+            <!-- Corner guides -->
+            <div style="position:absolute;top:12px;left:12px;width:24px;height:24px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:3px 0 0 0"></div>
+            <div style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 3px 0 0"></div>
+            <div style="position:absolute;bottom:12px;left:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 3px"></div>
+            <div style="position:absolute;bottom:12px;right:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 3px 0"></div>
+            <!-- Quality warning (hidden by default) -->
+            <div id="quality-warn" style="display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(191,54,12,.9);padding:8px 12px;font-size:11px;color:#fff;font-weight:600">
+              ⚠️ Photo may be too dark. Try better lighting.
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="mockCapture()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M20.94 11A8.994 8.994 0 1 1 12 3c.9 0 1.78.12 2.6.34"/><polyline points="22 4 12 14 9 11"/></svg>
+              Take Photo
+            </button>
+            <button class="btn btn-secondary" onclick="mockCapture()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+              Upload Photo
+            </button>
+          </div>
+
+          <div id="retake-section" style="display:none">
+            <button class="btn btn-ghost btn-sm w-full" onclick="retakePhoto()" style="margin-bottom:12px">↺ Retake Photo</button>
+            <button class="btn btn-primary" onclick="go('s-symptoms')">Use This Photo →</button>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">
+            Supported: JPG, PNG · Max 10MB
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: SYMPTOMS ══════════ -->
+    <div class="screen hidden" id="s-symptoms">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-capture')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Symptom Check</h2>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <div style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+            What do you see on the plant? Select all that apply. You can change your answers before continuing.
+          </div>
+
+          <div id="symptom-list">
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">🌿</div>
+              <div class="symptom-text">
+                <div class="label">Yellow or white stripes</div>
+                <div class="desc">Stripes running along the length of the leaf</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">🖤</div>
+              <div class="symptom-text">
+                <div class="label">Black whip-like growth</div>
+                <div class="desc">A dark, curved structure growing from the tip</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">🎨</div>
+              <div class="symptom-text">
+                <div class="label">Mosaic or patchy color</div>
+                <div class="desc">Irregular mix of green and yellow patches</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">🔶</div>
+              <div class="symptom-text">
+                <div class="label">Rust-colored spots</div>
+                <div class="desc">Small brown-orange spots scattered on leaves</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">💛</div>
+              <div class="symptom-text">
+                <div class="label">Drying or unusual discoloration</div>
+                <div class="desc">Leaves turning brown, dry, or off-color</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+            <div class="symptom-card" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">✅</div>
+              <div class="symptom-text">
+                <div class="label">None of the above</div>
+                <div class="desc">Plant looks healthy or I'm not sure</div>
+              </div>
+              <div class="check-circle"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px;background:var(--surface);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--muted)">
+            ℹ️ Selecting more symptoms helps improve accuracy. You can edit this before saving.
+          </div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)">
+        <button class="btn btn-primary" id="symptom-next" onclick="go('s-analyzing')" style="opacity:.5;pointer-events:none">Analyze →</button>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Select at least one symptom to continue</div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: ANALYZING ══════════ -->
+    <div class="screen hidden" id="s-analyzing" style="justify-content:center;align-items:center">
+      <div style="text-align:center;padding:32px">
+        <div style="position:relative;width:120px;height:120px;margin:0 auto 24px">
+          <div class="pulse-ring" style="position:absolute;inset:-16px;border-radius:50%;background:rgba(68,93,72,.12)"></div>
+          <div style="width:120px;height:120px;border-radius:50%;background:var(--surface);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;z-index:1">
+            <svg class="spin" width="48" height="48" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--border)" stroke-width="2"/><path d="M12 2a10 10 0 0 1 10 10" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Analyzing your photo…</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Checking photo and symptom inputs.<br>This usually takes a few seconds.</div>
+        <div style="margin:0 auto;max-width:240px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-align:left">Processing…</div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="analysis-progress" style="width:0%"></div></div>
+        </div>
+        <div style="margin-top:16px;background:var(--surface);border-radius:var(--radius-sm);padding:10px 16px;font-size:12px;color:var(--muted);max-width:260px;margin-left:auto;margin-right:auto">
+          📡 Working offline — results will use local analysis
+        </div>
+        <button class="btn btn-ghost btn-sm btn-fit btn-center mt-16" onclick="go('s-symptoms')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: RESULT ══════════ -->
+    <div class="screen hidden" id="s-result">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Detection Result</h2>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <!-- Result Card -->
+          <div class="result-card">
+            <div class="result-header">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px">Possible Disease Detected</div>
+              <div class="disease-name">Sugarcane Smut</div>
+              <div class="confidence">Symptom match: High (3 of 4 matching indicators)</div>
+            </div>
+            <div class="result-body">
+              <div class="section-title">Matched Symptoms</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth observed</span></div>
+                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying/discoloration detected</span></div>
+                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Photo shows dark formations</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Disclaimer -->
+          <div style="background:#FFF3E0;border:1px solid #FFD0A0;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;color:#BF360C;margin-bottom:4px">⚠️ Important Notice</div>
+            <div style="font-size:12px;color:#7F4000;line-height:1.6">This is a <strong>possible detection only</strong>, not a confirmed diagnosis. Please consult an agricultural technician for field verification before taking major action.</div>
+          </div>
+
+          <!-- Needs Review Fallback (comment - would show if confidence low) -->
+          <!-- <div class="card" style="border:2px solid var(--border)">
+            <div style="font-size:14px;font-weight:700;color:var(--text)">🤔 Needs Manual Review</div>
+            <div class="text-sm text-muted mt-8">The photo or symptoms were not clear enough for an accurate result. Please consult a field technician.</div>
+          </div> -->
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" onclick="go('s-advisory')">View Recommended Actions →</button>
+            <button class="btn btn-secondary" onclick="go('s-save')">Save Record</button>
+            <button class="btn btn-ghost btn-sm" onclick="go('s-guide')">↺ Scan Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: ADVISORY ══════════ -->
+    <div class="screen hidden" id="s-advisory">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-result')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Recommended Actions</h2>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <!-- Urgency -->
+          <div style="background:#FFEBEE;border-left:4px solid var(--danger);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
+            <div style="font-size:13px;font-weight:700;color:var(--danger)">🔴 High Urgency — Immediate Attention Needed</div>
+            <div style="font-size:12px;color:#7F0000;margin-top:4px">Sugarcane Smut spreads quickly. Isolate affected plants now.</div>
+          </div>
+
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Step-by-step Actions</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="flex gap-12">
+                <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+                <div><div class="text-sm font-bold">Isolate affected stalks</div><div class="text-xs text-muted mt-8">Remove and bag plants showing black whip growth. Do not leave them in the field.</div></div>
+              </div>
+              <div class="flex gap-12">
+                <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+                <div><div class="text-sm font-bold">Do not use cuttings</div><div class="text-xs text-muted mt-8">Avoid using seed canes from affected areas to prevent spreading the disease.</div></div>
+              </div>
+              <div class="flex gap-12">
+                <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+                <div><div class="text-sm font-bold">Seek field verification</div><div class="text-xs text-muted mt-8">Contact the Municipal Agriculture Office or a field technician for on-site confirmation.</div></div>
+              </div>
+              <div class="flex gap-12">
+                <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+                <div><div class="text-sm font-bold">Submit a report</div><div class="text-xs text-muted mt-8">Save and submit this detection to help the MAO track disease spread in Nasugbu.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:var(--surface2)">
+            <div class="section-title">MAO Contact — Nasugbu</div>
+            <div class="text-sm">Municipal Agriculture Office</div>
+            <div class="text-xs text-muted mt-8">Brgy. Poblacion, Nasugbu, Batangas</div>
+            <div class="text-xs text-muted">Tel: (043) 416-XXXX</div>
+          </div>
+
+          <button class="btn btn-primary" onclick="go('s-save')">Save and Submit Report →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: SAVE / REPORT ══════════ -->
+    <div class="screen hidden" id="s-save">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-advisory')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Save Report</h2>
+      </div>
+      <div class="scroll-content">
+        <div id="save-form-view">
+          <div class="section">
+            <div class="card">
+              <div class="section-title">Detection Summary</div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-bold">Sugarcane Smut</span>
+                <span class="chip chip-smut">Possible</span>
+              </div>
+              <div class="text-xs text-muted mt-8">July 12, 2025 · 10:23 AM</div>
+            </div>
+            <div class="field"><label>Barangay</label>
+              <select><option>Brgy. Cogunan</option><option>Brgy. Wawa</option><option>Brgy. Mataas na Lupa</option><option>Brgy. Bilaran</option><option>Brgy. Balaytigue</option><option>Brgy. Looc</option></select>
+            </div>
+            <div class="field"><label>Farmer Name (optional)</label><input type="text" placeholder="e.g. Juan dela Cruz"/></div>
+            <div class="field"><label>Additional Notes (optional)</label><textarea placeholder="e.g. North side of the field, row 3…"></textarea></div>
+            <div class="divider"></div>
+            <div class="flex gap-12 mb-12">
+              <div style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);text-align:center;cursor:pointer" onclick="saveLocal()">
+                <div style="font-size:18px">💾</div>
+                <div class="text-xs font-bold mt-8">Save Locally</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">No internet needed</div>
+              </div>
+              <div style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--primary);text-align:center;cursor:pointer" onclick="saveAndQueue()">
+                <div style="font-size:18px">📡</div>
+                <div class="text-xs font-bold mt-8">Submit / Queue</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Sync to MAO later</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Success State -->
+        <div id="save-success-view" style="display:none;flex:1;justify-content:center;align-items:center;padding:40px 24px;flex-direction:column;text-align:center">
+          <div style="width:72px;height:72px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px">✅</div>
+          <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">Report Saved!</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Your report has been added to the sync queue. It will be submitted to the MAO when you're online.</div>
+          <button class="btn btn-primary" onclick="go('s-home')">Back to Home</button>
+          <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-guide')">Scan Another Plant</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: OFFLINE QUEUE ══════════ -->
+    <div class="screen hidden" id="s-queue">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Sync Queue</h2>
+      </div>
+      <div class="offline-banner">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.54 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+        Currently offline — reports saved locally
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="text-sm font-bold">2 reports waiting</div>
+            <button class="btn btn-secondary btn-sm btn-fit" onclick="mockSync()">Send Now</button>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between mb-8">
+              <div class="text-sm font-bold">Scan — Brgy. Wawa</div>
+              <span class="chip chip-queued">Queued</span>
+            </div>
+            <div class="text-xs text-muted">Possible Smut · July 12, 2025 · 10:23 AM</div>
+          </div>
+          <div class="card">
+            <div class="flex items-center justify-between mb-8">
+              <div class="text-sm font-bold">Scan — Brgy. Cogunan</div>
+              <span class="chip chip-queued">Queued</span>
+            </div>
+            <div class="text-xs text-muted">Possible Rust · July 10, 2025 · 2:14 PM</div>
+          </div>
+
+          <div style="background:var(--surface);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--muted);border:1px dashed var(--border);text-align:center">
+            📡 Reports sync automatically when internet is restored.<br>Your data is safe on this device.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: HISTORY ══════════ -->
+    <div class="screen hidden" id="s-history">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>My Records</h2>
+      </div>
+      <div style="padding:10px 20px;background:var(--bg);flex-shrink:0;border-bottom:1px solid var(--border)">
+        <input id="history-search" type="text" oninput="applyHistoryFilters()" placeholder="🔍 Search records…" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
+        <div style="display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding-bottom:4px">
+          <button class="btn btn-primary history-filter-btn filter-pill" onclick="setHistoryFilter('all', this)">All</button>
+          <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('smut', this)">Smut</button>
+          <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('rust', this)">Rust</button>
+          <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('mildew', this)">Mildew</button>
+          <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('mosaic', this)">Mosaic</button>
+          <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('healthy', this)">Healthy</button>
+        </div>
+      </div>
+      <div class="scroll-content">
+        <div style="padding:12px 20px">
+          <div class="section-title">July 2025</div>
+
+          <div class="card history-record" data-disease="smut" data-status="queued" data-search="brgy. wawa july 12 maria santos" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Brgy. Wawa</div><div class="text-xs text-muted">July 12 · 10:23 AM</div></div>
+              <span class="chip chip-smut">Possible Smut</span>
+            </div>
+            <div class="flex items-center gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span><span style="font-size:11px;color:var(--muted)">Awaiting sync</span></div>
+          </div>
+
+          <div class="card history-record" data-disease="healthy" data-status="sent" data-search="brgy. cogunan july 10 maria santos" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Brgy. Cogunan</div><div class="text-xs text-muted">July 10 · 3:45 PM</div></div>
+              <span class="chip chip-healthy">Healthy</span>
+            </div>
+            <div class="flex items-center gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span><span style="font-size:11px;color:var(--muted)">Synced to MAO</span></div>
+          </div>
+
+          <div class="card history-record" data-disease="rust" data-status="sent" data-search="brgy. mataas na lupa july 8 pedro" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Brgy. Mataas na Lupa</div><div class="text-xs text-muted">July 8 · 8:05 AM</div></div>
+              <span class="chip chip-rust">Possible Rust</span>
+            </div>
+            <div class="flex items-center gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span><span style="font-size:11px;color:var(--muted)">Reviewed by MAO</span></div>
+          </div>
+
+          <div class="card history-record" data-disease="mildew" data-status="queued" data-search="brgy. bilaran july 5 manual review" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Brgy. Bilaran</div><div class="text-xs text-muted">July 5 · 1:12 PM</div></div>
+              <span class="chip chip-mildew">Possible Mildew</span>
+            </div>
+            <div class="flex items-center gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span><span style="font-size:11px;color:var(--muted)">Awaiting sync</span></div>
+          </div>
+
+          <div id="history-empty" class="empty-state" style="display:none;padding:28px 10px">
+            <div class="icon">📂</div>
+            <h3>No matching records</h3>
+            <p>Try another keyword or switch to a different filter.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goTab('home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+        <button class="nav-btn" onclick="goTab('scan')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan</button>
+        <button class="nav-btn active" onclick="goTab('history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records</button>
+        <button class="nav-btn" onclick="goTab('settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+        <button class="nav-btn" onclick="mobileLogout()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: RECORD DETAIL ══════════ -->
+    <div class="screen hidden" id="s-record-detail">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Record Detail</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+          <!-- Mock image -->
+          <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#2d5a30,#4a8b4e);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:13px;position:relative;overflow:hidden">
+            <div style="text-align:center"><div style="font-size:36px;margin-bottom:4px">🌾</div><div>Sugarcane photo — Brgy. Wawa</div></div>
+            <span class="chip chip-smut" style="position:absolute;top:12px;right:12px">Possible Smut</span>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Detection Info</div>
+            <table style="width:100%;font-size:13px;border-collapse:collapse">
+              <tr><td style="padding:6px 0;color:var(--muted);width:40%">Date</td><td style="font-weight:600">July 12, 2025 · 10:23 AM</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Barangay</td><td style="font-weight:600">Brgy. Wawa</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Farmer</td><td style="font-weight:600">Juan dela Cruz</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Status</td><td><span class="chip chip-queued">Queued</span></td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Submitted by</td><td style="font-weight:600">Maria Santos</td></tr>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Symptoms Reported</div>
+            <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth</span></div>
+            <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying or unusual discoloration</span></div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Notes</div>
+            <div class="text-sm text-muted">North side of the field, row 3. Several affected stalks observed.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" onclick="showToast('Report submitted to sync queue')">Submit to MAO</button>
+            <button class="btn btn-ghost btn-sm" onclick="confirmDelete()">🗑 Delete Record</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: HELP / FAQ ══════════ -->
+    <div class="screen hidden" id="s-help">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Help & FAQ</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+          <div class="card" style="background:var(--primary);color:#fff">
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px">📸 How to Take a Good Photo</div>
+            <div style="font-size:12px;opacity:.85;line-height:1.6">Hold your phone 20–30 cm from the plant in good natural light. Focus on the affected leaf or stalk. Avoid shadows and blurry shots.</div>
+          </div>
+
+          <div class="section-title mt-12">Frequently Asked Questions</div>
+
+          <div class="card" onclick="this.querySelector('.faq-ans').style.display=this.querySelector('.faq-ans').style.display=='block'?'none':'block'" style="cursor:pointer">
+            <div class="flex justify-between items-center"><div class="text-sm font-bold">What does "Possible disease detected" mean?</div><span>▾</span></div>
+            <div class="faq-ans" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">It means the app found indicators that could suggest a disease — but this is not a confirmed diagnosis. Always consult an agricultural technician before taking major action.</div>
+          </div>
+
+          <div class="card" onclick="this.querySelector('.faq-ans').style.display=this.querySelector('.faq-ans').style.display=='block'?'none':'block'" style="cursor:pointer">
+            <div class="flex justify-between items-center"><div class="text-sm font-bold">Can I use this app without internet?</div><span>▾</span></div>
+            <div class="faq-ans" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">Yes. Scans and records are saved locally. Reports will be queued and submitted to the MAO automatically once you reconnect.</div>
+          </div>
+
+          <div class="card" onclick="this.querySelector('.faq-ans').style.display=this.querySelector('.faq-ans').style.display=='block'?'none':'block'" style="cursor:pointer">
+            <div class="flex justify-between items-center"><div class="text-sm font-bold">My photo was rejected. What should I do?</div><span>▾</span></div>
+            <div class="faq-ans" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">Try retaking the photo in better lighting. Make sure the affected area fills most of the frame. Avoid blurry or dark images.</div>
+          </div>
+
+          <div class="section-title mt-16">Disease Glossary</div>
+
+          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🌫️</span><div class="text-sm font-bold">Downy Mildew</div></div><div class="text-xs text-muted">Caused by Peronosclerospora sacchari. Shows white downy growth on underside of leaves, yellow stripes on top surface.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🖤</span><div class="text-sm font-bold">Sugarcane Smut</div></div><div class="text-xs text-muted">Caused by Sporisorium scitamineum. Infected stalks produce a black whip-like structure. Spreads via infected seed canes.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🎨</span><div class="text-sm font-bold">Mosaic Disease</div></div><div class="text-xs text-muted">Caused by Sugarcane mosaic virus (SCMV). Creates alternating green and yellow patches on leaves. Spread by aphids.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🔶</span><div class="text-sm font-bold">Sugarcane Rust</div></div><div class="text-xs text-muted">Caused by Puccinia melanocephala. Shows rust-colored or brown pustules on leaves, mainly in cool and humid conditions.</div></div>
+
+          <div class="card" style="background:var(--surface2)">
+            <div class="text-sm font-bold mb-8">📞 Need more help?</div>
+            <div class="text-xs text-muted">Contact the Municipal Agriculture Office of Nasugbu, Batangas at (043) 416-XXXX or visit Brgy. Poblacion.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: SETTINGS ══════════ -->
+    <div class="screen hidden" id="s-settings">
+      <div class="app-header" style="border:none">
+        <h2>Settings</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+          <div class="section-title">Display & Accessibility</div>
+          <div class="card mb-0" style="border-radius:var(--radius) var(--radius) 0 0;margin-bottom:1px">
+            <div class="flex items-center justify-between">
+              <div><div class="text-sm font-bold">Language / Wika</div><div class="text-xs text-muted mt-8">English / Filipino</div></div>
+              <select style="border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:6px 10px;font-family:var(--font);font-size:12px;background:var(--bg)"><option>English</option><option>Filipino</option></select>
+            </div>
+          </div>
+          <div class="card mb-0" style="border-radius:0;margin-bottom:1px">
+            <div class="flex items-center justify-between">
+              <div><div class="text-sm font-bold">Text Size</div><div class="text-xs text-muted mt-8">Normal</div></div>
+              <select style="border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:6px 10px;font-family:var(--font);font-size:12px;background:var(--bg)"><option>Normal</option><option>Large</option><option>Extra Large</option></select>
+            </div>
+          </div>
+          <div class="card" style="border-radius:0 0 var(--radius) var(--radius)">
+            <div class="flex items-center justify-between">
+              <div><div class="text-sm font-bold">High Contrast Mode</div><div class="text-xs text-muted mt-8">Easier to read outdoors</div></div>
+              <div class="switch" id="contrast-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+
+          <div class="section-title mt-16">Notifications</div>
+          <div class="card">
+            <div class="flex items-center justify-between mb-12">
+              <div><div class="text-sm font-bold">Sync Alerts</div><div class="text-xs text-muted mt-8">Notify when reports are sent</div></div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div><div class="text-sm font-bold">MAO Advisories</div><div class="text-xs text-muted mt-8">Disease alerts from the Agriculture Office</div></div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+
+          <div class="section-title mt-16">Account & Security</div>
+          <div class="card">
+            <div class="flex items-center justify-between mb-12">
+              <div><div class="text-sm font-bold">Profile Settings</div><div class="text-xs text-muted mt-8">Edit name, email, password, and contact details</div></div>
+              <button class="btn btn-secondary btn-sm btn-fit" onclick="go('s-profile')">Manage</button>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="mobileLogout()">Logout</button>
+          </div>
+
+          <div class="section-title mt-16">About</div>
+          <div class="card">
+            <div class="flex items-center justify-between mb-8"><span class="text-sm text-muted">App Name</span><span class="text-sm font-bold">CaneGuard</span></div>
+            <div class="flex items-center justify-between mb-8"><span class="text-sm text-muted">Version</span><span class="text-sm font-bold" style="font-family:var(--mono)">v1.0.0-prototype</span></div>
+            <div class="flex items-center justify-between mb-8"><span class="text-sm text-muted">Project</span><span class="text-sm font-bold">CaneGuard Capstone</span></div>
+            <div class="flex items-center justify-between"><span class="text-sm text-muted">Location</span><span class="text-sm font-bold">Nasugbu, Batangas</span></div>
+          </div>
+          <div style="background:#FFF3E0;border-radius:var(--radius-sm);padding:12px;font-size:11px;color:#7F4000;text-align:center;line-height:1.6">
+            ⚠️ This is a static prototype for capstone presentation only. No real ML model, backend, or data transmission is active.
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goTab('home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+        <button class="nav-btn" onclick="goTab('scan')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan</button>
+        <button class="nav-btn" onclick="goTab('history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records</button>
+        <button class="nav-btn active" onclick="goTab('settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+        <button class="nav-btn" onclick="mobileLogout()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: MOBILE PROFILE ══════════ -->
+    <div class="screen hidden" id="s-profile">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>My Profile</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+          <div class="card account-form">
+            <div class="section-title">Account Information</div>
+            <div class="spacer">&nbsp;</div>
+            <div class="field"><label>Full Name</label><input type="text" value="Maria Santos"/></div>
+            <div class="field"><label>Email</label><input type="email" value="example@gmail.com"/></div>
+            <div class="field"><label>Mobile Number</label><input type="text" value="0917-555-2121"/></div>
+            <div class="field"><label>Role</label><select><option>Field Personnel</option><option>Farmer</option></select></div>
+          </div>
+
+          <div class="card account-form">
+            <div class="section-title">Change Password</div>
+            <div class="spacer">&nbsp;</div>
+            <div class="field"><label>Current Password</label><input type="password" placeholder="Current password"/></div>
+            <div class="field"><label>New Password</label><input type="password" placeholder="New password"/></div>
+            <div class="field"><label>Confirm New Password</label><input type="password" placeholder="Confirm new password"/></div>
+            <div class="account-actions">
+              <button class="btn btn-primary btn-sm" onclick="saveMobileProfile()">Save Changes</button>
+              <button class="btn btn-ghost btn-sm" onclick="go('s-settings')">Cancel</button>
+            </div>
+          </div>
+
+          <button class="btn btn-danger" onclick="mobileLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #screen -->
+</div><!-- end #device -->
+
+
+<!-- ════════════════════════ MAO DASHBOARD ════════════════════ -->
+<div id="mao-shell">
+  <!-- Topbar -->
+  <div class="mao-topbar">
+    <div class="brand brand-inline">
+      <span class="brand-logo-chip"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-white"/></span>
+      <span>CaneGuard - MAO Dashboard</span>
+    </div>
+    <div class="right">
+      <span style="opacity:.7">Municipal Agriculture Office · Nasugbu, Batangas</span>
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+    </div>
+  </div>
+
+  <div id="mao-login-view" style="display:flex;flex:1;align-items:center;justify-content:center;padding:28px;background:linear-gradient(145deg,#f5f8f5,#edf3ee)">
+    <div class="auth-card" style="max-width:430px">
+      <div class="auth-brand">
+        <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+        <div class="auth-brand-label">CaneGuard MAO</div>
+      </div>
+      <div class="auth-title">MAO Dashboard Login</div>
+      <div class="auth-sub">Sign in to view reports, analytics, and advisories for Nasugbu, Batangas.</div>
+      <div class="field"><label>Office Email</label><input id="mao-login-email" type="email" placeholder="mao.nasugbu@gov.ph"/></div>
+      <div class="field"><label>Password</label><input id="mao-login-password" type="password" placeholder="Enter dashboard password"/></div>
+      <div class="auth-row">
+        <div class="flex items-center gap-8">
+          <div class="switch" id="mao-remember-switch" onclick="this.classList.toggle('on')"></div>
+          <span class="text-xs text-muted">Remember me</span>
+        </div>
+        <button class="auth-link" onclick="openMaoForgot()">Forgot password?</button>
+      </div>
+      <button class="btn btn-primary" onclick="maoLogin()">Sign In to Dashboard</button>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted)">Static prototype: authentication flow is simulated.</div>
+    </div>
+  </div>
+
+  <div id="mao-forgot-view" style="display:none;flex:1;align-items:center;justify-content:center;padding:28px;background:linear-gradient(145deg,#f5f8f5,#edf3ee)">
+    <div class="auth-card" style="max-width:430px">
+      <div class="auth-brand">
+        <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+        <div class="auth-brand-label">Account Recovery</div>
+      </div>
+      <div class="auth-title" style="font-size:20px">Forgot MAO Password</div>
+      <div class="auth-sub">Enter your office email to receive a mock reset link for this prototype.</div>
+      <div class="field"><label>Office Email</label><input id="mao-forgot-email" type="email" placeholder="mao.nasugbu@gov.ph"/></div>
+      <button class="btn btn-primary" onclick="sendMaoReset()">Send Reset Link</button>
+      <button class="btn btn-ghost btn-sm mt-10" onclick="backToMaoLogin()">Back to Login</button>
+    </div>
+  </div>
+
+  <div class="mao-layout" id="mao-app" style="display:none">
+    <!-- Sidebar -->
+    <div class="mao-sidebar">
+      <div style="padding:12px 20px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Navigation</div>
+      <div class="mao-nav-item active" onclick="maoTab('overview')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Overview
+      </div>
+      <div class="mao-nav-item" onclick="maoTab('reports')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Reports
+      </div>
+      <div class="mao-nav-item" onclick="maoTab('report-detail')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Report Detail
+      </div>
+      <div class="mao-nav-item" onclick="maoTab('barangay')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Barangay Summary
+      </div>
+      <div class="mao-nav-item" onclick="maoTab('advisory')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Advisory Panel
+      </div>
+      <div class="mao-nav-item" onclick="maoTab('profile')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </div>
+      <div class="mao-nav-item" onclick="maoLogout()">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </div>
+      <div style="margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);margin-top:16px">
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">Logged in as:<br><strong style="color:var(--text)">Engr. Reyes, MAO</strong></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);font-family:var(--mono)">Prototype Mode</div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="mao-content">
+
+      <!-- OVERVIEW -->
+      <div class="mao-panel active" id="mao-overview">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Dashboard Overview</div>
+          <div style="font-size:13px;color:var(--muted)">Nasugbu, Batangas · July 2025</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card"><div class="value">47</div><div class="label">Total Reports</div></div>
+          <div class="stat-card"><div class="value" style="color:var(--warning)">12</div><div class="label">Queued / Unreviewed</div></div>
+          <div class="stat-card"><div class="value" style="color:var(--danger)">18</div><div class="label">Possible Disease Cases</div></div>
+          <div class="stat-card"><div class="value" style="color:var(--success)">29</div><div class="label">Reviewed</div></div>
+        </div>
+
+        <!-- Most reported diseases -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Disease Breakdown</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div><div class="flex justify-between text-sm mb-8"><span>Sugarcane Smut</span><span class="font-bold">14</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:78%;background:#7B1FA2"></div></div></div>
+              <div><div class="flex justify-between text-sm mb-8"><span>Downy Mildew</span><span class="font-bold">10</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:56%;background:#1565C0"></div></div></div>
+              <div><div class="flex justify-between text-sm mb-8"><span>Mosaic Disease</span><span class="font-bold">8</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:44%;background:#F57F17"></div></div></div>
+              <div><div class="flex justify-between text-sm mb-8"><span>Sugarcane Rust</span><span class="font-bold">6</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:33%;background:#BF360C"></div></div></div>
+              <div><div class="flex justify-between text-sm mb-8"><span>Healthy</span><span class="font-bold">9</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:50%;background:#2E7D32"></div></div></div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Top Barangays Reporting</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Wawa</div><div class="text-xs text-muted">11 reports</div></div><span class="chip chip-smut">High: Smut</span></div>
+              <div class="divider"></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Cogunan</div><div class="text-xs text-muted">9 reports</div></div><span class="chip chip-mildew">High: Mildew</span></div>
+              <div class="divider"></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Bilaran</div><div class="text-xs text-muted">7 reports</div></div><span class="chip chip-mosaic">High: Mosaic</span></div>
+              <div class="divider"></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Mataas na Lupa</div><div class="text-xs text-muted">6 reports</div></div><span class="chip chip-rust">High: Rust</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="chart-card">
+            <div class="chart-title">Weekly Case Volume</div>
+            <div class="chart-bars">
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:34%;background:#6E8B74"></div></div><div class="chart-meta">Wk1</div><div class="chart-val">9</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:52%;background:#5E7A65"></div></div><div class="chart-meta">Wk2</div><div class="chart-val">14</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:86%;background:#B94040"></div></div><div class="chart-meta">Wk3</div><div class="chart-val">23</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:62%;background:#445D48"></div></div><div class="chart-meta">Wk4</div><div class="chart-val">17</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Processing Performance</div>
+            <div class="trend-row"><div class="trend-label">Same-day review</div><div class="trend-track"><div class="trend-fill" style="width:61%;background:var(--success)"></div></div><div class="chart-val">61%</div></div>
+            <div class="trend-row"><div class="trend-label">2-3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--warning)"></div></div><div class="chart-val">27%</div></div>
+            <div class="trend-row"><div class="trend-label">Backlog over 3d</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--danger)"></div></div><div class="chart-val">12%</div></div>
+            <div class="divider"></div>
+            <div class="text-xs text-muted">Peak inflow: Tuesday and Friday morning uploads from Brgy. Wawa and Brgy. Cogunan.</div>
+          </div>
+        </div>
+
+        <!-- Recent reports -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+          <div class="flex justify-between items-center mb-16">
+            <div style="font-size:14px;font-weight:700">Recent Reports</div>
+            <button class="btn btn-secondary btn-sm btn-fit" onclick="maoTab('reports')">View All</button>
+          </div>
+          <table class="mao-table">
+            <thead><tr><th>Date</th><th>Barangay</th><th>Disease</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr onclick="maoTab('report-detail')"><td>Jul 12, 2025</td><td>Brgy. Wawa</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td></tr>
+              <tr onclick="maoTab('report-detail')"><td>Jul 11, 2025</td><td>Brgy. Cogunan</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td></tr>
+              <tr onclick="maoTab('report-detail')"><td>Jul 10, 2025</td><td>Brgy. Bilaran</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td></tr>
+              <tr onclick="maoTab('report-detail')"><td>Jul 9, 2025</td><td>Brgy. Mataas na Lupa</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REPORTS LIST -->
+      <div class="mao-panel" id="mao-reports">
+        <div class="flex justify-between items-center mb-16" style="flex-wrap:wrap;gap:12px">
+          <div><div style="font-size:22px;font-weight:800;color:var(--text)">All Reports</div><div style="font-size:13px;color:var(--muted)">47 total · Nasugbu, Batangas</div></div>
+          <div class="flex gap-12">
+            <input id="mao-report-search" type="text" oninput="applyMaoFilters()" placeholder="🔍 Search…" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none;min-width:180px"/>
+            <button class="btn btn-ghost btn-sm btn-fit">Export ↓</button>
+          </div>
+        </div>
+
+        <!-- Filter chips -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('all', this)">All</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('smut', this)">Smut</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('mildew', this)">Mildew</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('rust', this)">Rust</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('mosaic', this)">Mosaic</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('healthy', this)">Healthy</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('queued', this)">Queued</button>
+          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('reviewed', this)">Reviewed</button>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+          <table class="mao-table">
+            <thead><tr><th>#</th><th>Date</th><th>Barangay</th><th>Reporter</th><th>Disease</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="mao-reports-body">
+              <tr class="mao-report-row" data-disease="smut" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-047</td><td>Jul 12</td><td>Brgy. Wawa</td><td>Maria S.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="mildew" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-046</td><td>Jul 11</td><td>Brgy. Cogunan</td><td>Jose R.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="healthy" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-045</td><td>Jul 10</td><td>Brgy. Bilaran</td><td>Ana L.</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="rust" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-044</td><td>Jul 9</td><td>Brgy. Mataas na Lupa</td><td>Pedro M.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="mosaic" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-043</td><td>Jul 8</td><td>Brgy. Looc</td><td>Maria S.</td><td><span class="chip chip-mosaic">Possible Mosaic</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="smut" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-042</td><td>Jul 7</td><td>Brgy. Wawa</td><td>Jose R.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-disease="mildew" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-041</td><td>Jul 6</td><td>Brgy. Balaytigue</td><td>Ana L.</td><td><span class="chip chip-unclear">Needs Review</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="mao-reports-empty" class="empty-state" style="display:none;padding:24px 10px">
+          <div class="icon">🗂️</div>
+          <h3>No reports found</h3>
+          <p>Try different filters or update your search keyword.</p>
+        </div>
+      </div>
+
+      <!-- REPORT DETAIL -->
+      <div class="mao-panel" id="mao-report-detail">
+        <div class="flex items-center gap-12 mb-20">
+          <button onclick="maoTab('reports')" class="btn btn-ghost btn-sm btn-fit">← Back</button>
+          <div><div style="font-size:20px;font-weight:800;color:var(--text)">Report RPT-047</div><div style="font-size:13px;color:var(--muted)">Submitted July 12, 2025 · 10:23 AM</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <!-- Mock image -->
+            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#2d5a30,#4a8b4e);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5)">
+              <div style="text-align:center"><div style="font-size:48px">🌾</div><div style="font-size:13px">Submitted photo — Brgy. Wawa</div></div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+              <div class="section-title">Symptoms Reported</div>
+              <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth</span></div>
+              <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying or unusual discoloration</span></div>
+              <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Yellow or white stripes observed</span></div>
+            </div>
+          </div>
+          <div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+              <div class="section-title">Detection Summary</div>
+              <div class="flex items-center justify-between mb-12">
+                <span style="font-size:16px;font-weight:800">Sugarcane Smut</span>
+                <span class="chip chip-smut">Possible</span>
+              </div>
+              <table style="width:100%;font-size:13px;border-collapse:collapse">
+                <tr><td style="padding:5px 0;color:var(--muted);width:45%">Barangay</td><td class="font-bold">Brgy. Wawa</td></tr>
+                <tr><td style="padding:5px 0;color:var(--muted)">Reporter</td><td class="font-bold">Maria Santos</td></tr>
+                <tr><td style="padding:5px 0;color:var(--muted)">Farmer</td><td class="font-bold">Juan dela Cruz</td></tr>
+                <tr><td style="padding:5px 0;color:var(--muted)">Role</td><td class="font-bold">Field Personnel</td></tr>
+                <tr><td style="padding:5px 0;color:var(--muted)">Sync Status</td><td><span class="chip chip-queued">Queued</span></td></tr>
+              </table>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+              <div class="section-title">Notes from Field</div>
+              <div class="text-sm text-muted">North side of the field, row 3. Several affected stalks observed. Farmer reports symptoms appeared within the last 2 weeks.</div>
+            </div>
+            <div style="background:#FFF3E0;border:1px solid #FFD0A0;border-radius:var(--radius);padding:16px;margin-bottom:16px">
+              <div class="section-title" style="color:#BF360C">Advisory (Auto-generated)</div>
+              <div class="text-sm" style="color:#7F4000">Isolate affected stalks. Do not use seed canes from this area. Recommend field verification by an agricultural technician within 3–5 days.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-primary btn-sm" onclick="showMAOToast('Report marked as reviewed')">✅ Mark as Reviewed</button>
+              <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Flagged for field check')">🚩 Flag for Field Check</button>
+              <button class="btn btn-ghost btn-sm" onclick="showMAOToast('Summary downloaded (mock)')">⬇ Download Summary</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BARANGAY SUMMARY -->
+      <div class="mao-panel" id="mao-barangay">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Barangay Monitoring</div>
+          <div style="font-size:13px;color:var(--muted)">Disease spread overview · Nasugbu, Batangas · July 2025</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+          <div style="background:var(--surface);border:2px solid var(--danger);border-radius:var(--radius);padding:16px;position:relative">
+            <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--danger)"></div>
+            <div class="font-bold" style="font-size:15px">Brgy. Wawa</div>
+            <div class="text-xs text-muted mb-8">11 reports · 🔴 High priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:92%;background:var(--danger)"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-smut" style="font-size:10px">Smut x8</span></div>
+          </div>
+          <div style="background:var(--surface);border:2px solid var(--warning);border-radius:var(--radius);padding:16px;position:relative">
+            <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--warning)"></div>
+            <div class="font-bold" style="font-size:15px">Brgy. Cogunan</div>
+            <div class="text-xs text-muted mb-8">9 reports · 🟡 Medium priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:75%;background:var(--warning)"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-mildew" style="font-size:10px">Mildew x6</span></div>
+          </div>
+          <div style="background:var(--surface);border:2px solid var(--warning);border-radius:var(--radius);padding:16px;position:relative">
+            <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--warning)"></div>
+            <div class="font-bold" style="font-size:15px">Brgy. Bilaran</div>
+            <div class="text-xs text-muted mb-8">7 reports · 🟡 Medium priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:58%;background:var(--warning)"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-mosaic" style="font-size:10px">Mosaic x5</span></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <div class="font-bold" style="font-size:15px">Brgy. Mataas na Lupa</div>
+            <div class="text-xs text-muted mb-8">6 reports · 🟢 Low priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:50%"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-rust" style="font-size:10px">Rust x4</span></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <div class="font-bold" style="font-size:15px">Brgy. Looc</div>
+            <div class="text-xs text-muted mb-8">5 reports · 🟢 Low priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:42%"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-mosaic" style="font-size:10px">Mosaic x3</span></div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <div class="font-bold" style="font-size:15px">Brgy. Balaytigue</div>
+            <div class="text-xs text-muted mb-8">4 reports · 🟢 Low priority</div>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width:33%"></div></div>
+            <div style="margin-top:8px"><span class="chip chip-unclear" style="font-size:10px">Unclear x2</span></div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">📊 Monthly Trend (Mock)</div>
+          <div class="text-xs text-muted mb-16">Weekly reports vs resolved cases — July 2025</div>
+          <div class="chart-bars" style="height:150px;margin-bottom:10px">
+            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:35%;background:var(--primary-light)"></div></div><div class="chart-meta">Wk1</div><div class="chart-val">11</div></div>
+            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:56%;background:var(--primary)"></div></div><div class="chart-meta">Wk2</div><div class="chart-val">17</div></div>
+            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:91%;background:var(--danger)"></div></div><div class="chart-meta">Wk3</div><div class="chart-val">28</div></div>
+            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:63%;background:#3A7D44"></div></div><div class="chart-meta">Wk4</div><div class="chart-val">19</div></div>
+          </div>
+          <div class="trend-row"><div class="trend-label">Resolved in week</div><div class="trend-track"><div class="trend-fill" style="width:68%;background:var(--success)"></div></div><div class="chart-val">68%</div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">Week 3 peaked strongly, then cases dropped after targeted advisories in Brgy. Wawa.</div>
+        </div>
+      </div>
+
+      <!-- PROFILE PANEL -->
+      <div class="mao-panel" id="mao-profile">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">My Profile</div>
+          <div style="font-size:13px;color:var(--muted)">Manage MAO account details and dashboard credentials</div>
+        </div>
+
+        <div class="mao-profile-grid">
+          <div class="chart-card account-form">
+            <div class="chart-title">Account Details</div>
+            <div class="field"><label>Full Name</label><input type="text" value="Engr. Lea Reyes"/></div>
+            <div class="field"><label>Office Email</label><input type="email" value="mao.nasugbu@gov.ph"/></div>
+            <div class="field"><label>Contact Number</label><input type="text" value="(043) 416-1122"/></div>
+            <div class="field"><label>Role</label><select><option>MAO Admin</option><option>MAO Analyst</option><option>Field Coordinator</option></select></div>
+            <button class="btn btn-primary btn-sm" onclick="showMAOToast('Profile updated (mock)')">Save Profile</button>
+          </div>
+
+          <div class="chart-card account-form">
+            <div class="chart-title">Security</div>
+            <div class="field"><label>Current Password</label><input type="password" placeholder="Current password"/></div>
+            <div class="field"><label>New Password</label><input type="password" placeholder="New password"/></div>
+            <div class="field"><label>Confirm New Password</label><input type="password" placeholder="Confirm password"/></div>
+            <div class="account-actions">
+              <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Password change submitted (mock)')">Change Password</button>
+              <button class="btn btn-danger btn-sm" onclick="maoLogout()">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVISORY PANEL -->
+      <div class="mao-panel" id="mao-advisory">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Advisory Panel</div>
+          <div style="font-size:13px;color:var(--muted)">Disease-based recommendations for field response</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:#FFEBEE;border:1px solid #FFCDD2;border-left:4px solid var(--danger);border-radius:var(--radius);padding:20px">
+            <div class="flex justify-between items-center mb-8">
+              <div class="flex items-center gap-12"><span style="font-size:20px">🖤</span><span style="font-size:15px;font-weight:800">Sugarcane Smut</span></div>
+              <span class="chip chip-smut">14 active cases</span>
+            </div>
+            <div class="text-sm" style="color:#7F0000;margin-bottom:12px;line-height:1.6">Isolate infected stalks immediately. Do not use seed canes from affected areas. Conduct field verification and destroy infected materials through burning or burial.</div>
+            <div class="text-xs text-muted">Priority areas: Brgy. Wawa, Brgy. Cogunan</div>
+            <button class="btn btn-danger btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Smut (mock)')">Issue Advisory</button>
+          </div>
+
+          <div style="background:#E3F2FD;border:1px solid #BBDEFB;border-left:4px solid #1565C0;border-radius:var(--radius);padding:20px">
+            <div class="flex justify-between items-center mb-8">
+              <div class="flex items-center gap-12"><span style="font-size:20px">🌫️</span><span style="font-size:15px;font-weight:800">Downy Mildew</span></div>
+              <span class="chip chip-mildew">10 active cases</span>
+            </div>
+            <div class="text-sm" style="color:#0D47A1;margin-bottom:12px;line-height:1.6">Remove and destroy infected plant material. Apply recommended fungicide if available. Monitor surrounding fields. Improve drainage in affected areas.</div>
+            <div class="text-xs text-muted">Priority areas: Brgy. Cogunan, Brgy. Bilaran</div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Mildew (mock)')">Issue Advisory</button>
+          </div>
+
+          <div style="background:#FFF8E1;border:1px solid #FFE082;border-left:4px solid #F57F17;border-radius:var(--radius);padding:20px">
+            <div class="flex justify-between items-center mb-8">
+              <div class="flex items-center gap-12"><span style="font-size:20px">🎨</span><span style="font-size:15px;font-weight:800">Mosaic Disease</span></div>
+              <span class="chip chip-mosaic">8 active cases</span>
+            </div>
+            <div class="text-sm" style="color:#7F4000;margin-bottom:12px;line-height:1.6">Control aphid vectors with appropriate pesticide. Remove and destroy infected plant material. Avoid planting susceptible varieties in affected areas.</div>
+            <div class="text-xs text-muted">Priority areas: Brgy. Bilaran, Brgy. Looc</div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Mosaic (mock)')">Issue Advisory</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end mao-content -->
+  </div><!-- end mao-layout -->
+
+  <!-- MAO Toast -->
+  <div id="mao-toast" style="position:fixed;bottom:24px;right:24px;background:#1F2A21;color:#fff;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999">Saved</div>
+</div><!-- end mao-shell -->
+
+<!-- Toast -->
+<div id="toast">Saved successfully</div>
+
+<script>
+// ─── NAVIGATION STATE ─────────────────────────────────────────
+let currentScreen = 's-splash';
+let obSlide = 1;
+let symptomsSelected = 0;
+let historyFilter = 'all';
+let maoFilter = 'all';
+let maoLoggedIn = false;
+
+function go(screenId) {
+  const cur = document.getElementById(currentScreen);
+  const next = document.getElementById(screenId);
+  if (!next) return;
+  cur.classList.remove('hidden','slide-left');
+  cur.classList.add('slide-left');
+  next.classList.remove('hidden','slide-left');
+  currentScreen = screenId;
+
+  // Special: start analysis animation
+  if (screenId === 's-analyzing') startAnalysis();
+  // Special: restore save form
+  if (screenId === 's-save') {
+    document.getElementById('save-form-view').style.display = 'block';
+    document.getElementById('save-success-view').style.display = 'none';
+  }
+}
+
+function goTab(tab) {
+  const map = {home:'s-home', scan:'s-guide', history:'s-history', settings:'s-settings'};
+  if (map[tab]) go(map[tab]);
+}
+
+// ─── AUTH + PROFILE ──────────────────────────────────────────
+function mobileLogin() {
+  const email = document.getElementById('mobile-login-email').value.trim();
+  const password = document.getElementById('mobile-login-password').value.trim();
+  if (!email || !password) {
+    showToast('Please enter email and password');
+    return;
+  }
+  showToast('Signed in successfully (mock)');
+  go('s-home');
+}
+
+function sendMobileReset() {
+  const email = document.getElementById('mobile-forgot-email').value.trim();
+  if (!email) {
+    showToast('Enter your email first');
+    return;
+  }
+  showToast('Reset link sent (mock)');
+  go('s-mobile-login');
+}
+
+function saveMobileProfile() {
+  showToast('Profile updated (mock)');
+  go('s-settings');
+}
+
+function mobileLogout() {
+  showToast('Logged out');
+  go('s-mobile-login');
+}
+
+function maoLogin() {
+  const email = document.getElementById('mao-login-email').value.trim();
+  const password = document.getElementById('mao-login-password').value.trim();
+  if (!email || !password) {
+    showMAOToast('Enter email and password');
+    return;
+  }
+  maoLoggedIn = true;
+  document.getElementById('mao-login-view').style.display = 'none';
+  document.getElementById('mao-forgot-view').style.display = 'none';
+  document.getElementById('mao-app').style.display = 'flex';
+  maoTab('overview');
+  showMAOToast('Welcome to MAO dashboard');
+}
+
+function maoLogout() {
+  maoLoggedIn = false;
+  document.getElementById('mao-app').style.display = 'none';
+  document.getElementById('mao-forgot-view').style.display = 'none';
+  document.getElementById('mao-login-view').style.display = 'flex';
+  showMAOToast('Logged out from dashboard');
+}
+
+function openMaoForgot() {
+  document.getElementById('mao-login-view').style.display = 'none';
+  document.getElementById('mao-forgot-view').style.display = 'flex';
+}
+
+function backToMaoLogin() {
+  document.getElementById('mao-forgot-view').style.display = 'none';
+  document.getElementById('mao-login-view').style.display = 'flex';
+}
+
+function sendMaoReset() {
+  const email = document.getElementById('mao-forgot-email').value.trim();
+  if (!email) {
+    showMAOToast('Enter office email first');
+    return;
+  }
+  showMAOToast('Reset link sent (mock)');
+  backToMaoLogin();
+}
+
+function initClickFeedback() {
+  const clickableSelector = [
+    'button',
+    '.nav-btn',
+    '.mao-nav-item',
+    '.back-btn',
+    '.toggle-btn',
+    '.auth-link'
+  ].join(',');
+
+  document.addEventListener('click', (event) => {
+    const target = event.target.closest(clickableSelector);
+    if (!target) return;
+    target.classList.remove('press-feedback');
+    void target.offsetWidth;
+    target.classList.add('press-feedback');
+  });
+
+  document.addEventListener('animationend', (event) => {
+    if (event.target.classList && event.target.classList.contains('press-feedback')) {
+      event.target.classList.remove('press-feedback');
+    }
+  });
+}
+
+function getPasswordStatusText(password) {
+  if (!password) {
+    return { text: 'Start typing password', state: '' };
+  }
+  if (password.length >= 8) {
+    return { text: 'Checks', state: 'valid' };
+  }
+  const missing = 8 - password.length;
+  const suffix = missing === 1 ? '' : 's';
+  return { text: `Needs ${missing} more character${suffix}`, state: 'invalid' };
+}
+
+function attachPasswordValidation(input) {
+  if (input.dataset.passwordBound === '1') return;
+  input.dataset.passwordBound = '1';
+
+  let status = input.parentElement.querySelector('.password-status');
+  if (!status) {
+    status = document.createElement('div');
+    status.className = 'password-status';
+    input.insertAdjacentElement('afterend', status);
+  }
+
+  const updateStatus = () => {
+    const { text, state } = getPasswordStatusText(input.value.trim());
+    status.textContent = `Password strength: ${text}`;
+    status.classList.remove('valid', 'invalid');
+    if (state) status.classList.add(state);
+  };
+
+  input.addEventListener('input', updateStatus);
+  input.addEventListener('focus', updateStatus);
+  updateStatus();
+}
+
+function initPasswordValidation() {
+  document.querySelectorAll('input[type="password"]').forEach(attachPasswordValidation);
+}
+
+// ─── FILTERS ────────────────────────────────────────────────
+function setHistoryFilter(filter, btn) {
+  historyFilter = filter;
+  document.querySelectorAll('.history-filter-btn').forEach(chip => {
+    chip.classList.remove('btn-primary');
+    chip.classList.add('btn-ghost');
+  });
+  btn.classList.remove('btn-ghost');
+  btn.classList.add('btn-primary');
+  applyHistoryFilters();
+}
+
+function applyHistoryFilters() {
+  const query = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+  const rows = document.querySelectorAll('.history-record');
+  let visible = 0;
+
+  rows.forEach(row => {
+    const disease = row.dataset.disease || '';
+    const searchBlob = `${row.textContent} ${row.dataset.search || ''}`.toLowerCase();
+    const diseaseMatch = historyFilter === 'all' || disease === historyFilter;
+    const searchMatch = !query || searchBlob.includes(query);
+    const show = diseaseMatch && searchMatch;
+
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  const empty = document.getElementById('history-empty');
+  if (empty) empty.style.display = visible === 0 ? 'flex' : 'none';
+}
+
+function setMaoFilter(filter, btn) {
+  maoFilter = filter;
+  document.querySelectorAll('.mao-filter-btn').forEach(chip => {
+    chip.classList.remove('btn-primary');
+    chip.classList.add('btn-ghost');
+  });
+  btn.classList.remove('btn-ghost');
+  btn.classList.add('btn-primary');
+  applyMaoFilters();
+}
+
+function applyMaoFilters() {
+  const query = (document.getElementById('mao-report-search')?.value || '').trim().toLowerCase();
+  const rows = document.querySelectorAll('.mao-report-row');
+  let visible = 0;
+
+  rows.forEach(row => {
+    const disease = row.dataset.disease || '';
+    const status = row.dataset.status || '';
+    const text = row.textContent.toLowerCase();
+    const stateFilter = maoFilter === 'queued' || maoFilter === 'reviewed';
+    const filterMatch = maoFilter === 'all'
+      ? true
+      : stateFilter
+        ? status === maoFilter
+        : disease === maoFilter;
+    const searchMatch = !query || text.includes(query);
+    const show = filterMatch && searchMatch;
+
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  const empty = document.getElementById('mao-reports-empty');
+  if (empty) empty.style.display = visible === 0 ? 'flex' : 'none';
+}
+
+// ─── ONBOARDING ───────────────────────────────────────────────
+function onboardNext() {
+  if (obSlide < 3) {
+    document.getElementById('ob'+obSlide).style.display = 'none';
+    document.getElementById('od'+obSlide).style.width = '8px';
+    document.getElementById('od'+obSlide).style.background = 'var(--border)';
+    obSlide++;
+    document.getElementById('ob'+obSlide).style.display = 'block';
+    document.getElementById('od'+obSlide).style.width = '24px';
+    document.getElementById('od'+obSlide).style.background = 'var(--primary)';
+    if (obSlide === 3) document.getElementById('ob-next-btn').textContent = 'Get Started →';
+  } else {
+    go('s-role');
+  }
+}
+
+// ─── CAPTURE ──────────────────────────────────────────────────
+function mockCapture() {
+  // Simulate a photo being taken
+  const preview = document.getElementById('cam-preview');
+  const placeholder = document.getElementById('cam-placeholder');
+  const retake = document.getElementById('retake-section');
+
+  placeholder.style.display = 'none';
+  preview.style.background = 'linear-gradient(135deg, #2d5a30, #4a8b4e)';
+  preview.innerHTML += `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:13px;flex-direction:column;gap:8px"><div style="font-size:36px">🌾</div><div>Sugarcane leaf — preview</div></div>`;
+
+  retake.style.display = 'block';
+}
+
+function retakePhoto() {
+  const preview = document.getElementById('cam-preview');
+  preview.style.background = '#1a1a1a';
+  preview.innerHTML = `
+    <div id="cam-placeholder" style="text-align:center;color:rgba(255,255,255,.6)">
+      <div style="font-size:48px;margin-bottom:8px">📷</div>
+      <div style="font-size:12px">Camera preview</div>
+      <div style="font-size:10px;opacity:.5;margin-top:4px">(mock display)</div>
+    </div>
+    <img id="cam-img" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
+    <div style="position:absolute;top:12px;left:12px;width:24px;height:24px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:3px 0 0 0"></div>
+    <div style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 3px 0 0"></div>
+    <div style="position:absolute;bottom:12px;left:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 3px"></div>
+    <div style="position:absolute;bottom:12px;right:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 3px 0"></div>`;
+  document.getElementById('retake-section').style.display = 'none';
+}
+
+// ─── SYMPTOMS ─────────────────────────────────────────────────
+function toggleSymptom(el) {
+  el.classList.toggle('selected');
+  symptomsSelected = document.querySelectorAll('.symptom-card.selected').length;
+  const btn = document.getElementById('symptom-next');
+  const check = el.querySelector('.check-circle');
+  if (el.classList.contains('selected')) {
+    check.innerHTML = `<svg width="12" height="12" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  } else {
+    check.innerHTML = '';
+  }
+  if (symptomsSelected > 0) {
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  } else {
+    btn.style.opacity = '.5';
+    btn.style.pointerEvents = 'none';
+  }
+}
+
+// ─── ANALYSIS ─────────────────────────────────────────────────
+function startAnalysis() {
+  const bar = document.getElementById('analysis-progress');
+  let w = 0;
+  const iv = setInterval(() => {
+    w += Math.random() * 15 + 5;
+    if (w >= 100) { w = 100; clearInterval(iv); setTimeout(() => go('s-result'), 500); }
+    bar.style.width = w + '%';
+  }, 300);
+}
+
+// ─── SAVE ─────────────────────────────────────────────────────
+function saveLocal() {
+  document.getElementById('save-form-view').style.display = 'none';
+  document.getElementById('save-success-view').style.display = 'flex';
+}
+function saveAndQueue() {
+  document.getElementById('save-form-view').style.display = 'none';
+  document.getElementById('save-success-view').style.display = 'flex';
+}
+
+// ─── SYNC MOCK ────────────────────────────────────────────────
+function mockSync() {
+  showToast('Syncing reports… (mock)');
+  setTimeout(() => showToast('2 reports queued for sync'), 1500);
+}
+
+// ─── DELETE CONFIRM ───────────────────────────────────────────
+function confirmDelete() {
+  if (confirm('Delete this record? This action cannot be undone.')) {
+    showToast('Record deleted');
+    go('s-history');
+  }
+}
+
+// ─── TOAST ────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function showMAOToast(msg) {
+  const t = document.getElementById('mao-toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+// ─── VIEW SWITCH ──────────────────────────────────────────────
+function switchView(v) {
+  const device = document.getElementById('device');
+  const mao = document.getElementById('mao-shell');
+  const btns = document.querySelectorAll('#view-toggle .toggle-btn');
+  if (v === 'mobile') {
+    device.style.display = 'flex';
+    mao.classList.remove('active');
+    btns[0].classList.add('active');
+    btns[1].classList.remove('active');
+    document.body.style.alignItems = 'flex-start';
+  } else {
+    device.style.display = 'none';
+    mao.classList.add('active');
+    btns[1].classList.add('active');
+    btns[0].classList.remove('active');
+    document.body.style.alignItems = 'flex-start';
+    document.body.style.justifyContent = 'center';
+    if (maoLoggedIn) {
+      document.getElementById('mao-login-view').style.display = 'none';
+      document.getElementById('mao-forgot-view').style.display = 'none';
+      document.getElementById('mao-app').style.display = 'flex';
+    } else {
+      document.getElementById('mao-app').style.display = 'none';
+      document.getElementById('mao-forgot-view').style.display = 'none';
+      document.getElementById('mao-login-view').style.display = 'flex';
+    }
+  }
+}
+
+// ─── MAO NAVIGATION ───────────────────────────────────────────
+function maoTab(panel) {
+  document.querySelectorAll('.mao-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.mao-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('mao-'+panel).classList.add('active');
+  // Highlight nav
+  const navMap = {overview:0, reports:1, 'report-detail':2, barangay:3, advisory:4, profile:5};
+  const items = document.querySelectorAll('.mao-nav-item');
+  if (navMap[panel] !== undefined) items[navMap[panel]].classList.add('active');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // All screens hidden except splash
+  document.querySelectorAll('.screen:not(#s-splash)').forEach(s => s.classList.add('hidden'));
+  initClickFeedback();
+  initPasswordValidation();
+  applyHistoryFilters();
+  applyMaoFilters();
+});
+</script>
+</body>
+</html>
