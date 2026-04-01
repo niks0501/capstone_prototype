@@ -510,7 +510,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
   flex-shrink:0;overflow:hidden;
 }
 .auth-brand-mark img{width:100%;height:100%;object-fit:contain}
-.auth-brand-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+  /* Onboarding + Role: robust vertical + horizontal centering */
+  #s-onboard, #s-role{display:grid;place-items:center;min-height:100%}
+  #s-onboard > .flex-col, #s-role > .p-24{width:calc(100% - 48px);max-width:360px;box-sizing:border-box;margin:auto}
 </style>
 </head>
 <body>
@@ -672,7 +674,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
     <!-- ══════════ SCREEN: ONBOARDING ══════════ -->
     <div class="screen hidden" id="s-onboard" style="background:var(--bg)">
-      <div class="flex-col justify-center p-24" style="flex:1">
+      <div class="flex-col justify-center p-24">
         <div id="onboard-slides">
           <div id="ob1" class="text-center">
             <div style="font-size:72px;margin-bottom:16px">🌿</div>
