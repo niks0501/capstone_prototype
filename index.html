@@ -414,9 +414,50 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .auth-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
 .auth-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 16px}
 .auth-link{background:none;border:none;color:var(--primary);font-size:12px;font-weight:700;cursor:pointer;padding:0}
-.password-status{margin-top:6px;font-size:11px;line-height:1.4;color:var(--muted);font-weight:600;min-height:16px}
-.password-status.valid{color:#2e7d32}
-.password-status.invalid{color:var(--danger)}
+/* ── password field eye-toggle ─────────────────────────────── */
+.pw-field{position:relative;display:block}
+.pw-field input{width:100%;padding-right:46px !important}
+.pw-eye{
+  position:absolute;top:50%;right:13px;transform:translateY(-50%);
+  width:22px;height:22px;padding:0;border:none;background:none;
+  cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;
+  transition:color .18s;-webkit-tap-highlight-color:transparent;
+}
+.pw-eye:hover{color:var(--primary)}
+.pw-eye svg{width:17px;height:17px;display:block;pointer-events:none}
+
+/* ── password strength row (register / change-pw only) ──────── */
+.pw-strength{
+  display:flex;align-items:center;gap:6px;
+  margin-top:6px;min-height:18px;
+  font-size:11px;font-weight:600;
+  opacity:0;transition:opacity .18s;pointer-events:none;
+}
+.pw-strength.visible{opacity:1}
+.pw-strength-icon{width:14px;height:14px;flex-shrink:0;position:relative}
+@keyframes pw-spin{to{transform:rotate(360deg)}}
+.pw-spinner{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--border);border-top-color:var(--muted);
+  animation:pw-spin .75s linear infinite;
+  position:absolute;inset:1px;
+}
+.pw-strength-text{color:var(--muted)}
+.pw-strength.pw-weak  .pw-strength-text{color:var(--danger)}
+.pw-strength.pw-weak  .pw-spinner{border-top-color:var(--danger);border-color:rgba(185,64,64,.2)}
+.pw-strength.pw-fair  .pw-strength-text{color:var(--warning)}
+.pw-strength.pw-fair  .pw-spinner{border-top-color:var(--warning);border-color:rgba(201,123,46,.2)}
+.pw-strength.pw-good  .pw-strength-text{color:#2e7d32}
+.pw-strength.pw-good  .pw-spinner{animation:none;border-color:#2e7d32;border-top-color:#2e7d32}
+.pw-strength.pw-good  .pw-spinner::after{
+  content:'✓';position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:900;color:#2e7d32;line-height:1;
+}
+/* ── sign-up / sign-in toggle row ───────────────────────────── */
+.auth-signup-row{
+  margin-top:14px;text-align:center;font-size:12px;color:var(--muted);
+}
 .account-form .field{margin-bottom:16px}
 .account-actions{display:flex;gap:10px;margin-top:6px}
 .account-actions .btn{flex:1;width:auto}
@@ -531,7 +572,12 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
           <div class="field">
             <label>Password</label>
-            <input id="mobile-login-password" type="password" placeholder="Enter password"/>
+            <div class="pw-field">
+              <input id="mobile-login-password" type="password" placeholder="Enter password"/>
+              <button type="button" class="pw-eye" onclick="togglePwEye('mobile-login-password',this)" aria-label="Show or hide password" tabindex="-1">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
           </div>
 
           <div class="auth-row">
@@ -543,8 +589,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
 
           <button class="btn btn-primary" onclick="mobileLogin()">Sign In →</button>
-          <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-onboard')">Continue as Demo User</button>
-          <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.5">Prototype only: account validation is simulated.</div>
+          <div class="auth-signup-row">Don't have an account? <button class="auth-link" style="font-size:12px" onclick="go('s-mobile-register')">Sign up</button></div>
+          <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.5;text-align:center">Prototype only — account validation is simulated.</div>
         </div>
       </div>
     </div>
@@ -569,6 +615,57 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
           <button class="btn btn-primary" onclick="sendMobileReset()">Send Reset Link</button>
           <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-mobile-login')">Back to Sign In</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: MOBILE REGISTER ══════════ -->
+    <div class="screen hidden" id="s-mobile-register">
+      <div class="app-header" style="border:none">
+        <button class="back-btn" onclick="go('s-mobile-login')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Create Account</h2>
+      </div>
+      <div class="auth-shell" style="align-items:flex-start;padding-top:12px">
+        <div class="auth-card" style="width:100%">
+          <div class="auth-brand">
+            <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+            <div class="auth-brand-label">CaneGuard Mobile</div>
+          </div>
+          <div class="auth-title" style="font-size:20px">Create your account</div>
+          <div class="auth-sub">Register to start scanning sugarcane and submitting field reports.</div>
+
+          <div class="field">
+            <label>Full Name</label>
+            <input id="reg-name" type="text" placeholder="e.g. Maria Santos"/>
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input id="reg-email" type="email" placeholder="example@gmail.com"/>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pw-field">
+              <input id="reg-password" type="password" placeholder="Create a password"/>
+              <button type="button" class="pw-eye" onclick="togglePwEye('reg-password',this)" aria-label="Show or hide password" tabindex="-1">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="pw-strength" id="reg-password-str"><div class="pw-strength-icon"><div class="pw-spinner" style="display:inline"></div></div><span class="pw-strength-text"></span></div>
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <div class="pw-field">
+              <input id="reg-confirm" type="password" placeholder="Repeat your password"/>
+              <button type="button" class="pw-eye" onclick="togglePwEye('reg-confirm',this)" aria-label="Show or hide password" tabindex="-1">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="pw-strength" id="reg-confirm-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="mobileRegister()">Create Account →</button>
+          <div class="auth-signup-row">Already have an account? <button class="auth-link" style="font-size:12px" onclick="go('s-mobile-login')">Sign in</button></div>
+          <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center;line-height:1.5">Prototype only — registration is simulated.</div>
         </div>
       </div>
     </div>
@@ -656,6 +753,15 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       </div>
 
       <div class="scroll-content">
+        <!-- Demo mode notice — shown after login, not a separate flow -->
+        <div id="demo-banner" style="margin:12px 20px 0;background:linear-gradient(135deg,#eef3ef,#e3ece4);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--primary)">🧪 Demo Mode Active</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">Signed in as demo user. Data and scans are simulated.</div>
+          </div>
+          <button onclick="document.getElementById('demo-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0;flex-shrink:0">✕</button>
+        </div>
+
         <div class="section">
           <div class="section-title">Quick Actions</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -1360,9 +1466,30 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div class="card account-form">
             <div class="section-title">Change Password</div>
             <div class="spacer">&nbsp;</div>
-            <div class="field"><label>Current Password</label><input type="password" placeholder="Current password"/></div>
-            <div class="field"><label>New Password</label><input type="password" placeholder="New password"/></div>
-            <div class="field"><label>Confirm New Password</label><input type="password" placeholder="Confirm new password"/></div>
+            <div class="field">
+              <label>Current Password</label>
+              <div class="pw-field">
+                <input id="mob-cur-pw" type="password" placeholder="Current password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mob-cur-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mob-cur-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
+            <div class="field">
+              <label>New Password</label>
+              <div class="pw-field">
+                <input id="mob-new-pw" type="password" placeholder="New password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mob-new-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mob-new-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
+            <div class="field">
+              <label>Confirm New Password</label>
+              <div class="pw-field">
+                <input id="mob-conf-pw" type="password" placeholder="Confirm new password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mob-conf-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mob-conf-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
             <div class="account-actions">
               <button class="btn btn-primary btn-sm" onclick="saveMobileProfile()">Save Changes</button>
               <button class="btn btn-ghost btn-sm" onclick="go('s-settings')">Cancel</button>
@@ -1401,7 +1528,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="auth-title">MAO Dashboard Login</div>
       <div class="auth-sub">Sign in to view reports, analytics, and advisories for Nasugbu, Batangas.</div>
       <div class="field"><label>Office Email</label><input id="mao-login-email" type="email" placeholder="mao.nasugbu@gov.ph"/></div>
-      <div class="field"><label>Password</label><input id="mao-login-password" type="password" placeholder="Enter dashboard password"/></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-field">
+          <input id="mao-login-password" type="password" placeholder="Enter password"/>
+          <button type="button" class="pw-eye" onclick="togglePwEye('mao-login-password',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
       <div class="auth-row">
         <div class="flex items-center gap-8">
           <div class="switch" id="mao-remember-switch" onclick="this.classList.toggle('on')"></div>
@@ -1409,8 +1542,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         </div>
         <button class="auth-link" onclick="openMaoForgot()">Forgot password?</button>
       </div>
-      <button class="btn btn-primary" onclick="maoLogin()">Sign In to Dashboard</button>
-      <div style="margin-top:12px;font-size:11px;color:var(--muted)">Static prototype: authentication flow is simulated.</div>
+      <button class="btn btn-primary" onclick="maoLogin()">Sign In →</button>
+      <div class="auth-signup-row">Don't have an account? <button class="auth-link" style="font-size:12px" onclick="openMaoRegister()">Sign up</button></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted)">Static prototype — authentication is simulated.</div>
     </div>
   </div>
 
@@ -1425,6 +1559,49 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="field"><label>Office Email</label><input id="mao-forgot-email" type="email" placeholder="mao.nasugbu@gov.ph"/></div>
       <button class="btn btn-primary" onclick="sendMaoReset()">Send Reset Link</button>
       <button class="btn btn-ghost btn-sm mt-10" onclick="backToMaoLogin()">Back to Login</button>
+    </div>
+  </div>
+
+  <!-- ══ MAO REGISTER VIEW ══ -->
+  <div id="mao-register-view" style="display:none;flex:1;align-items:center;justify-content:center;padding:28px;background:linear-gradient(145deg,#f5f8f5,#edf3ee);overflow-y:auto">
+    <div class="auth-card" style="max-width:430px">
+      <div class="auth-brand">
+        <div class="auth-brand-mark"><img src="cane_guard_logo.png" alt="CaneGuard logo" class="brand-logo brand-logo-primary"/></div>
+        <div class="auth-brand-label">CaneGuard MAO</div>
+      </div>
+      <div class="auth-title" style="font-size:20px">Register MAO Account</div>
+      <div class="auth-sub">Create an account to access the MAO dashboard for Nasugbu, Batangas.</div>
+
+      <div class="field"><label>Full Name</label><input id="mao-reg-name" type="text" placeholder="e.g. Engr. Lea Reyes"/></div>
+      <div class="field"><label>Office Email</label><input id="mao-reg-email" type="email" placeholder="mao.nasugbu@gov.ph"/></div>
+      <div class="field"><label>Role / Designation</label>
+        <select id="mao-reg-role">
+          <option value="">Select designation</option>
+          <option>MAO Admin</option>
+          <option>MAO Analyst</option>
+          <option>Field Coordinator</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-field">
+          <input id="mao-reg-password" type="password" placeholder="Create a password"/>
+          <button type="button" class="pw-eye" onclick="togglePwEye('mao-reg-password',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="pw-strength" id="mao-reg-password-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <div class="pw-field">
+          <input id="mao-reg-confirm" type="password" placeholder="Repeat your password"/>
+          <button type="button" class="pw-eye" onclick="togglePwEye('mao-reg-confirm',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="pw-strength" id="mao-reg-confirm-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="maoRegister()">Create Account →</button>
+      <div class="auth-signup-row">Already have an account? <button class="auth-link" style="font-size:12px" onclick="backToMaoLoginFromReg()">Sign in</button></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted)">Static prototype — registration is simulated.</div>
     </div>
   </div>
 
@@ -1724,9 +1901,30 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div class="chart-card account-form">
             <div class="chart-title">Security</div>
-            <div class="field"><label>Current Password</label><input type="password" placeholder="Current password"/></div>
-            <div class="field"><label>New Password</label><input type="password" placeholder="New password"/></div>
-            <div class="field"><label>Confirm New Password</label><input type="password" placeholder="Confirm password"/></div>
+            <div class="field">
+              <label>Current Password</label>
+              <div class="pw-field">
+                <input id="mao-cur-pw" type="password" placeholder="Current password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mao-cur-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mao-cur-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
+            <div class="field">
+              <label>New Password</label>
+              <div class="pw-field">
+                <input id="mao-new-pw" type="password" placeholder="New password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mao-new-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mao-new-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
+            <div class="field">
+              <label>Confirm New Password</label>
+              <div class="pw-field">
+                <input id="mao-conf-pw" type="password" placeholder="Confirm password"/>
+                <button type="button" class="pw-eye" onclick="togglePwEye('mao-conf-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              </div>
+              <div class="pw-strength" id="mao-conf-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+            </div>
             <div class="account-actions">
               <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Password change submitted (mock)')">Change Password</button>
               <button class="btn btn-danger btn-sm" onclick="maoLogout()">Logout</button>
@@ -1917,43 +2115,122 @@ function initClickFeedback() {
   });
 }
 
-function getPasswordStatusText(password) {
-  if (!password) {
-    return { text: 'Start typing password', state: '' };
-  }
-  if (password.length >= 8) {
-    return { text: 'Checks', state: 'valid' };
-  }
-  const missing = 8 - password.length;
-  const suffix = missing === 1 ? '' : 's';
-  return { text: `Needs ${missing} more character${suffix}`, state: 'invalid' };
+// ─── EYE ICON: TOGGLE PASSWORD VISIBILITY ─────────────────────
+const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+const EYE_SHUT = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+
+function togglePwEye(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const reveal = input.type === 'password';
+  input.type = reveal ? 'text' : 'password';
+  btn.querySelector('svg').innerHTML = reveal ? EYE_SHUT : EYE_OPEN;
+  btn.style.color = reveal ? 'var(--primary)' : '';
 }
 
-function attachPasswordValidation(input) {
-  if (input.dataset.passwordBound === '1') return;
-  input.dataset.passwordBound = '1';
+// ─── PASSWORD STRENGTH EVALUATION ─────────────────────────────
+function evalStrength(val) {
+  if (!val) return { state: '', text: '' };
+  if (val.length < 6)  return { state: 'pw-weak', text: 'Too short — needs at least 8 characters' };
+  if (val.length < 8)  return { state: 'pw-fair', text: `Almost there — ${8 - val.length} more character${8 - val.length > 1 ? 's' : ''} needed` };
+  const mixed = /[A-Z]/.test(val) && /[0-9]/.test(val);
+  if (!mixed) return { state: 'pw-fair', text: 'Good length — try adding a number and a capital letter' };
+  return { state: 'pw-good', text: 'Strong password' };
+}
 
-  let status = input.parentElement.querySelector('.password-status');
-  if (!status) {
-    status = document.createElement('div');
-    status.className = 'password-status';
-    input.insertAdjacentElement('afterend', status);
-  }
+function evalMatch(val, linkedId) {
+  const target = (document.getElementById(linkedId) || {}).value || '';
+  if (!val)           return { state: '', text: '' };
+  if (val !== target) return { state: 'pw-weak', text: 'Passwords do not match' };
+  return { state: 'pw-good', text: 'Passwords match' };
+}
 
-  const updateStatus = () => {
-    const { text, state } = getPasswordStatusText(input.value.trim());
-    status.textContent = `Password strength: ${text}`;
-    status.classList.remove('valid', 'invalid');
-    if (state) status.classList.add(state);
-  };
+// Bind live strength feedback to a pw-strength div
+// isConfirm=true → checks match against linkedId instead of running strength
+function bindStrength(inputId, strengthId, isConfirm, linkedId) {
+  const input = document.getElementById(inputId);
+  const wrap  = document.getElementById(strengthId);
+  if (!input || !wrap) return;
+  const textEl    = wrap.querySelector('.pw-strength-text');
+  const spinnerEl = wrap.querySelector('.pw-spinner');
 
-  input.addEventListener('input', updateStatus);
-  input.addEventListener('focus', updateStatus);
-  updateStatus();
+  input.addEventListener('input', () => {
+    const val = input.value;
+    const { state, text } = isConfirm ? evalMatch(val, linkedId) : evalStrength(val);
+
+    wrap.classList.toggle('visible', val.length > 0);
+    wrap.classList.remove('pw-weak', 'pw-fair', 'pw-good');
+    if (state) wrap.classList.add(state);
+
+    // swap spinner ↔ check icon
+    if (state === 'pw-good') {
+      spinnerEl.style.display = 'inline';
+    } else {
+      spinnerEl.style.display = '';
+    }
+    textEl.textContent = text;
+  });
 }
 
 function initPasswordValidation() {
-  document.querySelectorAll('input[type="password"]').forEach(attachPasswordValidation);
+  // Mobile register
+  bindStrength('reg-password',  'reg-password-str',  false, null);
+  bindStrength('reg-confirm',   'reg-confirm-str',   true,  'reg-password');
+  // Mobile profile change-password
+  bindStrength('mob-cur-pw',    'mob-cur-pw-str',    false, null);
+  bindStrength('mob-new-pw',    'mob-new-pw-str',    false, null);
+  bindStrength('mob-conf-pw',   'mob-conf-pw-str',   true,  'mob-new-pw');
+  // MAO register
+  bindStrength('mao-reg-password', 'mao-reg-password-str', false, null);
+  bindStrength('mao-reg-confirm',  'mao-reg-confirm-str',  true,  'mao-reg-password');
+  // MAO profile change-password
+  bindStrength('mao-cur-pw',    'mao-cur-pw-str',    false, null);
+  bindStrength('mao-new-pw',    'mao-new-pw-str',    false, null);
+  bindStrength('mao-conf-pw',   'mao-conf-pw-str',   true,  'mao-new-pw');
+}
+
+// ─── MOBILE REGISTER ─────────────────────────────────────────
+function mobileRegister() {
+  const name  = (document.getElementById('reg-name')?.value  || '').trim();
+  const email = (document.getElementById('reg-email')?.value || '').trim();
+  const pw    = (document.getElementById('reg-password')?.value || '');
+  const conf  = (document.getElementById('reg-confirm')?.value  || '');
+  if (!name || !email || !pw) { showToast('Please fill in all fields'); return; }
+  if (pw !== conf)   { showToast('Passwords do not match'); return; }
+  if (pw.length < 8) { showToast('Password must be at least 8 characters'); return; }
+  showToast('Account created! Welcome to CaneGuard 🌿');
+  // Reset onboarding slides back to slide 1 before showing them
+  resetOnboarding();
+  go('s-onboard');
+}
+
+// ─── MAO REGISTER ─────────────────────────────────────────────
+function openMaoRegister() {
+  document.getElementById('mao-login-view').style.display   = 'none';
+  document.getElementById('mao-forgot-view').style.display  = 'none';
+  document.getElementById('mao-register-view').style.display = 'flex';
+}
+
+function backToMaoLoginFromReg() {
+  document.getElementById('mao-register-view').style.display = 'none';
+  document.getElementById('mao-login-view').style.display    = 'flex';
+}
+
+function maoRegister() {
+  const name  = (document.getElementById('mao-reg-name')?.value     || '').trim();
+  const email = (document.getElementById('mao-reg-email')?.value    || '').trim();
+  const role  = (document.getElementById('mao-reg-role')?.value     || '').trim();
+  const pw    = (document.getElementById('mao-reg-password')?.value || '');
+  const conf  = (document.getElementById('mao-reg-confirm')?.value  || '');
+  if (!name || !email || !role || !pw) { showMAOToast('Please fill in all fields'); return; }
+  if (pw !== conf)   { showMAOToast('Passwords do not match'); return; }
+  if (pw.length < 8) { showMAOToast('Password must be at least 8 characters'); return; }
+  showMAOToast('Account created! Signing you in… (mock)');
+  // auto-login after register
+  document.getElementById('mao-register-view').style.display = 'none';
+  maoLoggedIn = true;
+  document.getElementById('mao-app').style.display = 'flex';
+  maoTab('overview');
 }
 
 // ─── FILTERS ────────────────────────────────────────────────
@@ -2026,6 +2303,24 @@ function applyMaoFilters() {
 }
 
 // ─── ONBOARDING ───────────────────────────────────────────────
+// Resets slides to slide 1 — called before navigating to s-onboard
+// so the flow always starts fresh (used after registration)
+function resetOnboarding() {
+  // hide all slides, reset dots
+  [1,2,3].forEach(n => {
+    const slide = document.getElementById('ob'+n);
+    const dot   = document.getElementById('od'+n);
+    if (slide) slide.style.display = n === 1 ? 'block' : 'none';
+    if (dot) {
+      dot.style.width      = n === 1 ? '24px' : '8px';
+      dot.style.background = n === 1 ? 'var(--primary)' : 'var(--border)';
+    }
+  });
+  obSlide = 1;
+  const btn = document.getElementById('ob-next-btn');
+  if (btn) btn.textContent = 'Next →';
+}
+
 function onboardNext() {
   if (obSlide < 3) {
     document.getElementById('ob'+obSlide).style.display = 'none';
@@ -2161,13 +2456,14 @@ function switchView(v) {
     btns[0].classList.remove('active');
     document.body.style.alignItems = 'flex-start';
     document.body.style.justifyContent = 'center';
+    // always hide register + forgot when switching to MAO view
+    document.getElementById('mao-register-view').style.display = 'none';
+    document.getElementById('mao-forgot-view').style.display   = 'none';
     if (maoLoggedIn) {
       document.getElementById('mao-login-view').style.display = 'none';
-      document.getElementById('mao-forgot-view').style.display = 'none';
       document.getElementById('mao-app').style.display = 'flex';
     } else {
       document.getElementById('mao-app').style.display = 'none';
-      document.getElementById('mao-forgot-view').style.display = 'none';
       document.getElementById('mao-login-view').style.display = 'flex';
     }
   }
