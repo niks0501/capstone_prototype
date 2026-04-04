@@ -1159,7 +1159,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div style="display:flex;flex-direction:column;gap:10px">
             <button class="btn btn-primary" onclick="go('s-advisory')">View Recommended Actions →</button>
             <button class="btn btn-secondary" onclick="go('s-save')">Save Record</button>
-            <button class="btn btn-ghost btn-sm" onclick="go('s-guide')">↺ Scan Again</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetScanFlow(); go('s-guide')">↺ Scan Again</button>
           </div>
         </div>
       </div>
@@ -1259,8 +1259,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div style="width:72px;height:72px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px">✅</div>
           <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">Report Saved!</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Your report has been added to the sync queue. It will be submitted to the MAO when you're online.</div>
-          <button class="btn btn-primary" onclick="go('s-home')">Back to Home</button>
-          <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-guide')">Scan Another Plant</button>
+          <button class="btn btn-primary" onclick="resetScanFlow(); go('s-home')">Back to Home</button>
+          <button class="btn btn-ghost btn-sm mt-10" onclick="resetScanFlow(); go('s-guide')">Scan Another Plant</button>
         </div>
       </div>
     </div>
@@ -2925,6 +2925,33 @@ function saveAndQueue() {
   success.style.transform = 'translateY(-50%)';
   const container = success.closest('.scroll-content');
   if (container) { container.scrollTop = 0; }
+}
+
+// Reset scan flow state so repeating a scan starts fresh
+function resetScanFlow() {
+  // Clear symptom selections
+  document.querySelectorAll('.symptom-card.selected').forEach(el => {
+    el.classList.remove('selected');
+    const chk = el.querySelector('.check-circle'); if (chk) chk.innerHTML = '';
+  });
+  symptomsSelected = 0;
+  const symptomBtn = document.getElementById('symptom-next');
+  if (symptomBtn) { symptomBtn.style.opacity = '.5'; symptomBtn.style.pointerEvents = 'none'; }
+
+  // Reset camera preview / retake UI
+  try { retakePhoto(); } catch (e) { /* ignore if not present */ }
+
+  // Reset analysis progress
+  const bar = document.getElementById('analysis-progress'); if (bar) bar.style.width = '0%';
+
+  // Reset save form inputs
+  const saveSection = document.getElementById('s-save');
+  if (saveSection) {
+    const sel = saveSection.querySelector('select'); if (sel) sel.selectedIndex = 0;
+    saveSection.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
+    const successView = document.getElementById('save-success-view'); if (successView) successView.style.display = 'none';
+    const formView = document.getElementById('save-form-view'); if (formView) formView.style.display = 'block';
+  }
 }
 
 // ─── SYNC MOCK ────────────────────────────────────────────────
