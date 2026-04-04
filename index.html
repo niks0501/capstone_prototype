@@ -309,6 +309,16 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ─── DELETE CONFIRM MODAL (constrained to device frame) ─────── */
+#delete-modal-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2200;padding:20px;box-sizing:border-box}
+#delete-modal-overlay.active{display:flex}
+.delete-modal{width:100%;max-width:360px;background:var(--bg);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-md);text-align:left}
+.delete-modal .title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px}
+.delete-modal .desc{font-size:13px;color:var(--muted);margin-bottom:14px}
+.delete-modal .actions{display:flex;gap:10px;justify-content:flex-end}
+.delete-modal .actions .btn{min-width:96px}
+
+
 /* ─── MAO DASHBOARD SHELL ────────────────────────────────────── */
 #mao-shell{
   display:none;
@@ -1696,6 +1706,19 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     </div>
 
   </div><!-- end #screen -->
+
+  <!-- Delete Confirm Modal (moved inside device frame) -->
+  <div id="delete-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div class="delete-modal" role="document">
+      <div class="title" id="delete-modal-title">Delete Record?</div>
+      <div class="desc">This action cannot be undone. Are you sure you want to delete this record?</div>
+      <div class="actions">
+        <button class="btn btn-ghost btn-sm" id="delete-cancel-btn" onclick="hideDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" id="delete-confirm-btn" onclick="performDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end #device -->
 
 
@@ -2961,11 +2984,36 @@ function mockSync() {
 }
 
 // ─── DELETE CONFIRM ───────────────────────────────────────────
+// ─── DELETE CONFIRM (modal) ───────────────────────────────────
 function confirmDelete() {
-  if (confirm('Delete this record? This action cannot be undone.')) {
-    showToast('Record deleted');
-    go('s-history');
-  }
+  showDeleteModal();
+}
+
+function showDeleteModal() {
+  const overlay = document.getElementById('delete-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  // focus the cancel button for accessibility
+  const cancelBtn = document.getElementById('delete-cancel-btn');
+  if (cancelBtn) cancelBtn.focus();
+  document.addEventListener('keydown', escDeleteHandler);
+}
+
+function hideDeleteModal() {
+  const overlay = document.getElementById('delete-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  document.removeEventListener('keydown', escDeleteHandler);
+}
+
+function escDeleteHandler(e) {
+  if (e.key === 'Escape') hideDeleteModal();
+}
+
+function performDelete() {
+  hideDeleteModal();
+  showToast('Record deleted');
+  go('s-history');
 }
 
 // Simple MAO profile password change validation (prototype)
@@ -3243,24 +3291,28 @@ function setMapFilter(key, btn) {
   if (btnEl) { btnEl.classList.add('btn-primary'); btnEl.classList.remove('btn-ghost'); }
 
   const pins = document.querySelectorAll('.map-pin');
-  pins.forEach(p => {
-    if (key === 'all') { p.style.opacity = '1'; p.style.pointerEvents = ''; return; }
-    const bMatch = p.dataset.barangay && p.dataset.barangay === key;
-    const dMatch = p.dataset.disease && p.dataset.disease === key;
-    const show = bMatch || dMatch;
-    p.style.opacity = show ? '1' : '0.25';
-    p.style.pointerEvents = show ? '' : 'none';
-  });
+  // normalize key for robust matching
+  const normKey = (key || '').toString().trim().toLowerCase();
 
-  // Update active class for pin selection (only when key matches a barangay)
   pins.forEach(p => {
-    if (key === 'all') {
+    if (normKey === 'all') {
+      p.style.opacity = '1';
+      p.style.pointerEvents = 'auto';
       p.classList.remove('active');
-    } else if (p.dataset.barangay && p.dataset.barangay === key) {
-      p.classList.add('active');
-    } else {
-      p.classList.remove('active');
+      return;
     }
+
+    const barangay = (p.dataset.barangay || '').toString().trim().toLowerCase();
+    const diseaseAttr = (p.dataset.disease || '').toString().trim().toLowerCase();
+    const diseaseList = diseaseAttr ? diseaseAttr.split(',').map(s => s.trim()) : [];
+
+    const bMatch = barangay && barangay === normKey;
+    const dMatch = diseaseAttr && (diseaseList.includes(normKey) || diseaseAttr === normKey);
+    const show = bMatch || dMatch;
+
+    p.style.opacity = show ? '1' : '0.25';
+    p.style.pointerEvents = show ? 'auto' : 'none';
+    if (show) p.classList.add('active'); else p.classList.remove('active');
   });
 
   // Maintain currentPinFilter so pin clicks can toggle correctly.
