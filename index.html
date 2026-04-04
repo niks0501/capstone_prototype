@@ -81,6 +81,21 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .scroll-content{flex:1;overflow-y:auto;padding-bottom:80px}
 .scroll-content::-webkit-scrollbar{display:none}
 
+/* Centered success view for save/submit confirmation */
+#save-success-view{
+  position:absolute;
+  left:0;right:0;
+  top:50%;
+  transform:translateY(-50%);
+  padding:40px 24px;
+  display:none; /* shown by JS */
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:60;
+}
+
 /* ─── BOTTOM NAV ─────────────────────────────────────────────── */
 .bottom-nav{
   height:var(--nav-h);background:var(--bg);
@@ -513,6 +528,55 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
   /* Onboarding + Role: robust vertical + horizontal centering */
   #s-onboard, #s-role{display:grid;place-items:center;min-height:100%}
   #s-onboard > .flex-col, #s-role > .p-24{width:calc(100% - 48px);max-width:360px;box-sizing:border-box;margin:auto}
+/* Advisory card + status-pill */
+.card.advisory-card{
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:12px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+  position:relative;
+}
+.status-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  color:#fff;
+  line-height:1;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+.card.advisory-card[data-status="high"] .status-pill{background:var(--danger)}
+.card.advisory-card[data-status="medium"] .status-pill{background:var(--warning)}
+.card.advisory-card[data-status="low"] .status-pill{background:var(--success)}
+.card.advisory-card[data-status="info"] .status-pill{background:var(--info)}
+.card.advisory-card[data-status="high"]{border-left:4px solid var(--danger)}
+.card.advisory-card[data-status="medium"]{border-left:4px solid var(--warning)}
+.card.advisory-card[data-status="low"]{border-left:4px solid var(--success)}
+.card.advisory-card[data-status="info"]{border-left:4px solid var(--info)}
+.btn-inline{width:auto;padding:8px 16px}
+.field.error input, .field.error .pw-field input{border:1.5px solid var(--danger);box-shadow:0 0 0 6px rgba(185,46,46,.06);}
+.field.error label{color:var(--danger)}
+.btn-inline{width:auto;padding:8px 16px}
+.error-text{font-size:12px;color:var(--danger);margin-top:0;display:none;line-height:1.05}
+.field.error .error-text{display:block}
+.field.error .pw-strength{display:none !important;margin-top:0 !important;min-height:0 !important}
+
+/* Quick Actions: enlarge inline emoji icons in home Quick Actions */
+.quick-action .quick-icon{font-size:22px;display:inline-block;width:30px;text-align:center;margin-right:10px;line-height:1;transform:translateY(1px)}
+.quick-action .quick-icon svg{width:20px;height:20px;display:block}
+.quick-icon.camera svg{width:28px;height:28px}
+.quick-action{display:inline-flex;align-items:center;gap:8px}
+
+/* MAP PIN: active state when a pin is used as a secondary filter */
+.map-pin > div:first-child{transition:transform .15s ease,box-shadow .15s ease}
+.map-pin.active > div:first-child{transform:scale(1.08);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.map-pin.active{z-index:60}
+
 </style>
 </head>
 <body>
@@ -737,7 +801,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="flex items-center justify-between">
           <div>
             <div style="font-size:12px;color:rgba(255,255,255,.7)">Magandang umaga,</div>
-            <div style="font-size:20px;font-weight:800;color:#fff">Charish Bea 👋</div>
+            <div style="font-size:20px;font-weight:800;color:#fff">Nikko Selwyn 👋</div>
           </div>
           <div class="flex items-center gap-8">
             <span class="chip chip-online" id="home-online-chip">Online</span>
@@ -755,22 +819,38 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       </div>
 
       <div class="scroll-content">
-        <!-- Demo mode notice — shown after login, not a separate flow -->
-        <div id="demo-banner" style="margin:12px 20px 0;background:linear-gradient(135deg,#eef3ef,#e3ece4);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--primary)">🧪 Demo Mode Active</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px">Signed in as demo user. Data and scans are simulated.</div>
-          </div>
-          <button onclick="document.getElementById('demo-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0;flex-shrink:0">✕</button>
-        </div>
+        
 
         <div class="section">
           <div class="section-title">Quick Actions</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <button class="btn btn-primary" onclick="go('s-guide')">📷 Start Scan</button>
-            <button class="btn btn-secondary" onclick="go('s-history')">🗂 My Records</button>
-            <button class="btn btn-ghost" onclick="go('s-queue')">📡 Sync Queue <span class="chip chip-queued">2</span></button>
-            <button class="btn btn-ghost" onclick="go('s-help')">❓ Help & FAQ</button>
+            <button class="btn btn-primary quick-action" onclick="go('s-guide')"><span class="quick-icon camera" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                  <circle cx="12" cy="12" r="11" fill="var(--success)"/>
+                  <path d="M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M9 8l1-2h4l1 2" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="14" r="2.3" fill="#fff"/>
+                </svg>
+              </span> Start Scan</button>
+            <button class="btn btn-secondary quick-action" onclick="go('s-history')"><span class="quick-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
+                  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+                  <path d="M8 11h8M8 15h8"/>
+                </svg>
+              </span> My Records</button>
+            <button class="btn btn-ghost quick-action" onclick="go('s-queue')"><span class="quick-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M1 20v-6a9 9 0 0 1 15.64-6.36L23 10"></path>
+                </svg>
+              </span> Sync Queue <span class="chip chip-queued">2</span></button>
+            <button class="btn btn-ghost quick-action" onclick="go('s-help')"><span class="quick-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <path d="M12 17h.01"></path>
+                </svg>
+              </span> Help & FAQ</button>
           </div>
         </div>
 
@@ -841,8 +921,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <button class="nav-btn" onclick="goTab('settings')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
         </button>
-        <button class="nav-btn" onclick="mobileLogout()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
+        <button class="nav-btn" onclick="goTab('farmer-reports')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports
         </button>
       </div>
     </div>
@@ -1095,9 +1175,12 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="scroll-content">
         <div class="section">
           <!-- Urgency -->
-          <div style="background:#FFEBEE;border-left:4px solid var(--danger);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
-            <div style="font-size:13px;font-weight:700;color:var(--danger)">🔴 High Urgency — Immediate Attention Needed</div>
-            <div style="font-size:12px;color:#7F0000;margin-top:4px">Sugarcane Smut spreads quickly. Isolate affected plants now.</div>
+          <div class="card advisory-card" data-status="high" role="region" aria-label="High urgency — Immediate attention needed">
+            <div class="flex justify-between items-center" style="margin-bottom:6px">
+              <div style="font-size:13px;font-weight:700;color:var(--text)">🔴 High Urgency — Immediate Attention Needed</div>
+              <span class="status-pill">High</span>
+            </div>
+            <div style="font-size:12px;color:var(--danger)">Sugarcane Smut spreads quickly. Isolate affected plants now.</div>
           </div>
 
           <div class="card">
@@ -1122,7 +1205,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             </div>
           </div>
 
-          <div class="card" style="background:var(--surface2)">
+          <div class="card">
             <div class="section-title">MAO Contact — Nasugbu</div>
             <div class="text-sm">Municipal Agriculture Office</div>
             <div class="text-xs text-muted mt-8">Brgy. Poblacion, Nasugbu, Batangas</div>
@@ -1172,13 +1255,122 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
         </div>
         <!-- Success State -->
-        <div id="save-success-view" style="display:none;flex:1;justify-content:center;align-items:center;padding:40px 24px;flex-direction:column;text-align:center">
+        <div id="save-success-view" style="display:none;padding:40px 24px;text-align:center">
           <div style="width:72px;height:72px;background:#E8F5E9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px">✅</div>
           <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">Report Saved!</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Your report has been added to the sync queue. It will be submitted to the MAO when you're online.</div>
           <button class="btn btn-primary" onclick="go('s-home')">Back to Home</button>
           <button class="btn btn-ghost btn-sm mt-10" onclick="go('s-guide')">Scan Another Plant</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: FARMER REPORTS ══════════ -->
+    <div class="screen hidden" id="s-farmer-reports">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Reports</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="section">
+
+          <!-- Aggregated disease summary -->
+          <div class="section-title">Disease Summary</div>
+          <div class="card" style="padding:14px 16px;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
+                <div style="font-size:28px;font-weight:800;color:var(--danger)">18</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Total Scans</div>
+              </div>
+              <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
+                <div style="font-size:28px;font-weight:800;color:var(--warning)">11</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Diseases Detected</div>
+              </div>
+              <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
+                <div style="font-size:28px;font-weight:800;color:var(--success)">5</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Healthy Scans</div>
+              </div>
+              <div style="text-align:center;padding:12px 8px;background:#FFF3E0;border-radius:var(--radius-sm)">
+                <div style="font-size:28px;font-weight:800;color:#C97B2E">2</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Pending Sync</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Disease breakdown -->
+          <div class="section-title mt-12">By Disease Type</div>
+          <div class="card">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Smut</span><span class="chip chip-smut" style="font-size:10px">7 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:63%"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Downy Mildew</span><span class="chip chip-mildew" style="font-size:10px">3 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:27%;background:var(--info)"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Mosaic Disease</span><span class="chip chip-mosaic" style="font-size:10px">1 case</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:9%;background:var(--warning)"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sync status -->
+          <div class="section-title mt-12">Sync Status</div>
+          <div class="card" style="background:#FFF3E0;border:1px solid #FFD0A0">
+            <div class="flex items-center justify-between mb-8">
+              <div>
+                <div class="text-sm font-bold" style="color:#BF360C">📡 2 reports unsent</div>
+                <div class="text-xs text-muted mt-4">Saved locally · Will sync when online</div>
+              </div>
+              <span class="chip chip-queued">Queued</span>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="mockSync()">Sync to MAO Now</button>
+          </div>
+
+          <div class="card" style="margin-top:0">
+            <div class="flex items-center justify-between mb-8">
+              <div>
+                <div class="text-sm font-bold" style="color:var(--success)">✅ 16 reports synced</div>
+                <div class="text-xs text-muted mt-4">Last synced: July 12, 2025 · 11:04 AM</div>
+              </div>
+              <span class="chip chip-sent">Sent</span>
+            </div>
+          </div>
+
+          <!-- Recent submissions -->
+          <div class="section-title mt-12">Recent Submissions</div>
+          <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Scan — Brgy. Wawa</div><div class="text-xs text-muted">July 12 · 10:23 AM</div></div>
+              <span class="chip chip-smut">Possible Smut</span>
+            </div>
+            <div class="flex gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span></div>
+          </div>
+          <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Scan — Brgy. Bilaran</div><div class="text-xs text-muted">July 5 · 1:12 PM</div></div>
+              <span class="chip chip-mildew">Possible Mildew</span>
+            </div>
+            <div class="flex gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span></div>
+          </div>
+          <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
+            <div class="flex items-center justify-between mb-8">
+              <div><div class="text-sm font-bold">Scan — Brgy. Cogunan</div><div class="text-xs text-muted">July 10 · 3:45 PM</div></div>
+              <span class="chip chip-healthy">Healthy</span>
+            </div>
+            <div class="flex gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <button class="nav-btn" onclick="goTab('home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+        <button class="nav-btn" onclick="goTab('scan')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan</button>
+        <button class="nav-btn" onclick="goTab('history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records</button>
+        <button class="nav-btn" onclick="goTab('settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+        <button class="nav-btn active" onclick="goTab('farmer-reports')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports</button>
       </div>
     </div>
 
@@ -1286,7 +1478,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <button class="nav-btn" onclick="goTab('scan')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan</button>
         <button class="nav-btn active" onclick="goTab('history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records</button>
         <button class="nav-btn" onclick="goTab('settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
-        <button class="nav-btn" onclick="mobileLogout()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+        <button class="nav-btn" onclick="goTab('farmer-reports')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports</button>
       </div>
     </div>
 
@@ -1309,9 +1501,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <table style="width:100%;font-size:13px;border-collapse:collapse">
               <tr><td style="padding:6px 0;color:var(--muted);width:40%">Date</td><td style="font-weight:600">July 12, 2025 · 10:23 AM</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Barangay</td><td style="font-weight:600">Brgy. Wawa</td></tr>
-              <tr><td style="padding:6px 0;color:var(--muted)">Farmer</td><td style="font-weight:600">Juan dela Cruz</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Farmer</td><td style="font-weight:600">Ronel Lance</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Status</td><td><span class="chip chip-queued">Queued</span></td></tr>
-              <tr><td style="padding:6px 0;color:var(--muted)">Submitted by</td><td style="font-weight:600">Maria Santos</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Submitted by</td><td style="font-weight:600">Charish Bea</td></tr>
             </table>
           </div>
 
@@ -1444,7 +1636,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <button class="nav-btn" onclick="goTab('scan')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Scan</button>
         <button class="nav-btn" onclick="goTab('history')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Records</button>
         <button class="nav-btn active" onclick="goTab('settings')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
-        <button class="nav-btn" onclick="mobileLogout()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+        <button class="nav-btn" onclick="goTab('farmer-reports')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports</button>
       </div>
     </div>
 
@@ -1493,9 +1685,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <div class="pw-strength" id="mob-conf-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
             </div>
             <div class="account-actions">
-              <button class="btn btn-primary btn-sm" onclick="saveMobileProfile()">Save Changes</button>
-              <button class="btn btn-ghost btn-sm" onclick="go('s-settings')">Cancel</button>
-            </div>
+                <button class="btn btn-primary btn-sm" onclick="saveMobileProfile()">Save Changes</button>
+                <button class="btn btn-ghost btn-sm" onclick="go('s-home')">Cancel</button>
+              </div>
           </div>
 
           <button class="btn btn-danger" onclick="mobileLogout()">Logout</button>
@@ -1611,31 +1803,39 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     <!-- Sidebar -->
     <div class="mao-sidebar">
       <div style="padding:12px 20px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Navigation</div>
-      <div class="mao-nav-item active" onclick="maoTab('overview')">
+      <div id="mao-nav-overview" class="mao-nav-item active" onclick="maoTab('overview')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Overview
       </div>
-      <div class="mao-nav-item" onclick="maoTab('reports')">
+      <div id="mao-nav-reports" class="mao-nav-item" onclick="maoTab('reports')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Reports
       </div>
-      <div class="mao-nav-item" onclick="maoTab('report-detail')">
+      <div id="mao-nav-report-detail" class="mao-nav-item" onclick="maoTab('report-detail')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         Report Detail
       </div>
-      <div class="mao-nav-item" onclick="maoTab('barangay')">
-        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Barangay Summary
+      <div id="mao-nav-map" class="mao-nav-item" onclick="maoTab('map')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        Map
       </div>
-      <div class="mao-nav-item" onclick="maoTab('advisory')">
+      <div id="mao-nav-analytics" class="mao-nav-item" onclick="maoTab('analytics')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </div>
+      <div id="mao-nav-users" class="mao-nav-item" onclick="maoTab('users')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </div>
+      <div id="mao-nav-advisory" class="mao-nav-item" onclick="maoTab('advisory')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Advisory Panel
       </div>
-      <div class="mao-nav-item" onclick="maoTab('profile')">
+      <div id="mao-nav-profile" class="mao-nav-item" onclick="maoTab('profile')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
         Profile
       </div>
-      <div class="mao-nav-item" onclick="maoLogout()">
+      <div id="mao-nav-logout" class="mao-nav-item" onclick="maoLogout()">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Logout
       </div>
@@ -1821,12 +2021,95 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         </div>
       </div>
 
-      <!-- BARANGAY SUMMARY -->
-      <div class="mao-panel" id="mao-barangay">
+      <!-- MAP MODULE -->
+      <div class="mao-panel" id="mao-map">
         <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Barangay Monitoring</div>
-          <div style="font-size:13px;color:var(--muted)">Disease spread overview · Nasugbu, Batangas · July 2025</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Map</div>
+          <div style="font-size:13px;color:var(--muted)">Geographical disease scan locations · Nasugbu, Batangas · July 2025</div>
         </div>
+
+        <!-- Map filter bar -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Filter:</span>
+          <button data-filter="all" class="btn btn-primary btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('all',this)">All Barangays</button>
+          <button data-filter="wawa" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('wawa',this)">Brgy. Wawa</button>
+          <button data-filter="cogunan" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('cogunan',this)">Brgy. Cogunan</button>
+          <button data-filter="bilaran" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('bilaran',this)">Brgy. Bilaran</button>
+          <button data-filter="smut" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('smut',this)">Smut Only</button>
+          <button data-filter="mildew" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('mildew',this)">Mildew Only</button>
+        </div>
+
+        <!-- SVG mock map of Nasugbu barangays -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;position:relative">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:700">Scan Location Hotspot Map</span>
+            <span style="font-size:11px;color:var(--muted)">Nasugbu, Batangas</span>
+          </div>
+          <div style="position:relative;background:linear-gradient(160deg,#c8e6c9 0%,#a5d6a7 40%,#81c784 100%);height:340px;overflow:hidden">
+            <!-- Ocean/water area -->
+            <div style="position:absolute;right:0;top:0;width:30%;height:100%;background:linear-gradient(90deg,rgba(100,181,246,.3),rgba(100,181,246,.7));border-left:2px dashed rgba(100,181,246,.5)"></div>
+            <div style="position:absolute;right:2%;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(13,71,161,.8);font-weight:700;writing-mode:vertical-rl;letter-spacing:.08em">Balayan Bay</div>
+            <!-- Grid lines -->
+            <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.15" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg">
+              <line x1="0" y1="85" x2="600" y2="85" stroke="#2e7d32" stroke-width="1"/>
+              <line x1="0" y1="170" x2="600" y2="170" stroke="#2e7d32" stroke-width="1"/>
+              <line x1="0" y1="255" x2="600" y2="255" stroke="#2e7d32" stroke-width="1"/>
+              <line x1="150" y1="0" x2="150" y2="340" stroke="#2e7d32" stroke-width="1"/>
+              <line x1="300" y1="0" x2="300" y2="340" stroke="#2e7d32" stroke-width="1"/>
+              <line x1="450" y1="0" x2="450" y2="340" stroke="#2e7d32" stroke-width="1"/>
+            </svg>
+            <!-- Hotspot pins -->
+            <!-- Brgy. Wawa - HIGH (11 reports) -->
+            <div class="map-pin" data-barangay="wawa" data-disease="smut" style="position:absolute;left:22%;top:28%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Wawa — 11 reports · Smut x8')">
+              <div style="width:44px;height:44px;border-radius:50%;background:#B94040;border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800">11</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Brgy. Wawa</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#B94040"></div>
+            </div>
+            <!-- Brgy. Cogunan - MEDIUM (9 reports) -->
+            <div class="map-pin" data-barangay="cogunan" data-disease="mildew" style="position:absolute;left:38%;top:48%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Cogunan — 9 reports · Mildew x6')">
+              <div style="width:40px;height:40px;border-radius:50%;background:#C97B2E;border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800">9</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Brgy. Cogunan</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#C97B2E"></div>
+            </div>
+            <!-- Brgy. Bilaran - MEDIUM (7 reports) -->
+            <div class="map-pin" data-barangay="bilaran" data-disease="mosaic" style="position:absolute;left:52%;top:30%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Bilaran — 7 reports · Mosaic x5')">
+              <div style="width:38px;height:38px;border-radius:50%;background:#C97B2E;border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800">7</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Brgy. Bilaran</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#C97B2E"></div>
+            </div>
+            <!-- Brgy. Mataas na Lupa - LOW (6 reports) -->
+            <div class="map-pin" data-barangay="mataas" style="position:absolute;left:34%;top:70%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Mataas na Lupa — 6 reports · Rust x4')">
+              <div style="width:34px;height:34px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800">6</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Mataas na Lupa</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
+            </div>
+            <!-- Brgy. Looc - LOW (5 reports) -->
+            <div class="map-pin" data-barangay="looc" style="position:absolute;left:58%;top:62%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Looc — 5 reports · Mosaic x3')">
+              <div style="width:32px;height:32px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">5</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Brgy. Looc</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
+            </div>
+            <!-- Brgy. Balaytigue - LOW (4 reports) -->
+            <div class="map-pin" data-barangay="balaytigue" style="position:absolute;left:18%;top:60%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Balaytigue — 4 reports · Unclear x2')">
+              <div style="width:30px;height:30px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">4</div>
+              <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Balaytigue</div>
+              <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
+            </div>
+            <!-- Legend -->
+            <div style="position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,.92);border-radius:8px;padding:8px 12px;font-size:10px;line-height:1.8">
+              <div style="font-weight:700;margin-bottom:4px;font-size:11px">Legend</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#B94040;border:1px solid #fff"></span>High (10+)</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#C97B2E;border:1px solid #fff"></span>Medium (6–9)</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#445D48;border:1px solid #fff"></span>Low (1–5)</div>
+            </div>
+            <!-- Compass -->
+            <div style="position:absolute;top:12px;right:72px;background:rgba(255,255,255,.85);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,.2)">🧭</div>
+          </div>
+          <div style="padding:10px 16px;font-size:11px;color:var(--muted);text-align:center">Tap a pin to see barangay details · Numbers indicate total scan reports</div>
+        </div>
+
+        <!-- Barangay detail cards below map -->
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px">Barangay Summary</div>
 
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
           <div style="background:var(--surface);border:2px solid var(--danger);border-radius:var(--radius);padding:16px;position:relative">
@@ -1894,11 +2177,27 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="mao-profile-grid">
           <div class="chart-card account-form">
             <div class="chart-title">Account Details</div>
-            <div class="field"><label>Full Name</label><input type="text" value="Engr. Lea Reyes"/></div>
-            <div class="field"><label>Office Email</label><input type="email" value="mao.nasugbu@gov.ph"/></div>
-            <div class="field"><label>Contact Number</label><input type="text" value="(043) 416-1122"/></div>
-            <div class="field"><label>Role</label><select><option>MAO Admin</option><option>MAO Analyst</option><option>Field Coordinator</option></select></div>
-            <button class="btn btn-primary btn-sm" onclick="showMAOToast('Profile updated (mock)')">Save Profile</button>
+            <div class="field">
+              <label>Full Name</label>
+              <input id="mao-fullname" type="text" value="Engr. Lea Reyes"/>
+              <div class="error-text" id="mao-fullname-err"></div>
+            </div>
+            <div class="field">
+              <label>Office Email</label>
+              <input id="mao-email" type="email" value="mao.nasugbu@gov.ph"/>
+              <div class="error-text" id="mao-email-err"></div>
+            </div>
+            <div class="field">
+              <label>Contact Number</label>
+              <input id="mao-contact" type="text" value="(043) 416-1122"/>
+              <div class="error-text" id="mao-contact-err"></div>
+            </div>
+            <div class="field">
+              <label>Role</label>
+              <select id="mao-role"><option>MAO Admin</option><option>MAO Analyst</option><option>Field Coordinator</option></select>
+              <div class="error-text" id="mao-role-err"></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveMaoProfile()">Save Profile</button>
           </div>
 
           <div class="chart-card account-form">
@@ -1910,6 +2209,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-cur-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
               <div class="pw-strength" id="mao-cur-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+              <div class="error-text" id="mao-cur-pw-err"></div>
             </div>
             <div class="field">
               <label>New Password</label>
@@ -1918,6 +2218,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-new-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
               <div class="pw-strength" id="mao-new-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+              <div class="error-text" id="mao-new-pw-err"></div>
             </div>
             <div class="field">
               <label>Confirm New Password</label>
@@ -1926,12 +2227,203 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-conf-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
               <div class="pw-strength" id="mao-conf-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+              <div class="error-text" id="mao-conf-pw-err"></div>
             </div>
             <div class="account-actions">
-              <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Password change submitted (mock)')">Change Password</button>
+              <button class="btn btn-secondary btn-sm" onclick="changeMaoPassword()">Change Password</button>
               <button class="btn btn-danger btn-sm" onclick="maoLogout()">Logout</button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS PANEL -->
+      <div class="mao-panel" id="mao-analytics">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Analytics</div>
+          <div style="font-size:13px;color:var(--muted)">Disease occurrence trends · Nasugbu, Batangas</div>
+        </div>
+
+        <!-- Timeframe selector -->
+        <div style="display:flex;gap:8px;margin-bottom:24px;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Timeframe:</span>
+          <button data-filter="week" class="btn btn-primary btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('week',this)">This Week</button>
+          <button data-filter="month" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('month',this)">This Month</button>
+          <button data-filter="quarter" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('quarter',this)">3 Months</button>
+        </div>
+
+        <!-- KPI strip -->
+        <div class="stat-grid" style="margin-bottom:24px">
+          <div class="stat-card">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total Scans</div>
+            <div style="font-size:28px;font-weight:800;color:var(--text)">63</div>
+            <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 18% vs last period</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Disease Rate</div>
+            <div style="font-size:28px;font-weight:800;color:var(--danger)">74%</div>
+            <div style="font-size:11px;color:var(--danger);margin-top:2px">↑ 9% vs last period</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Resolved</div>
+            <div style="font-size:28px;font-weight:800;color:var(--success)">41</div>
+            <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 12% vs last period</div>
+          </div>
+          <div class="stat-card">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Active Farmers</div>
+            <div style="font-size:28px;font-weight:800;color:var(--info)">12</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">No change</div>
+          </div>
+        </div>
+
+        <div class="analytics-grid" style="margin-bottom:24px">
+          <!-- Weekly trend chart -->
+          <div class="chart-card">
+            <div class="chart-title">Weekly Disease Occurrence Trend</div>
+            <div class="chart-bars" style="height:180px;margin-bottom:10px">
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:24%;background:#6E8B74"></div></div><div class="chart-meta">W1</div><div class="chart-val">6</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:40%;background:#5E7A65"></div></div><div class="chart-meta">W2</div><div class="chart-val">10</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:72%;background:#C97B2E"></div></div><div class="chart-meta">W3</div><div class="chart-val">18</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:92%;background:#B94040"></div></div><div class="chart-meta">W4</div><div class="chart-val">23</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:60%;background:#445D48"></div></div><div class="chart-meta">W5</div><div class="chart-val">15</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:44%;background:#6E8B74"></div></div><div class="chart-meta">W6</div><div class="chart-val">11</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);text-align:center">Week 4 peak followed by decline after MAO advisories issued</div>
+          </div>
+          <!-- Disease breakdown -->
+          <div class="chart-card">
+            <div class="chart-title">Disease Type Breakdown</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Smut</span><span class="text-sm font-bold" style="color:#4A148C">14 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:37%;background:#7B1FA2"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Downy Mildew</span><span class="text-sm font-bold" style="color:#0D47A1">10 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:26%;background:#1565C0"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Mosaic Disease</span><span class="text-sm font-bold" style="color:#F57F17">8 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:21%;background:#F9A825"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Rust</span><span class="text-sm font-bold" style="color:#BF360C">5 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:13%;background:#E64A19"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Healthy / Unclear</span><span class="text-sm font-bold" style="color:var(--muted)">3 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:8%;background:var(--muted)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resolution performance -->
+        <div class="chart-card" style="margin-bottom:0">
+          <div class="chart-title">Response &amp; Resolution Performance</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+            <div class="trend-row"><div class="trend-label">Same-day review</div><div class="trend-track"><div class="trend-fill" style="width:61%;background:var(--success)"></div></div><div class="chart-val">61%</div></div>
+            <div class="trend-row"><div class="trend-label">2–3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--warning)"></div></div><div class="chart-val">27%</div></div>
+            <div class="trend-row"><div class="trend-label">Backlog (&gt;3 days)</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--danger)"></div></div><div class="chart-val">12%</div></div>
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--muted)">Peak inflow: Tuesday and Friday morning uploads from Brgy. Wawa and Brgy. Cogunan.</div>
+        </div>
+      </div>
+
+      <!-- USERS PANEL -->
+      <div class="mao-panel" id="mao-users">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Users</div>
+          <div style="font-size:13px;color:var(--muted)">Registered farmers and field personnel · Nasugbu, Batangas</div>
+        </div>
+
+        <!-- Search and actions -->
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <input id="users-search" type="text" oninput="applyUsersFilter()" placeholder="🔍 Search by name or barangay…" style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm filter-pill-sm users-role-btn btn-primary" onclick="setUsersRole('all',this)" style="background:var(--primary);color:#fff">All</button>
+            <button class="btn btn-ghost btn-sm filter-pill-sm users-role-btn" onclick="setUsersRole('farmer',this)">Farmers</button>
+            <button class="btn btn-ghost btn-sm filter-pill-sm users-role-btn" onclick="setUsersRole('personnel',this)">Personnel</button>
+          </div>
+        </div>
+
+        <!-- Users table -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+          <table class="mao-table">
+            <thead>
+              <tr><th>Name</th><th>Role</th><th>Barangay</th><th>Scans</th><th>Last Active</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr class="users-row" data-role="farmer" data-name="Juan dela Cruz Brgy. Wawa">
+                <td><div style="font-weight:600">Juan dela Cruz</div><div style="font-size:11px;color:var(--muted)">23-10001</div></td>
+                <td><span class="chip" style="background:#E8F5E9;color:#1B5E20">Farmer</span></td>
+                <td>Brgy. Wawa</td>
+                <td style="font-weight:700">18</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 12, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Juan dela Cruz — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="farmer" data-name="Pedro Manalo Brgy. Cogunan">
+                <td><div style="font-weight:600">Pedro Manalo</div><div style="font-size:11px;color:var(--muted)">23-10002</div></td>
+                <td><span class="chip" style="background:#E8F5E9;color:#1B5E20">Farmer</span></td>
+                <td>Brgy. Cogunan</td>
+                <td style="font-weight:700">12</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 10, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Pedro Manalo — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="farmer" data-name="Ana Lim Brgy. Bilaran">
+                <td><div style="font-weight:600">Ana Lim</div><div style="font-size:11px;color:var(--muted)">23-10003</div></td>
+                <td><span class="chip" style="background:#E8F5E9;color:#1B5E20">Farmer</span></td>
+                <td>Brgy. Bilaran</td>
+                <td style="font-weight:700">9</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 9, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Ana Lim — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="personnel" data-name="Maria Santos Field Personnel">
+                <td><div style="font-weight:600">Maria Santos</div><div style="font-size:11px;color:var(--muted)">23-10004</div></td>
+                <td><span class="chip chip-queued">Personnel</span></td>
+                <td>Brgy. Wawa</td>
+                <td style="font-weight:700">22</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 12, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Maria Santos — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="farmer" data-name="Jose Reyes Brgy. Looc">
+                <td><div style="font-weight:600">Jose Reyes</div><div style="font-size:11px;color:var(--muted)">23-10005</div></td>
+                <td><span class="chip" style="background:#E8F5E9;color:#1B5E20">Farmer</span></td>
+                <td>Brgy. Looc</td>
+                <td style="font-weight:700">7</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 7, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Jose Reyes — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="farmer" data-name="Rosa Garcia Brgy. Mataas na Lupa">
+                <td><div style="font-weight:600">Rosa Garcia</div><div style="font-size:11px;color:var(--muted)">23-10006</div></td>
+                <td><span class="chip" style="background:#E8F5E9;color:#1B5E20">Farmer</span></td>
+                <td>Brgy. Mataas na Lupa</td>
+                <td style="font-weight:700">5</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 5, 2025</td>
+                <td><span class="chip chip-offline">Inactive</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Rosa Garcia — mock')">View →</span></td>
+              </tr>
+              <tr class="users-row" data-role="personnel" data-name="Charish Bea Field Personnel Balaytigue">
+                <td><div style="font-weight:600">Charish Bea</div><div style="font-size:11px;color:var(--muted)">23-10007</div></td>
+                <td><span class="chip chip-queued">Personnel</span></td>
+                <td>Brgy. Balaytigue</td>
+                <td style="font-weight:700">11</td>
+                <td style="font-size:12px;color:var(--muted)">Jul 8, 2025</td>
+                <td><span class="chip chip-sent">Active</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Charish Bea — mock')">View →</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="users-empty" class="empty-state" style="display:none;padding:24px 10px">
+          <div class="icon">👤</div>
+          <h3>No users found</h3>
+          <p>Try a different name or barangay keyword.</p>
         </div>
       </div>
 
@@ -1943,34 +2435,40 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         </div>
 
         <div style="display:flex;flex-direction:column;gap:16px">
-          <div style="background:#FFEBEE;border:1px solid #FFCDD2;border-left:4px solid var(--danger);border-radius:var(--radius);padding:20px">
+          <div class="card advisory-card" data-status="high" role="region" aria-label="High urgency — Sugarcane Smut" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
               <div class="flex items-center gap-12"><span style="font-size:20px">🖤</span><span style="font-size:15px;font-weight:800">Sugarcane Smut</span></div>
-              <span class="chip chip-smut">14 active cases</span>
+              <div class="flex items-center gap-8"><span class="status-pill">High</span><span class="chip chip-smut">14 active cases</span></div>
             </div>
-            <div class="text-sm" style="color:#7F0000;margin-bottom:12px;line-height:1.6">Isolate infected stalks immediately. Do not use seed canes from affected areas. Conduct field verification and destroy infected materials through burning or burial.</div>
+            <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Isolate infected stalks immediately. Do not use seed canes from affected areas. Conduct field verification and destroy infected materials through burning or burial.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Wawa, Brgy. Cogunan</div>
-            <button class="btn btn-danger btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Smut (mock)')">Issue Advisory</button>
+            <div style="margin-top:12px">
+              <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Smut (mock)')">Issue Advisory</button>
+            </div>
           </div>
 
-          <div style="background:#E3F2FD;border:1px solid #BBDEFB;border-left:4px solid #1565C0;border-radius:var(--radius);padding:20px">
+          <div class="card advisory-card" data-status="medium" role="region" aria-label="Medium urgency — Downy Mildew" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
               <div class="flex items-center gap-12"><span style="font-size:20px">🌫️</span><span style="font-size:15px;font-weight:800">Downy Mildew</span></div>
-              <span class="chip chip-mildew">10 active cases</span>
+              <div class="flex items-center gap-8"><span class="status-pill">Medium</span><span class="chip chip-mildew">10 active cases</span></div>
             </div>
-            <div class="text-sm" style="color:#0D47A1;margin-bottom:12px;line-height:1.6">Remove and destroy infected plant material. Apply recommended fungicide if available. Monitor surrounding fields. Improve drainage in affected areas.</div>
+            <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Remove and destroy infected plant material. Apply recommended fungicide if available. Monitor surrounding fields. Improve drainage in affected areas.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Cogunan, Brgy. Bilaran</div>
-            <button class="btn btn-secondary btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Mildew (mock)')">Issue Advisory</button>
+            <div style="margin-top:12px">
+              <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mildew (mock)')">Issue Advisory</button>
+            </div>
           </div>
 
-          <div style="background:#FFF8E1;border:1px solid #FFE082;border-left:4px solid #F57F17;border-radius:var(--radius);padding:20px">
+          <div class="card advisory-card" data-status="low" role="region" aria-label="Low urgency — Mosaic Disease" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
               <div class="flex items-center gap-12"><span style="font-size:20px">🎨</span><span style="font-size:15px;font-weight:800">Mosaic Disease</span></div>
-              <span class="chip chip-mosaic">8 active cases</span>
+              <div class="flex items-center gap-8"><span class="status-pill">Low</span><span class="chip chip-mosaic">8 active cases</span></div>
             </div>
-            <div class="text-sm" style="color:#7F4000;margin-bottom:12px;line-height:1.6">Control aphid vectors with appropriate pesticide. Remove and destroy infected plant material. Avoid planting susceptible varieties in affected areas.</div>
+            <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Control aphid vectors with appropriate pesticide. Remove and destroy infected plant material. Avoid planting susceptible varieties in affected areas.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Bilaran, Brgy. Looc</div>
-            <button class="btn btn-secondary btn-sm" style="margin-top:12px;width:auto;padding:8px 16px" onclick="showMAOToast('Advisory issued for Mosaic (mock)')">Issue Advisory</button>
+            <div style="margin-top:12px">
+              <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mosaic (mock)')">Issue Advisory</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2013,7 +2511,7 @@ function go(screenId) {
 }
 
 function goTab(tab) {
-  const map = {home:'s-home', scan:'s-guide', history:'s-history', settings:'s-settings'};
+  const map = {home:'s-home', scan:'s-guide', history:'s-history', settings:'s-settings', 'farmer-reports':'s-farmer-reports'};
   if (map[tab]) go(map[tab]);
 }
 
@@ -2041,7 +2539,7 @@ function sendMobileReset() {
 
 function saveMobileProfile() {
   showToast('Profile updated (mock)');
-  go('s-settings');
+  go('s-home');
 }
 
 function mobileLogout() {
@@ -2403,11 +2901,30 @@ function startAnalysis() {
 // ─── SAVE ─────────────────────────────────────────────────────
 function saveLocal() {
   document.getElementById('save-form-view').style.display = 'none';
-  document.getElementById('save-success-view').style.display = 'flex';
+  const success = document.getElementById('save-success-view');
+  success.style.display = 'flex';
+  // position absolutely so it's centered within the screen
+  success.style.position = 'absolute';
+  success.style.left = '0';
+  success.style.right = '0';
+  success.style.top = '50%';
+  success.style.transform = 'translateY(-50%)';
+  // ensure any underlying scroll is reset
+  const container = success.closest('.scroll-content');
+  if (container) { container.scrollTop = 0; }
 }
 function saveAndQueue() {
   document.getElementById('save-form-view').style.display = 'none';
-  document.getElementById('save-success-view').style.display = 'flex';
+  const success = document.getElementById('save-success-view');
+  success.style.display = 'flex';
+  // position absolutely so it's centered within the screen
+  success.style.position = 'absolute';
+  success.style.left = '0';
+  success.style.right = '0';
+  success.style.top = '50%';
+  success.style.transform = 'translateY(-50%)';
+  const container = success.closest('.scroll-content');
+  if (container) { container.scrollTop = 0; }
 }
 
 // ─── SYNC MOCK ────────────────────────────────────────────────
@@ -2422,6 +2939,100 @@ function confirmDelete() {
     showToast('Record deleted');
     go('s-history');
   }
+}
+
+// Simple MAO profile password change validation (prototype)
+function changeMaoPassword() {
+  const curEl = document.getElementById('mao-cur-pw');
+  const newEl = document.getElementById('mao-new-pw');
+  const confEl = document.getElementById('mao-conf-pw');
+  const cur = (curEl?.value || '').trim();
+  const nw = (newEl?.value || '');
+  const conf = (confEl?.value || '');
+
+  // clear previous error states and texts
+  [curEl, newEl, confEl].forEach(el => {
+    if (!el) return;
+    const wrap = el.closest('.field');
+    if (wrap) {
+      wrap.classList.remove('error');
+      const err = wrap.querySelector('.error-text'); if (err) err.textContent = '';
+    }
+  });
+
+  if (!cur || !nw || !conf) {
+    if (!cur) { const wrap = curEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    if (!nw) { const wrap = newEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    if (!conf) { const wrap = confEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    showMAOToast('Please fill in all password fields');
+    return;
+  }
+  if (nw !== conf) {
+    const wrapNew = newEl.closest('.field'); wrapNew.classList.add('error'); const errNew = wrapNew.querySelector('.error-text'); if (errNew) errNew.textContent = 'Passwords do not match';
+    const wrapConf = confEl.closest('.field'); wrapConf.classList.add('error'); const errConf = wrapConf.querySelector('.error-text'); if (errConf) errConf.textContent = 'Passwords do not match';
+    showMAOToast('New passwords do not match');
+    return;
+  }
+  if (nw.length < 8) {
+    const wrapNew = newEl.closest('.field'); wrapNew.classList.add('error'); const errNew = wrapNew.querySelector('.error-text'); if (errNew) errNew.textContent = 'New password must be at least 8 characters';
+    showMAOToast('New password must be at least 8 characters');
+    return;
+  }
+
+  // success (mock)
+  showMAOToast('Password change submitted (mock)');
+  // clear inputs and strength indicators
+  [curEl, newEl, confEl].forEach(el => { if (el) el.value = ''; });
+  ['mao-cur-pw-str','mao-new-pw-str','mao-conf-pw-str'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove('visible','pw-weak','pw-fair','pw-good');
+      const txt = el.querySelector('.pw-strength-text'); if (txt) txt.textContent = '';
+    }
+  });
+}
+
+// Validate and save MAO profile (prototype)
+function saveMaoProfile() {
+  const nameEl = document.getElementById('mao-fullname');
+  const emailEl = document.getElementById('mao-email');
+  const contactEl = document.getElementById('mao-contact');
+  const roleEl = document.getElementById('mao-role');
+
+  // clear previous errors
+  [nameEl, emailEl, contactEl, roleEl].forEach(el => {
+    if (!el) return;
+    const wrap = el.closest('.field');
+    if (wrap) {
+      wrap.classList.remove('error');
+      const err = wrap.querySelector('.error-text'); if (err) err.textContent = '';
+    }
+  });
+
+  const name = (nameEl?.value || '').trim();
+  const email = (emailEl?.value || '').trim();
+  const contact = (contactEl?.value || '').trim();
+  const role = (roleEl?.value || '').trim();
+
+  if (!name || !email || !contact || !role) {
+    if (!name) { const wrap = nameEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    if (!email) { const wrap = emailEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    if (!contact) { const wrap = contactEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
+    if (!role) { const wrap = roleEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Please select a role'; }
+    showMAOToast('Please fill in all profile fields');
+    return;
+  }
+
+  // basic email check
+  const emailValid = /\S+@\S+\.\S+/.test(email);
+  if (!emailValid) {
+    const wrap = emailEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Enter a valid email';
+    showMAOToast('Enter a valid email');
+    return;
+  }
+
+  // success (mock)
+  showMAOToast('Profile updated (mock)');
 }
 
 // ─── TOAST ────────────────────────────────────────────────────
@@ -2471,15 +3082,196 @@ function switchView(v) {
   }
 }
 
-// ─── MAO NAVIGATION ───────────────────────────────────────────
+// ─── USERS FILTER ─────────────────────────────────────────────
+let usersRoleFilter = 'all';
+// currently-selected barangay pin filter (used for pin click toggle)
+let currentPinFilter = 'all';
+function setUsersRole(role, btn) {
+  usersRoleFilter = role;
+  document.querySelectorAll('.users-role-btn').forEach(b => { b.classList.remove('btn-primary'); b.style.background=''; b.style.color=''; });
+  btn.classList.add('btn-primary'); btn.style.background='var(--primary)'; btn.style.color='#fff';
+  applyUsersFilter();
+}
+function applyUsersFilter() {
+  const q = (document.getElementById('users-search')?.value || '').toLowerCase();
+  const rows = document.querySelectorAll('.users-row');
+  let visible = 0;
+  rows.forEach(r => {
+    const roleMatch = usersRoleFilter === 'all' || r.dataset.role === usersRoleFilter;
+    const nameMatch = !q || (r.dataset.name || '').toLowerCase().includes(q);
+    const show = roleMatch && nameMatch;
+    r.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const empty = document.getElementById('users-empty');
+  if (empty) empty.style.display = visible === 0 ? 'flex' : 'none';
+}
+
+// ─── ANALYTICS TIMEFRAME ──────────────────────────────────────
+function setAnalyticsTf(tf, btn) {
+  // update pill UI (find button if not provided)
+  document.querySelectorAll('.analytics-tf-btn').forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-ghost'); });
+  const btnEl = btn || document.querySelector('.analytics-tf-btn[data-filter="' + tf + '"]');
+  if (btnEl) { btnEl.classList.add('btn-primary'); btnEl.classList.remove('btn-ghost'); }
+  showMAOToast('Showing data for: ' + tf + ' (mock)');
+
+  // update charts and KPIs for the selected timeframe
+  updateAnalytics(tf);
+
+}
+
+// Update analytics charts and KPI values for a given timeframe key
+function updateAnalytics(tf) {
+  const panel = document.getElementById('mao-analytics');
+  if (!panel) return;
+
+  const datasets = {
+    week: {
+      stats: [63, '74%', 41, 12],
+      weekly: [6,10,18,23,15,11],
+      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+      trend: [61,27,12],
+      breakdown: [14,10,8,5,3],
+      breakdownWidths: ['37%','26%','21%','13%','8%'],
+      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+    },
+    month: {
+      stats: [240, '68%', 160, 18],
+      weekly: [28,40,65,90,55,42],
+      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+      trend: [64,22,14],
+      breakdown: [70,45,32,22,11],
+      breakdownWidths: ['31%','20%','14%','10%','5%'],
+      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+    },
+    quarter: {
+      stats: [720, '62%', 520, 30],
+      weekly: [80,120,200,300,250,170],
+      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+      trend: [68,20,12],
+      breakdown: [210,150,110,60,40],
+      breakdownWidths: ['29%','21%','15%','8%','6%'],
+      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+    }
+  };
+
+  const ds = datasets[tf] || datasets.week;
+
+  // Update KPI stat cards (assumes four stat-cards in order)
+  const statCards = panel.querySelectorAll('.stat-grid .stat-card');
+  statCards.forEach((card, i) => {
+    const divs = card.querySelectorAll('div');
+    if (!divs[1]) return;
+    switch(i) {
+      case 0: divs[1].innerText = ds.stats[0]; break; // Total Scans
+      case 1: divs[1].innerText = ds.stats[1]; break; // Disease Rate
+      case 2: divs[1].innerText = ds.stats[2]; break; // Resolved
+      case 3: divs[1].innerText = ds.stats[3]; break; // Active Farmers
+    }
+  });
+
+  // Update weekly bars
+  const cols = panel.querySelectorAll('.chart-bars .chart-col');
+  const maxWeek = Math.max(...ds.weekly, 1);
+  cols.forEach((col, idx) => {
+    const val = ds.weekly[idx] || 0;
+    const pct = Math.round((val / maxWeek) * 100);
+    const fill = col.querySelector('.chart-fill');
+    const valEl = col.querySelector('.chart-val');
+    if (fill) {
+      fill.style.height = pct + '%';
+      if (ds.weeklyColors && ds.weeklyColors[idx]) fill.style.background = ds.weeklyColors[idx];
+    }
+    if (valEl) valEl.innerText = val;
+  });
+
+  // Update breakdown progress bars and labels
+  const breakdownCard = panel.querySelectorAll('.analytics-grid .chart-card')[1];
+  if (breakdownCard) {
+    const fills = breakdownCard.querySelectorAll('.progress-bar-fill');
+    const labelRows = breakdownCard.querySelectorAll('div > .flex.justify-between');
+    fills.forEach((f, i) => {
+      f.style.width = ds.breakdownWidths[i] || '0%';
+      if (ds.breakdownColors && ds.breakdownColors[i]) f.style.background = ds.breakdownColors[i];
+      const labelVal = labelRows[i]?.querySelectorAll('span')[1];
+      if (labelVal) labelVal.innerText = (ds.breakdown[i] || 0) + ' cases';
+    });
+  }
+
+  // Update trend rows
+  const trendRows = panel.querySelectorAll('.chart-card .trend-row');
+  trendRows.forEach((row, i) => {
+    const fill = row.querySelector('.trend-fill');
+    const valEl = row.querySelector('.chart-val');
+    const v = ds.trend[i] || 0;
+    if (fill) fill.style.width = v + '%';
+    if (valEl) valEl.innerText = v + '%';
+  });
+}
+// ─── MAP FILTER ────────────────────────────────────────────────
+function setMapFilter(key, btn) {
+  // style map filter buttons (find matching button if `btn` not provided)
+  document.querySelectorAll('.mao-map-filter-btn').forEach(b => { b.classList.remove('btn-primary'); b.classList.add('btn-ghost'); });
+  const btnEl = btn || document.querySelector('.mao-map-filter-btn[data-filter="' + key + '"]');
+  if (btnEl) { btnEl.classList.add('btn-primary'); btnEl.classList.remove('btn-ghost'); }
+
+  const pins = document.querySelectorAll('.map-pin');
+  pins.forEach(p => {
+    if (key === 'all') { p.style.opacity = '1'; p.style.pointerEvents = ''; return; }
+    const bMatch = p.dataset.barangay && p.dataset.barangay === key;
+    const dMatch = p.dataset.disease && p.dataset.disease === key;
+    const show = bMatch || dMatch;
+    p.style.opacity = show ? '1' : '0.25';
+    p.style.pointerEvents = show ? '' : 'none';
+  });
+
+  // Update active class for pin selection (only when key matches a barangay)
+  pins.forEach(p => {
+    if (key === 'all') {
+      p.classList.remove('active');
+    } else if (p.dataset.barangay && p.dataset.barangay === key) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+
+  // Maintain currentPinFilter so pin clicks can toggle correctly.
+  if (key === 'all') {
+    currentPinFilter = 'all';
+  } else {
+    const anyBarangayPin = Array.from(pins).some(p => p.dataset.barangay === key);
+    currentPinFilter = anyBarangayPin ? key : 'all';
+  }
+}
+
+
 function maoTab(panel) {
   document.querySelectorAll('.mao-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.mao-nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('mao-'+panel).classList.add('active');
-  // Highlight nav
-  const navMap = {overview:0, reports:1, 'report-detail':2, barangay:3, advisory:4, profile:5};
-  const items = document.querySelectorAll('.mao-nav-item');
-  if (navMap[panel] !== undefined) items[navMap[panel]].classList.add('active');
+  // Highlight nav (use id-based items for reliable selection)
+  const navEl = document.getElementById('mao-nav-' + panel);
+  if (navEl) navEl.classList.add('active');
+}
+
+// Attach click handlers to map pins so clicking acts as a secondary filter.
+function initMapPinClicks() {
+  const pins = document.querySelectorAll('.map-pin');
+  pins.forEach(p => {
+    p.addEventListener('click', (e) => {
+      const barangay = p.dataset.barangay;
+      if (!barangay) return;
+      // Toggle: clicking the same pin again resets to 'all'
+      if (currentPinFilter === barangay) {
+        currentPinFilter = 'all';
+        setMapFilter('all');
+      } else {
+        currentPinFilter = barangay;
+        setMapFilter(barangay);
+      }
+    });
+  });
 }
 
 // ─── INIT ─────────────────────────────────────────────────────
@@ -2490,6 +3282,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initPasswordValidation();
   applyHistoryFilters();
   applyMaoFilters();
+  initMapPinClicks();
+  // initialize analytics charts to default timeframe
+  setAnalyticsTf('week');
 });
 </script>
 </body>
