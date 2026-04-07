@@ -997,6 +997,32 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <div style="font-size:10px;opacity:.5;margin-top:4px">(mock display)</div>
             </div>
             <img id="cam-img" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
+
+            <!-- Preview overlay (used by mock capture) -->
+            <div id="preview-overlay" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-size:13px;flex-direction:column;gap:8px;z-index:30;pointer-events:none">
+              <div style="font-size:36px">🌾</div>
+              <div id="preview-caption">Sugarcane leaf — preview</div>
+            </div>
+
+            <!-- Upload overlay (shows progress/status during simulated upload) -->
+            <div id="upload-overlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:260">
+              <div style="width:92%;max-width:360px;background:rgba(255,255,255,0.03);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 14px 48px rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:center;gap:14px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <svg class="spin" width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.12)" stroke-width="3"/><path d="M22 12a10 10 0 0 1-10 10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+                  <div id="upload-title" style="font-size:17px;font-weight:800;color:#fff">Uploading photo</div>
+                </div>
+                <div style="width:100%">
+                  <div class="progress-bar-wrap" style="height:12px;border-radius:12px;overflow:hidden;box-shadow:inset 0 -4px 12px rgba(0,0,0,.25)">
+                    <div id="upload-progress" class="progress-bar-fill" style="width:0%;height:100%;box-shadow:0 6px 18px rgba(0,0,0,.35);background:linear-gradient(90deg,var(--primary),var(--primary-light))"></div>
+                  </div>
+                </div>
+                <div id="upload-text" style="font-size:13px;color:#fff;opacity:.95">0%</div>
+                <div style="width:100%;display:flex;justify-content:center;margin-top:6px">
+                  <button id="upload-cancel-btn" class="btn btn-ghost btn-sm" onclick="cancelUpload()">Cancel</button>
+                </div>
+              </div>
+            </div>
+
             <!-- Corner guides -->
             <div style="position:absolute;top:12px;left:12px;width:24px;height:24px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:3px 0 0 0"></div>
             <div style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 3px 0 0"></div>
@@ -1007,21 +1033,23 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               ⚠️ Photo may be too dark. Try better lighting.
             </div>
           </div>
+          <!-- Hidden file input for upload (triggered by Upload Photo) -->
+          <input id="upload-input" type="file" accept="image/*" style="display:none" />
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
             <button class="btn btn-primary" onclick="mockCapture()">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M20.94 11A8.994 8.994 0 1 1 12 3c.9 0 1.78.12 2.6.34"/><polyline points="22 4 12 14 9 11"/></svg>
               Take Photo
             </button>
-            <button class="btn btn-secondary" onclick="mockCapture()">
+            <button class="btn btn-secondary" onclick="chooseFile()">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
               Upload Photo
             </button>
           </div>
 
           <div id="retake-section" style="display:none">
-            <button class="btn btn-ghost btn-sm w-full" onclick="retakePhoto()" style="margin-bottom:12px">↺ Retake Photo</button>
-            <button class="btn btn-primary" onclick="go('s-symptoms')">Use This Photo →</button>
+            <button id="retake-btn" class="btn btn-ghost btn-sm w-full" onclick="retakePhoto()" style="margin-bottom:12px">↺ Retake Photo</button>
+            <button id="use-photo-btn" class="btn btn-primary" onclick="go('s-symptoms')">Use This Photo →</button>
           </div>
 
           <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">
@@ -1512,7 +1540,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <tr><td style="padding:6px 0;color:var(--muted);width:40%">Date</td><td style="font-weight:600">July 12, 2025 · 10:23 AM</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Barangay</td><td style="font-weight:600">Brgy. Wawa</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Farmer</td><td style="font-weight:600">Ronel Lance</td></tr>
-              <tr><td style="padding:6px 0;color:var(--muted)">Status</td><td><span class="chip chip-queued">Queued</span></td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted)">Status</td><td><span id="record-status-chip" class="chip chip-queued">Queued</span></td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Submitted by</td><td style="font-weight:600">Charish Bea</td></tr>
             </table>
           </div>
@@ -1529,7 +1557,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
 
           <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-primary" onclick="showToast('Report submitted to sync queue')">Submit to MAO</button>
+            <button id="submit-to-mao-btn" class="btn btn-primary" onclick="submitToMao(this)">Submit to MAO</button>
             <button class="btn btn-ghost btn-sm" onclick="confirmDelete()">🗑 Delete Record</button>
           </div>
         </div>
@@ -2514,8 +2542,10 @@ let symptomsSelected = 0;
 let historyFilter = 'all';
 let maoFilter = 'all';
 let maoLoggedIn = false;
+let mockUploadIv = null;
 
 function go(screenId) {
+  const prevScreen = currentScreen;
   const cur = document.getElementById(currentScreen);
   const next = document.getElementById(screenId);
   if (!next) return;
@@ -2523,6 +2553,21 @@ function go(screenId) {
   cur.classList.add('slide-left');
   next.classList.remove('hidden','slide-left');
   currentScreen = screenId;
+
+  // If leaving the Record Detail screen, reset its submit UI so next record can be submitted
+  try {
+    if (prevScreen === 's-record-detail' && screenId !== 's-record-detail') resetRecordDetailView();
+  } catch (e) { /* ignore */ }
+
+  // Ensure upload overlays are reset when navigating screens (avoid leftover overlay showing)
+  try {
+    const uploadOverlay = document.getElementById('upload-overlay'); if (uploadOverlay) uploadOverlay.style.display = 'none';
+    const uploadProgress = document.getElementById('upload-progress'); if (uploadProgress) uploadProgress.style.width = '0%';
+    const uploadText = document.getElementById('upload-text'); if (uploadText) uploadText.textContent = '';
+    const previewOverlay = document.getElementById('preview-overlay'); if (previewOverlay) previewOverlay.style.display = 'none';
+    const retakeSection = document.getElementById('retake-section'); if (retakeSection) retakeSection.style.display = 'none';
+    if (mockUploadIv) { clearInterval(mockUploadIv); mockUploadIv = null; }
+  } catch (e) { /* ignore DOM timing issues */ }
 
   // Special: start analysis animation
   if (screenId === 's-analyzing') startAnalysis();
@@ -2859,35 +2904,147 @@ function onboardNext() {
   }
 }
 
-// ─── CAPTURE ──────────────────────────────────────────────────
+// ─── CAPTURE + UPLOAD (prototype simulation) ────────────────
 function mockCapture() {
-  // Simulate a photo being taken
+  // show a mock preview (camera capture)
   const preview = document.getElementById('cam-preview');
   const placeholder = document.getElementById('cam-placeholder');
+  const previewOverlay = document.getElementById('preview-overlay');
   const retake = document.getElementById('retake-section');
+  const camImg = document.getElementById('cam-img');
+
+  // clear any selected image
+  if (camImg) { try { if (camImg.src) URL.revokeObjectURL(camImg.src); } catch (e){} camImg.src = ''; camImg.style.display = 'none'; }
 
   placeholder.style.display = 'none';
+  previewOverlay.style.display = 'flex';
   preview.style.background = 'linear-gradient(135deg, #2d5a30, #4a8b4e)';
-  preview.innerHTML += `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:13px;flex-direction:column;gap:8px"><div style="font-size:36px">🌾</div><div>Sugarcane leaf — preview</div></div>`;
-
   retake.style.display = 'block';
+  // ensure retake button is visible (it may have been hidden after a previous upload)
+  const retBtn = document.getElementById('retake-btn'); if (retBtn) { retBtn.style.display = 'block'; retBtn.disabled = false; retBtn.style.opacity = ''; }
 }
 
 function retakePhoto() {
+  if (mockUploadIv) { clearInterval(mockUploadIv); mockUploadIv = null; }
   const preview = document.getElementById('cam-preview');
+  const placeholder = document.getElementById('cam-placeholder');
+  const previewOverlay = document.getElementById('preview-overlay');
+  const uploadOverlay = document.getElementById('upload-overlay');
+  const camImg = document.getElementById('cam-img');
+
+  // reset to initial camera placeholder
+  placeholder.style.display = 'block';
+  previewOverlay.style.display = 'none';
+  if (uploadOverlay) uploadOverlay.style.display = 'none';
   preview.style.background = '#1a1a1a';
-  preview.innerHTML = `
-    <div id="cam-placeholder" style="text-align:center;color:rgba(255,255,255,.6)">
-      <div style="font-size:48px;margin-bottom:8px">📷</div>
-      <div style="font-size:12px">Camera preview</div>
-      <div style="font-size:10px;opacity:.5;margin-top:4px">(mock display)</div>
-    </div>
-    <img id="cam-img" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
-    <div style="position:absolute;top:12px;left:12px;width:24px;height:24px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:3px 0 0 0"></div>
-    <div style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 3px 0 0"></div>
-    <div style="position:absolute;bottom:12px;left:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 3px"></div>
-    <div style="position:absolute;bottom:12px;right:12px;width:24px;height:24px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 3px 0"></div>`;
-  document.getElementById('retake-section').style.display = 'none';
+
+  if (camImg) {
+    if (camImg.src) try { URL.revokeObjectURL(camImg.src); } catch (e){}
+    camImg.src = '';
+    camImg.style.display = 'none';
+  }
+
+  const retakeSection = document.getElementById('retake-section');
+  if (retakeSection) retakeSection.style.display = 'none';
+
+  // reset upload progress UI
+  const up = document.getElementById('upload-progress'); if (up) up.style.width = '0%';
+  const ut = document.getElementById('upload-text'); if (ut) ut.textContent = '';
+}
+
+function chooseFile() {
+  const inp = document.getElementById('upload-input');
+  if (!inp) return;
+  inp.value = '';
+  inp.click();
+}
+
+function handleFileSelect(e) {
+  const file = e?.target?.files?.[0] || null;
+  if (!file) return;
+  const camImg = document.getElementById('cam-img');
+  const placeholder = document.getElementById('cam-placeholder');
+  const previewOverlay = document.getElementById('preview-overlay');
+  const retake = document.getElementById('retake-section');
+
+  // show selected image preview
+  const url = URL.createObjectURL(file);
+  camImg.src = url; camImg.style.display = 'block';
+  placeholder.style.display = 'none';
+  if (previewOverlay) previewOverlay.style.display = 'none';
+  if (retake) retake.style.display = 'block';
+
+  // begin simulated upload automatically for prototype
+  startMockUpload(file);
+}
+
+function startMockUpload(file) {
+  const uploadOverlay = document.getElementById('upload-overlay');
+  const progressBar = document.getElementById('upload-progress');
+  const uploadText = document.getElementById('upload-text');
+  const uploadTitle = document.getElementById('upload-title');
+  const retBtn = document.getElementById('retake-btn');
+
+  if (uploadOverlay) uploadOverlay.style.display = 'flex';
+  if (uploadTitle) uploadTitle.textContent = 'Uploading photo';
+  if (uploadText) uploadText.textContent = '0%';
+  if (progressBar) { progressBar.style.width = '0%'; progressBar.style.transition = 'width .25s ease'; }
+  if (retBtn) { retBtn.disabled = true; retBtn.style.opacity = '.6'; }
+
+  let pct = 0;
+  mockUploadIv = setInterval(() => {
+    pct += Math.random() * 18 + 6;
+    if (pct >= 100) pct = 100;
+    if (progressBar) progressBar.style.width = pct + '%';
+    if (uploadText) uploadText.textContent = Math.round(pct) + '%';
+    if (pct >= 100) {
+      clearInterval(mockUploadIv); mockUploadIv = null;
+      if (uploadText) uploadText.textContent = 'Upload complete';
+      if (uploadTitle) uploadTitle.textContent = 'Done';
+      // brief delay then hide overlay and hide retake button (prototype behavior)
+      setTimeout(() => {
+        if (uploadOverlay) uploadOverlay.style.display = 'none';
+        if (retBtn) retBtn.style.display = 'none';
+        showToast('Photo uploaded (mock)');
+      }, 900);
+    }
+  }, 220);
+}
+
+function cancelUpload() {
+  if (mockUploadIv) { clearInterval(mockUploadIv); mockUploadIv = null; }
+  const uploadOverlay = document.getElementById('upload-overlay');
+  const uploadText = document.getElementById('upload-text');
+  const uploadTitle = document.getElementById('upload-title');
+  const progressBar = document.getElementById('upload-progress');
+  const retakeSection = document.getElementById('retake-section');
+  // remove previewed image and restore camera placeholder
+  const camImg = document.getElementById('cam-img');
+  const camPlaceholder = document.getElementById('cam-placeholder');
+  const previewOverlay = document.getElementById('preview-overlay');
+  const camPreview = document.getElementById('cam-preview');
+
+  if (camImg) {
+    try { if (camImg.src) URL.revokeObjectURL(camImg.src); } catch (e) {}
+    camImg.src = '';
+    camImg.style.display = 'none';
+  }
+  if (camPlaceholder) camPlaceholder.style.display = 'block';
+  if (previewOverlay) previewOverlay.style.display = 'none';
+  if (camPreview) camPreview.style.background = '#1a1a1a';
+
+  if (uploadText) uploadText.textContent = 'Upload canceled';
+  if (uploadTitle) uploadTitle.textContent = 'Canceled';
+  if (progressBar) progressBar.style.width = '0%';
+  if (retakeSection) retakeSection.style.display = 'none';
+
+  setTimeout(() => {
+    if (uploadOverlay) uploadOverlay.style.display = 'none';
+    if (uploadText) uploadText.textContent = '';
+    if (uploadTitle) uploadTitle.textContent = '';
+  }, 700);
+
+  showToast('Upload canceled');
 }
 
 // ─── SYMPTOMS ─────────────────────────────────────────────────
@@ -3014,6 +3171,49 @@ function performDelete() {
   hideDeleteModal();
   showToast('Record deleted');
   go('s-history');
+}
+
+// Submit record to MAO (prototype behavior)
+function submitToMao(btn) {
+  if (!btn) return;
+  // prevent double submit
+  btn.disabled = true;
+  const origText = btn.textContent;
+  btn.textContent = 'Submitting…';
+
+  // update status chip immediately for feedback
+  const statusChip = document.getElementById('record-status-chip');
+  if (statusChip) {
+    statusChip.classList.remove('chip-queued','chip-unclear');
+    statusChip.classList.add('chip-sent');
+    statusChip.textContent = 'Submitted';
+  }
+
+  // small simulated processing delay then finalize button state
+  setTimeout(() => {
+    btn.textContent = 'Submitted';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-ghost');
+    // keep disabled to indicate final state
+    btn.disabled = true;
+    showToast('Report submitted to MAO (mock)');
+  }, 900);
+}
+
+// Reset the Record Detail view UI so the submit button is ready for another record
+function resetRecordDetailView() {
+  const btn = document.getElementById('submit-to-mao-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'Submit to MAO';
+    btn.classList.remove('btn-ghost');
+    if (!btn.classList.contains('btn-primary')) btn.classList.add('btn-primary');
+  }
+  const statusChip = document.getElementById('record-status-chip');
+  if (statusChip) {
+    statusChip.className = 'chip chip-queued';
+    statusChip.textContent = 'Queued';
+  }
 }
 
 // Simple MAO profile password change validation (prototype)
@@ -3362,6 +3562,9 @@ document.addEventListener('DOMContentLoaded', () => {
   applyHistoryFilters();
   applyMaoFilters();
   initMapPinClicks();
+  // attach upload input handler for prototype upload flow
+  const upIn = document.getElementById('upload-input');
+  if (upIn) upIn.addEventListener('change', handleFileSelect);
   // initialize analytics charts to default timeframe
   setAnalyticsTf('week');
 });
