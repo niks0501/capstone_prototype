@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CaneGuard – Plant Patrol Prototype</title>
+<link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 /* ─── THEME TOKENS ────────────────────────────────────────────── */
@@ -217,7 +218,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .symptom-card.selected{border-color:var(--primary);background:rgba(68,93,72,.06)}
 .symptom-icon{
   width:40px;height:40px;border-radius:10px;background:var(--surface2);
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--primary);flex-shrink:0;
 }
 .symptom-text{flex:1}
 .symptom-text .label{font-size:13px;font-weight:600;color:var(--text)}
@@ -586,6 +587,76 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .map-pin > div:first-child{transition:transform .15s ease,box-shadow .15s ease}
 .map-pin.active > div:first-child{transform:scale(1.08);box-shadow:0 10px 30px rgba(0,0,0,.45)}
 .map-pin.active{z-index:60}
+.heat-spot{
+  position:absolute;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  mix-blend-mode:multiply;
+  filter:blur(10px);
+  opacity:.68;
+}
+.heat-high{background:radial-gradient(circle,rgba(185,64,64,.72) 0%,rgba(185,64,64,.34) 42%,rgba(185,64,64,0) 72%)}
+.heat-medium{background:radial-gradient(circle,rgba(201,123,46,.62) 0%,rgba(201,123,46,.28) 45%,rgba(201,123,46,0) 74%)}
+.heat-low{background:radial-gradient(circle,rgba(58,125,68,.52) 0%,rgba(58,125,68,.22) 48%,rgba(58,125,68,0) 76%)}
+.manual-result-empty{border:1px dashed var(--border);background:var(--bg);border-radius:var(--radius-sm);padding:12px}
+.guideline-editor textarea{min-height:98px}
+.disease-photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.disease-photo-card{padding:0;overflow:hidden;cursor:pointer}
+.disease-photo-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--surface2)}
+.disease-photo-card .disease-copy{padding:10px 12px}
+.report-photo{width:100%;height:100%;object-fit:cover;display:block}
+.report-photo-caption{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.54);color:#fff;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:700}
+.capture-quality{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;
+  border:1.5px solid var(--border);background:var(--surface);
+}
+.quality-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;background:var(--danger);box-shadow:0 0 0 4px rgba(185,64,64,.14)}
+.capture-quality.good{border-color:rgba(58,125,68,.35);background:#F1F8F2}
+.capture-quality.good .quality-dot{background:var(--success);box-shadow:0 0 0 4px rgba(58,125,68,.16)}
+.capture-quality.bad{border-color:rgba(185,64,64,.35);background:#FFF4F4}
+.tutorial-overlay{
+  position:absolute;inset:0;z-index:1800;background:rgba(31,42,33,.50);
+  display:none;padding:18px;pointer-events:auto;
+}
+.tutorial-overlay.active{display:flex}
+.tutorial-card{background:var(--bg);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-md);width:calc(100% - 36px);position:absolute;left:18px;z-index:2}
+.tutorial-target{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;background:#E8F5E9;color:var(--primary);font-size:11px;font-weight:800;margin-bottom:8px}
+.tutorial-spotlight{
+  position:absolute;z-index:1;border:3px solid #fff;border-radius:16px;
+  box-shadow:0 0 0 999px rgba(31,42,33,.52),0 0 0 6px rgba(58,125,68,.28),0 10px 28px rgba(0,0,0,.28);
+  pointer-events:none;transition:all .2s ease;
+}
+.tutorial-arrow{
+  position:absolute;left:32px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;z-index:3;
+}
+.tutorial-arrow.down{border-top:10px solid var(--bg)}
+.tutorial-arrow.up{border-bottom:10px solid var(--bg)}
+.mao-filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px}
+.mao-filter-grid{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;align-items:end}
+.mao-filter-grid .field{margin-bottom:0}
+.chart-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:-4px;margin-bottom:10px}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--muted)}
+.legend-key{display:inline-flex;align-items:center;gap:5px}
+.legend-swatch{width:10px;height:10px;border-radius:2px;background:var(--primary)}
+.stat-card[data-tip]{position:relative;cursor:help}
+.stat-card[data-tip]::after{
+  content:attr(data-tip);position:absolute;left:12px;right:12px;bottom:calc(100% + 8px);
+  background:#1F2A21;color:#fff;border-radius:var(--radius-sm);padding:8px 10px;
+  font-size:11px;line-height:1.4;font-weight:500;opacity:0;transform:translateY(4px);
+  pointer-events:none;transition:opacity .16s,transform .16s;z-index:20;
+}
+.stat-card[data-tip]:hover::after,.stat-card[data-tip]:focus::after{opacity:1;transform:translateY(0)}
+.pie-chart{
+  width:170px;height:170px;border-radius:50%;
+  background:conic-gradient(#2E4031 0 38%,#445D48 38% 65%,#6E8B74 65% 84%,#8AA390 84% 96%,#C8D5CB 96% 100%);
+  box-shadow:inset 0 0 0 28px var(--surface),0 1px 6px rgba(0,0,0,.08);
+  flex-shrink:0;
+}
+.disease-mini-img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--border);background:var(--surface2);flex-shrink:0}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.template-preview{background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text);line-height:1.6}
 
 </style>
 </head>
@@ -593,8 +664,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
 <!-- VIEW TOGGLE -->
 <div id="view-toggle">
-  <button class="toggle-btn active" onclick="switchView('mobile')">📱 Mobile App</button>
-  <button class="toggle-btn" onclick="switchView('mao')">🖥️ MAO Dashboard</button>
+  <button class="toggle-btn active" onclick="switchView('mobile')">Mobile App</button>
+  <button class="toggle-btn" onclick="switchView('mao')">MAO Dashboard</button>
 </div>
 
 <!-- ════════════════════════ MOBILE DEVICE ════════════════════ -->
@@ -751,17 +822,17 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="flex-col justify-center p-24">
         <div id="onboard-slides">
           <div id="ob1" class="text-center">
-            <div style="font-size:72px;margin-bottom:16px">🌿</div>
+            <div style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:16px">SCAN</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Detect Possible Diseases</div>
             <div style="font-size:14px;color:var(--muted);line-height:1.7">Take or upload a photo of your sugarcane. Plant Patrol helps identify possible diseases quickly, even in the field.</div>
           </div>
           <div id="ob2" class="text-center" style="display:none">
-            <div style="font-size:72px;margin-bottom:16px">🔍</div>
+            <div style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:16px">CHECK</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Validate with Symptoms</div>
             <div style="font-size:14px;color:var(--muted);line-height:1.7">Answer simple questions about what you see. Symptom checks improve confidence in possible disease detection.</div>
           </div>
           <div id="ob3" class="text-center" style="display:none">
-            <div style="font-size:72px;margin-bottom:16px">📡</div>
+            <div style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:16px">SYNC</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px">Works Offline Too</div>
             <div style="font-size:14px;color:var(--muted);line-height:1.7">Save reports locally and sync later when connected. This supports fieldwork in low-signal areas.</div>
           </div>
@@ -786,14 +857,14 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.6">Select your role to get the right experience. This prototype supports assisted use by agricultural personnel.</div>
         </div>
         <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👨‍🌾</div>
+          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--primary);flex-shrink:0">FR</div>
           <div>
             <div style="font-size:16px;font-weight:700;color:var(--text)">Farmer</div>
             <div style="font-size:12px;color:var(--muted);margin-top:2px">Scan sugarcane plants and save reports from your farm.</div>
           </div>
         </div>
         <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🔬</div>
+          <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--primary);flex-shrink:0">FP</div>
           <div>
             <div style="font-size:16px;font-weight:700;color:var(--text)">Field Personnel</div>
             <div style="font-size:12px;color:var(--muted);margin-top:2px">Assist farmers and submit reports to the Agriculture Office.</div>
@@ -811,7 +882,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="flex items-center justify-between">
           <div>
             <div style="font-size:12px;color:rgba(255,255,255,.7)">Magandang umaga,</div>
-            <div style="font-size:20px;font-weight:800;color:#fff">Nikko Selwyn 👋</div>
+            <div style="font-size:20px;font-weight:800;color:#fff">Nikko Selwyn</div>
           </div>
           <div class="flex items-center gap-8">
             <span class="chip chip-online" id="home-online-chip">Online</span>
@@ -824,7 +895,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
         </div>
         <div class="mt-12" style="background:rgba(255,255,255,.12);border-radius:10px;padding:7px 12px;font-size:12px;color:rgba(255,255,255,.85)">
-          📍 Brgy. Cogunan, Nasugbu, Batangas
+          Location: Brgy. Cogunan, Nasugbu, Batangas
         </div>
       </div>
 
@@ -834,7 +905,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="section">
           <div class="section-title">Quick Actions</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <button class="btn btn-primary quick-action" onclick="go('s-guide')"><span class="quick-icon camera" aria-hidden="true">
+            <button id="tutorial-start-scan" class="btn btn-primary quick-action" onclick="go('s-guide')"><span class="quick-icon camera" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
                   <circle cx="12" cy="12" r="11" fill="var(--success)"/>
                   <path d="M5 12v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -862,35 +933,44 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 </svg>
               </span> Help & FAQ</button>
           </div>
+          <button class="btn btn-ghost btn-sm mt-12" onclick="showTutorial()">Start Quick Tutorial</button>
         </div>
 
         <div style="margin:0 20px 12px;background:#FFF3E0;border:1px solid #FFD0A0;border-radius:var(--radius-sm);padding:12px 14px">
-          <div style="font-size:12px;font-weight:700;color:#BF360C">📡 2 unsent reports</div>
+          <div style="font-size:12px;font-weight:700;color:#BF360C">2 unsent reports</div>
           <div style="font-size:11px;color:#7F4000;margin-top:2px">Will sync automatically when online. <span style="text-decoration:underline;cursor:pointer" onclick="go('s-queue')">View queue</span></div>
         </div>
 
         <div class="section">
-          <div class="section-title">Common Diseases - Quick Info</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Downy Mildew info - see Glossary')">
-              <div style="font-size:20px;margin-bottom:6px">🌫️</div>
-              <div style="font-size:12px;font-weight:700;color:var(--text)">Downy Mildew</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">White fuzz, yellow stripes</div>
+          <div class="section-title">Common Diseases - Photo Examples</div>
+          <div class="disease-photo-grid">
+            <div class="card disease-photo-card mb-0" onclick="showToast('Downy Mildew photo example - see Glossary')">
+              <img src="sugarcane_downey_mildew.jpg" alt="Sugarcane downy mildew example"/>
+              <div class="disease-copy">
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Downy Mildew</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">White fuzz, yellow stripes</div>
+              </div>
             </div>
-            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Sugarcane Smut info - see Glossary')">
-              <div style="font-size:20px;margin-bottom:6px">🖤</div>
-              <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Smut</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">Black whip-like growth</div>
+            <div class="card disease-photo-card mb-0" onclick="showToast('Sugarcane Smut photo example - see Glossary')">
+              <img src="sugarcane_smut.jpg" alt="Sugarcane smut example"/>
+              <div class="disease-copy">
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Smut</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Black whip-like growth</div>
+              </div>
             </div>
-            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Mosaic Disease info - see Glossary')">
-              <div style="font-size:20px;margin-bottom:6px">🟡</div>
-              <div style="font-size:12px;font-weight:700;color:var(--text)">Mosaic Disease</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">Irregular color patterns</div>
+            <div class="card disease-photo-card mb-0" onclick="showToast('Mosaic Disease photo example - see Glossary')">
+              <img src="sugarcane_mosaic.jpg" alt="Sugarcane mosaic disease example"/>
+              <div class="disease-copy">
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Mosaic Disease</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Patchy green-yellow leaves</div>
+              </div>
             </div>
-            <div class="card mb-0" style="cursor:pointer" onclick="showToast('Sugarcane Rust info - see Glossary')">
-              <div style="font-size:20px;margin-bottom:6px">🔶</div>
-              <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Rust</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">Rust-colored spots on leaves</div>
+            <div class="card disease-photo-card mb-0" onclick="showToast('Sugarcane Rust photo example - see Glossary')">
+              <img src="sugarcane_rust.jpg" alt="Sugarcane rust example"/>
+              <div class="disease-copy">
+                <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Rust</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">Brown-orange leaf spots</div>
+              </div>
             </div>
           </div>
         </div>
@@ -901,7 +981,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="flex items-center justify-between">
               <div>
                 <div class="text-sm font-bold">Scan - Brgy. Wawa</div>
-                <div class="text-xs text-muted mt-8">July 12, 2025 - 10:23 AM</div>
+                <div class="text-xs text-muted mt-8">Jul 12, 2025 · 10:23 AM</div>
               </div>
               <span class="chip chip-smut">Possible Smut</span>
             </div>
@@ -910,7 +990,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="flex items-center justify-between">
               <div>
                 <div class="text-sm font-bold">Scan - Brgy. Cogunan</div>
-                <div class="text-xs text-muted mt-8">July 10, 2025 - 3:45 PM</div>
+                <div class="text-xs text-muted mt-8">Jul 10, 2025 · 3:45 PM</div>
               </div>
               <span class="chip chip-healthy">Healthy</span>
             </div>
@@ -918,7 +998,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         </div>
       </div>
 
-      <div class="bottom-nav">
+      <div id="tutorial-bottom-nav" class="bottom-nav">
         <button class="nav-btn active" onclick="goTab('home')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
         </button>
@@ -931,7 +1011,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <button class="nav-btn" onclick="goTab('settings')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
         </button>
-        <button class="nav-btn" onclick="goTab('farmer-reports')">
+        <button id="tutorial-reports-nav" class="nav-btn" onclick="goTab('farmer-reports')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Reports
         </button>
       </div>
@@ -948,30 +1028,29 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="scroll-content">
         <div class="section">
           <div style="background:var(--primary);border-radius:var(--radius);padding:20px;margin-bottom:16px;color:#fff;text-align:center">
-            <div style="font-size:36px;margin-bottom:8px">📷</div>
             <div style="font-size:16px;font-weight:700">Take a Clear Sugarcane Photo</div>
-            <div style="font-size:12px;opacity:.8;margin-top:4px">Get closer to the affected area for best results.</div>
+            <div style="font-size:12px;opacity:.85;margin-top:4px">Keep the plant clear, bright, and close enough before scanning.</div>
           </div>
 
           <div class="card">
-            <div class="section-title">✅ Do This</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div class="flex gap-12 items-center"><span style="font-size:18px">☀️</span><span class="text-sm">Take photo in good, natural lighting</span></div>
-              <div class="flex gap-12 items-center"><span style="font-size:18px">🔍</span><span class="text-sm">Focus on the leaf, stalk, or affected area</span></div>
-              <div class="flex gap-12 items-center"><span style="font-size:18px">📐</span><span class="text-sm">Hold phone 20–30 cm from the plant</span></div>
-              <div class="flex gap-12 items-center"><span style="font-size:18px">🖼️</span><span class="text-sm">Ensure the affected area fills most of the frame</span></div>
+            <div class="section-title">Do This</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div class="text-sm">• Use bright natural light.</div>
+              <div class="text-sm">• Focus on the affected leaf or stalk.</div>
+              <div class="text-sm">• Hold the phone about 20-30 cm from the plant.</div>
+              <div class="text-sm">• Make the affected area fill most of the photo.</div>
             </div>
           </div>
           <div class="card">
-            <div class="section-title">❌ Avoid This</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div class="flex gap-12 items-center"><span style="font-size:18px">🌑</span><span class="text-sm text-danger">Dark or shadowy conditions</span></div>
-              <div class="flex gap-12 items-center"><span style="font-size:18px">💨</span><span class="text-sm text-danger">Blurry photos from moving the phone too fast</span></div>
-              <div class="flex gap-12 items-center"><span style="font-size:18px">↩️</span><span class="text-sm text-danger">Photo taken from too far away</span></div>
+            <div class="section-title">Avoid This</div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div class="text-sm text-danger">• Dark or shadowy photos.</div>
+              <div class="text-sm text-danger">• Blurry photos.</div>
+              <div class="text-sm text-danger">• Photos taken too far away.</div>
             </div>
           </div>
           <div style="background:var(--surface);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--muted);border:1px dashed var(--border)">
-            💡 <strong>Tip:</strong> You can upload an existing photo from your gallery if you already took one.
+            Tip: You can upload an existing photo from your gallery if you already took one.
           </div>
         </div>
       </div>
@@ -989,10 +1068,20 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="step-bar"><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
       <div class="scroll-content">
         <div class="section">
+          <div id="capture-quality" class="capture-quality bad">
+            <div class="flex items-center gap-10">
+              <span class="quality-dot"></span>
+              <div>
+                <div id="capture-quality-title" class="text-sm font-bold">Photo not ready</div>
+                <div id="capture-quality-desc" class="text-xs text-muted mt-8">Make sure the image is clear, bright, and close enough.</div>
+              </div>
+            </div>
+            <span id="capture-quality-label" class="chip chip-failed">Needs retake</span>
+          </div>
           <!-- Mock Camera Frame -->
           <div id="cam-preview" style="aspect-ratio:4/3;background:#1a1a1a;border-radius:var(--radius);overflow:hidden;position:relative;margin-bottom:12px;display:flex;align-items:center;justify-content:center;border:2px solid var(--border)">
             <div id="cam-placeholder" style="text-align:center;color:rgba(255,255,255,.6)">
-              <div style="font-size:48px;margin-bottom:8px">📷</div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;margin-bottom:8px">CAMERA</div>
               <div style="font-size:12px">Camera preview</div>
               <div style="font-size:10px;opacity:.5;margin-top:4px">(mock display)</div>
             </div>
@@ -1000,7 +1089,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
             <!-- Preview overlay (used by mock capture) -->
             <div id="preview-overlay" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-size:13px;flex-direction:column;gap:8px;z-index:30;pointer-events:none">
-              <div style="font-size:36px">🌾</div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#fff;background:rgba(47,125,50,.82);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 10px">LIVE PREVIEW</div>
               <div id="preview-caption">Sugarcane leaf — preview</div>
             </div>
 
@@ -1049,7 +1138,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div id="retake-section" style="display:none">
             <button id="retake-btn" class="btn btn-ghost btn-sm w-full" onclick="retakePhoto()" style="margin-bottom:12px">↺ Retake Photo</button>
-            <button id="use-photo-btn" class="btn btn-primary" onclick="go('s-symptoms')">Use This Photo →</button>
+            <button id="use-photo-btn" class="btn btn-primary" onclick="beginPhotoAnalysis()">Use This Photo →</button>
+            <button class="btn btn-ghost btn-sm w-full mt-10" onclick="simulateBadPhoto()">Simulate Bad Photo Feedback</button>
           </div>
 
           <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">
@@ -1062,74 +1152,74 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     <!-- ══════════ SCREEN: SYMPTOMS ══════════ -->
     <div class="screen hidden" id="s-symptoms">
       <div class="app-header">
-        <button class="back-btn" onclick="go('s-capture')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <h2>Symptom Check</h2>
+        <button class="back-btn" onclick="go('s-manual-prompt')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Manual Symptom Check</h2>
       </div>
       <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
       <div class="scroll-content">
         <div class="section">
           <div style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-            What do you see on the plant? Select all that apply. You can change your answers before continuing.
+            Ano ang nakikita sa tubo? Select all that apply. This manual check will be shown separately from the AI prediction for comparison.
           </div>
 
           <div id="symptom-list">
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">🌿</div>
+            <div class="symptom-card" data-symptom="Yellow or white stripes" data-disease="Downy Mildew" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">ST</div>
               <div class="symptom-text">
                 <div class="label">Yellow or white stripes</div>
-                <div class="desc">Stripes running along the length of the leaf</div>
+                <div class="desc">Guhit sa dahon from base to tip</div>
               </div>
               <div class="check-circle"></div>
             </div>
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">🖤</div>
+            <div class="symptom-card" data-symptom="Black whip-like growth" data-disease="Sugarcane Smut" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">SM</div>
               <div class="symptom-text">
                 <div class="label">Black whip-like growth</div>
-                <div class="desc">A dark, curved structure growing from the tip</div>
+                <div class="desc">Itim na parang buntot sa dulo ng tubo</div>
               </div>
               <div class="check-circle"></div>
             </div>
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">🎨</div>
+            <div class="symptom-card" data-symptom="Patchy green and yellow leaves" data-disease="Mosaic Disease" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">MO</div>
               <div class="symptom-text">
-                <div class="label">Mosaic or patchy color</div>
-                <div class="desc">Irregular mix of green and yellow patches</div>
+                <div class="label">Patchy green and yellow leaves</div>
+                <div class="desc">Hindi pantay na kulay sa dahon</div>
               </div>
               <div class="check-circle"></div>
             </div>
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">🔶</div>
+            <div class="symptom-card" data-symptom="Rust-colored spots" data-disease="Sugarcane Rust" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">RU</div>
               <div class="symptom-text">
                 <div class="label">Rust-colored spots</div>
-                <div class="desc">Small brown-orange spots scattered on leaves</div>
+                <div class="desc">Maliliit na brown-orange spots sa dahon</div>
               </div>
               <div class="check-circle"></div>
             </div>
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">💛</div>
+            <div class="symptom-card" data-symptom="Drying or unusual discoloration" data-disease="Sugarcane Smut" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">DR</div>
               <div class="symptom-text">
                 <div class="label">Drying or unusual discoloration</div>
-                <div class="desc">Leaves turning brown, dry, or off-color</div>
+                <div class="desc">Nanunuyo or nag-iiba ang kulay</div>
               </div>
               <div class="check-circle"></div>
             </div>
-            <div class="symptom-card" onclick="toggleSymptom(this)">
-              <div class="symptom-icon">✅</div>
+            <div class="symptom-card" data-symptom="None of the above" data-disease="Healthy or Unclear" onclick="toggleSymptom(this)">
+              <div class="symptom-icon">OK</div>
               <div class="symptom-text">
                 <div class="label">None of the above</div>
-                <div class="desc">Plant looks healthy or I'm not sure</div>
+                <div class="desc">Mukhang healthy or hindi sigurado</div>
               </div>
               <div class="check-circle"></div>
             </div>
           </div>
 
           <div style="margin-top:8px;background:var(--surface);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--muted)">
-            ℹ️ Selecting more symptoms helps improve accuracy. You can edit this before saving.
+            ℹ️ These answers do not change the AI prediction. They help the farmer and MAO compare what the photo model says with what was seen in the field.
           </div>
         </div>
       </div>
       <div style="padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)">
-        <button class="btn btn-primary" id="symptom-next" onclick="go('s-analyzing')" style="opacity:.5;pointer-events:none">Analyze →</button>
+        <button class="btn btn-primary" id="symptom-next" onclick="finishManualCheck()" style="opacity:.5;pointer-events:none">Compare with AI Prediction →</button>
         <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">Select at least one symptom to continue</div>
       </div>
     </div>
@@ -1144,15 +1234,42 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
         </div>
         <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Analyzing your photo…</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Checking photo and symptom inputs.<br>This usually takes a few seconds.</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px">Checking photo quality and possible disease signs.<br>The AI prediction is not shown yet.</div>
         <div style="margin:0 auto;max-width:240px">
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-align:left">Processing…</div>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" id="analysis-progress" style="width:0%"></div></div>
         </div>
         <div style="margin-top:16px;background:var(--surface);border-radius:var(--radius-sm);padding:10px 16px;font-size:12px;color:var(--muted);max-width:260px;margin-left:auto;margin-right:auto">
-          📡 Working offline — results will use local analysis
+          Offline mode: results will use local analysis
         </div>
-        <button class="btn btn-ghost btn-sm btn-fit btn-center mt-16" onclick="go('s-symptoms')">Cancel</button>
+        <button class="btn btn-ghost btn-sm btn-fit btn-center mt-16" onclick="go('s-capture')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: LOW CONFIDENCE PROMPT ══════════ -->
+    <div class="screen hidden" id="s-manual-prompt">
+      <div class="app-header">
+        <button class="back-btn" onclick="go('s-capture')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <h2>Photo Needs Review</h2>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="scroll-content">
+        <div class="section">
+          <div class="card" style="border:2px solid var(--warning);background:#FFF8E1">
+            <div style="font-size:12px;font-weight:800;color:#7F4000;margin-bottom:8px;text-transform:uppercase">Needs review</div>
+            <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px">AI photo confidence is low</div>
+            <div style="font-size:13px;color:#7F4000;line-height:1.6">The photo may be affected by lighting, blur, or distance. Before showing the AI guess, you can answer a few simple symptom questions.</div>
+          </div>
+          <div class="card">
+            <div class="section-title">Why ask this?</div>
+            <div class="text-sm text-muted" style="line-height:1.6">The manual symptom check is for comparison only. It will not be merged with the AI prediction, so farmers and MAO staff can see where the two agree or differ.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button id="tutorial-manual-check" class="btn btn-primary" onclick="startManualCheck()">Do Manual Symptom Check →</button>
+            <button class="btn btn-secondary" onclick="skipManualCheck()">Skip and View AI Prediction</button>
+            <button class="btn btn-ghost btn-sm" onclick="go('s-capture')">Retake Photo</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1160,42 +1277,45 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     <div class="screen hidden" id="s-result">
       <div class="app-header">
         <button class="back-btn" onclick="go('s-home')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <h2>Detection Result</h2>
+        <h2>Prediction Result</h2>
       </div>
       <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
       <div class="scroll-content">
         <div class="section">
-          <!-- Result Card -->
+          <!-- AI Result Card -->
           <div class="result-card">
             <div class="result-header">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px">Possible Disease Detected</div>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px">AI Prediction</div>
               <div class="disease-name">Sugarcane Smut</div>
-              <div class="confidence">Symptom match: High (3 of 4 matching indicators)</div>
+              <div class="confidence">Photo confidence: Low to moderate · 58%</div>
             </div>
             <div class="result-body">
-              <div class="section-title">Matched Symptoms</div>
+              <div class="section-title">Photo Signs Used by AI</div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth observed</span></div>
-                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying/discoloration detected</span></div>
-                <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Photo shows dark formations</span></div>
+                <div class="flex items-center gap-8"><span style="color:var(--warning)">•</span><span class="text-sm">Dark formation visible near cane tip</span></div>
+                <div class="flex items-center gap-8"><span style="color:var(--warning)">•</span><span class="text-sm">Some leaf drying visible in photo</span></div>
+                <div class="flex items-center gap-8"><span style="color:var(--warning)">•</span><span class="text-sm">Image quality needs field confirmation</span></div>
               </div>
+            </div>
+          </div>
+
+          <div class="card" id="manual-result-card">
+            <div class="section-title">Manual Symptom Check Result</div>
+            <div id="manual-result-body" class="manual-result-empty">
+              <div class="text-sm font-bold">Not completed</div>
+              <div class="text-xs text-muted mt-8">No manual symptom check was recorded. The AI prediction is shown by itself.</div>
             </div>
           </div>
 
           <!-- Important Disclaimer -->
           <div style="background:#FFF3E0;border:1px solid #FFD0A0;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
             <div style="font-size:12px;font-weight:700;color:#BF360C;margin-bottom:4px">⚠️ Important Notice</div>
-            <div style="font-size:12px;color:#7F4000;line-height:1.6">This is a <strong>possible detection only</strong>, not a confirmed diagnosis. Please consult an agricultural technician for field verification before taking major action.</div>
+            <div style="font-size:12px;color:#7F4000;line-height:1.6">This is an <strong>AI prediction only</strong>, not a confirmed diagnosis. Manual answers are shown separately for comparison. Please consult an agricultural technician before taking major action.</div>
           </div>
-
-          <!-- Needs Review Fallback (comment - would show if confidence low) -->
-          <!-- <div class="card" style="border:2px solid var(--border)">
-            <div style="font-size:14px;font-weight:700;color:var(--text)">🤔 Needs Manual Review</div>
-            <div class="text-sm text-muted mt-8">The photo or symptoms were not clear enough for an accurate result. Please consult a field technician.</div>
-          </div> -->
 
           <div style="display:flex;flex-direction:column;gap:10px">
             <button class="btn btn-primary" onclick="go('s-advisory')">View Recommended Actions →</button>
+            <button class="btn btn-secondary" id="manual-check-again-btn" onclick="startManualCheck()">Add / Edit Manual Check</button>
             <button class="btn btn-secondary" onclick="go('s-save')">Save Record</button>
             <button class="btn btn-ghost btn-sm" onclick="resetScanFlow(); go('s-guide')">↺ Scan Again</button>
           </div>
@@ -1212,10 +1332,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div></div>
       <div class="scroll-content">
         <div class="section">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">
+            Recommendations come from the MAO guideline library and can be updated by an admin when local advice changes.
+          </div>
           <!-- Urgency -->
           <div class="card advisory-card" data-status="high" role="region" aria-label="High urgency — Immediate attention needed">
             <div class="flex justify-between items-center" style="margin-bottom:6px">
-              <div style="font-size:13px;font-weight:700;color:var(--text)">🔴 High Urgency — Immediate Attention Needed</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">High Urgency - Immediate Attention Needed</div>
               <span class="status-pill">High</span>
             </div>
             <div style="font-size:12px;color:var(--danger)">Sugarcane Smut spreads quickly. Isolate affected plants now.</div>
@@ -1226,7 +1349,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div style="display:flex;flex-direction:column;gap:14px">
               <div class="flex gap-12">
                 <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-                <div><div class="text-sm font-bold">Isolate affected stalks</div><div class="text-xs text-muted mt-8">Remove and bag plants showing black whip growth. Do not leave them in the field.</div></div>
+                <div><div class="text-sm font-bold">Separate affected stalks</div><div class="text-xs text-muted mt-8">Alisin at ibalot ang tubo na may itim na whip growth. Huwag iwan sa field.</div></div>
               </div>
               <div class="flex gap-12">
                 <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
@@ -1234,7 +1357,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               </div>
               <div class="flex gap-12">
                 <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-                <div><div class="text-sm font-bold">Seek field verification</div><div class="text-xs text-muted mt-8">Contact the Municipal Agriculture Office or a field technician for on-site confirmation.</div></div>
+                <div><div class="text-sm font-bold">Ask for field checking</div><div class="text-xs text-muted mt-8">Tumawag sa Municipal Agriculture Office or field technician para ma-check sa mismong taniman.</div></div>
               </div>
               <div class="flex gap-12">
                 <div style="width:28px;height:28px;background:var(--primary);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
@@ -1265,27 +1388,33 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div id="save-form-view">
           <div class="section">
             <div class="card">
-              <div class="section-title">Detection Summary</div>
+              <div class="section-title">AI Prediction Summary</div>
               <div class="flex items-center justify-between">
                 <span class="text-sm font-bold">Sugarcane Smut</span>
-                <span class="chip chip-smut">Possible</span>
+                <span class="chip chip-smut">AI Prediction</span>
               </div>
-              <div class="text-xs text-muted mt-8">July 12, 2025 · 10:23 AM</div>
+              <div class="text-xs text-muted mt-8">Jul 12, 2025 · 10:23 AM</div>
             </div>
-            <div class="field"><label>Barangay</label>
-              <select><option>Brgy. Cogunan</option><option>Brgy. Wawa</option><option>Brgy. Mataas na Lupa</option><option>Brgy. Bilaran</option><option>Brgy. Balaytigue</option><option>Brgy. Looc</option></select>
+            <div class="card">
+              <div class="section-title">Location</div>
+              <div class="field"><label>Region</label><select><option>Region IV-A (CALABARZON)</option></select></div>
+              <div class="field"><label>Province</label><select><option>Batangas</option></select></div>
+              <div class="field"><label>Municipality</label><select><option>Nasugbu</option></select></div>
+              <div class="field" style="margin-bottom:0"><label>Barangay</label>
+                <select><option>Brgy. Cogunan</option><option>Brgy. Wawa</option><option>Brgy. Mataas na Lupa</option><option>Brgy. Bilaran</option><option>Brgy. Balaytigue</option><option>Brgy. Looc</option></select>
+              </div>
             </div>
             <div class="field"><label>Farmer Name (optional)</label><input type="text" placeholder="e.g. Juan dela Cruz"/></div>
             <div class="field"><label>Additional Notes (optional)</label><textarea placeholder="e.g. North side of the field, row 3…"></textarea></div>
             <div class="divider"></div>
             <div class="flex gap-12 mb-12">
               <div style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);text-align:center;cursor:pointer" onclick="saveLocal()">
-                <div style="font-size:18px">💾</div>
+                <div style="font-size:12px;font-weight:800;color:var(--primary)">SAVE</div>
                 <div class="text-xs font-bold mt-8">Save Locally</div>
                 <div style="font-size:10px;color:var(--muted);margin-top:2px">No internet needed</div>
               </div>
               <div style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--primary);text-align:center;cursor:pointer" onclick="saveAndQueue()">
-                <div style="font-size:18px">📡</div>
+                <div style="font-size:12px;font-weight:800;color:var(--primary)">SYNC</div>
                 <div class="text-xs font-bold mt-8">Submit / Queue</div>
                 <div style="font-size:10px;color:var(--muted);margin-top:2px">Sync to MAO later</div>
               </div>
@@ -1318,11 +1447,11 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
                 <div style="font-size:28px;font-weight:800;color:var(--danger)">18</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">Total Scans</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">Total Reports</div>
               </div>
               <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
                 <div style="font-size:28px;font-weight:800;color:var(--warning)">11</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">Diseases Detected</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">AI Predictions</div>
               </div>
               <div style="text-align:center;padding:12px 8px;background:var(--surface2);border-radius:var(--radius-sm)">
                 <div style="font-size:28px;font-weight:800;color:var(--success)">5</div>
@@ -1359,7 +1488,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div class="card" style="background:#FFF3E0;border:1px solid #FFD0A0">
             <div class="flex items-center justify-between mb-8">
               <div>
-                <div class="text-sm font-bold" style="color:#BF360C">📡 2 reports unsent</div>
+                <div class="text-sm font-bold" style="color:#BF360C">2 reports unsent</div>
                 <div class="text-xs text-muted mt-4">Saved locally · Will sync when online</div>
               </div>
               <span class="chip chip-queued">Queued</span>
@@ -1371,7 +1500,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="flex items-center justify-between mb-8">
               <div>
                 <div class="text-sm font-bold" style="color:var(--success)">✅ 16 reports synced</div>
-                <div class="text-xs text-muted mt-4">Last synced: July 12, 2025 · 11:04 AM</div>
+                <div class="text-xs text-muted mt-4">Last synced: Jul 12, 2025 · 11:04 AM</div>
               </div>
               <span class="chip chip-sent">Sent</span>
             </div>
@@ -1381,21 +1510,21 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div class="section-title mt-12">Recent Submissions</div>
           <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Scan — Brgy. Wawa</div><div class="text-xs text-muted">July 12 · 10:23 AM</div></div>
+              <div><div class="text-sm font-bold">Scan — Brgy. Wawa</div><div class="text-xs text-muted">Jul 12, 2025 · 10:23 AM</div></div>
               <span class="chip chip-smut">Possible Smut</span>
             </div>
             <div class="flex gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span></div>
           </div>
           <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Scan — Brgy. Bilaran</div><div class="text-xs text-muted">July 5 · 1:12 PM</div></div>
+              <div><div class="text-sm font-bold">Scan — Brgy. Bilaran</div><div class="text-xs text-muted">Jul 5, 2025 · 1:12 PM</div></div>
               <span class="chip chip-mildew">Possible Mildew</span>
             </div>
             <div class="flex gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span></div>
           </div>
           <div class="card" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Scan — Brgy. Cogunan</div><div class="text-xs text-muted">July 10 · 3:45 PM</div></div>
+              <div><div class="text-sm font-bold">Scan — Brgy. Cogunan</div><div class="text-xs text-muted">Jul 10, 2025 · 3:45 PM</div></div>
               <span class="chip chip-healthy">Healthy</span>
             </div>
             <div class="flex gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span></div>
@@ -1434,18 +1563,18 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <div class="text-sm font-bold">Scan — Brgy. Wawa</div>
               <span class="chip chip-queued">Queued</span>
             </div>
-            <div class="text-xs text-muted">Possible Smut · July 12, 2025 · 10:23 AM</div>
+            <div class="text-xs text-muted">Possible Smut · Jul 12, 2025 · 10:23 AM</div>
           </div>
           <div class="card">
             <div class="flex items-center justify-between mb-8">
               <div class="text-sm font-bold">Scan — Brgy. Cogunan</div>
               <span class="chip chip-queued">Queued</span>
             </div>
-            <div class="text-xs text-muted">Possible Rust · July 10, 2025 · 2:14 PM</div>
+            <div class="text-xs text-muted">Possible Rust · Jul 10, 2025 · 2:14 PM</div>
           </div>
 
           <div style="background:var(--surface);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--muted);border:1px dashed var(--border);text-align:center">
-            📡 Reports sync automatically when internet is restored.<br>Your data is safe on this device.
+            Reports sync automatically when internet is restored.<br>Your data is safe on this device.
           </div>
         </div>
       </div>
@@ -1458,7 +1587,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <h2>My Records</h2>
       </div>
       <div style="padding:10px 20px;background:var(--bg);flex-shrink:0;border-bottom:1px solid var(--border)">
-        <input id="history-search" type="text" oninput="applyHistoryFilters()" placeholder="🔍 Search records…" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
+        <input id="history-search" type="text" oninput="applyHistoryFilters()" placeholder="Search records..." style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
         <div style="display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding-bottom:4px">
           <button class="btn btn-primary history-filter-btn filter-pill" onclick="setHistoryFilter('all', this)">All</button>
           <button class="btn btn-ghost history-filter-btn filter-pill" onclick="setHistoryFilter('smut', this)">Smut</button>
@@ -1470,11 +1599,11 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       </div>
       <div class="scroll-content">
         <div style="padding:12px 20px">
-          <div class="section-title">July 2025</div>
+          <div class="section-title">Jul 2025</div>
 
           <div class="card history-record" data-disease="smut" data-status="queued" data-search="brgy. wawa july 12 maria santos" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Brgy. Wawa</div><div class="text-xs text-muted">July 12 · 10:23 AM</div></div>
+              <div><div class="text-sm font-bold">Brgy. Wawa</div><div class="text-xs text-muted">Jul 12, 2025 · 10:23 AM</div></div>
               <span class="chip chip-smut">Possible Smut</span>
             </div>
             <div class="flex items-center gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span><span style="font-size:11px;color:var(--muted)">Awaiting sync</span></div>
@@ -1482,7 +1611,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div class="card history-record" data-disease="healthy" data-status="sent" data-search="brgy. cogunan july 10 maria santos" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Brgy. Cogunan</div><div class="text-xs text-muted">July 10 · 3:45 PM</div></div>
+              <div><div class="text-sm font-bold">Brgy. Cogunan</div><div class="text-xs text-muted">Jul 10, 2025 · 3:45 PM</div></div>
               <span class="chip chip-healthy">Healthy</span>
             </div>
             <div class="flex items-center gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span><span style="font-size:11px;color:var(--muted)">Synced to MAO</span></div>
@@ -1490,7 +1619,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div class="card history-record" data-disease="rust" data-status="sent" data-search="brgy. mataas na lupa july 8 pedro" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Brgy. Mataas na Lupa</div><div class="text-xs text-muted">July 8 · 8:05 AM</div></div>
+              <div><div class="text-sm font-bold">Brgy. Mataas na Lupa</div><div class="text-xs text-muted">Jul 8, 2025 · 8:05 AM</div></div>
               <span class="chip chip-rust">Possible Rust</span>
             </div>
             <div class="flex items-center gap-8"><span class="chip chip-sent" style="font-size:10px">Sent</span><span style="font-size:11px;color:var(--muted)">Reviewed by MAO</span></div>
@@ -1498,14 +1627,14 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div class="card history-record" data-disease="mildew" data-status="queued" data-search="brgy. bilaran july 5 manual review" onclick="go('s-record-detail')" style="cursor:pointer">
             <div class="flex items-center justify-between mb-8">
-              <div><div class="text-sm font-bold">Brgy. Bilaran</div><div class="text-xs text-muted">July 5 · 1:12 PM</div></div>
+              <div><div class="text-sm font-bold">Brgy. Bilaran</div><div class="text-xs text-muted">Jul 5, 2025 · 1:12 PM</div></div>
               <span class="chip chip-mildew">Possible Mildew</span>
             </div>
             <div class="flex items-center gap-8"><span class="chip chip-queued" style="font-size:10px">Queued</span><span style="font-size:11px;color:var(--muted)">Awaiting sync</span></div>
           </div>
 
           <div id="history-empty" class="empty-state" style="display:none;padding:28px 10px">
-            <div class="icon">📂</div>
+            <div class="icon">REC</div>
             <h3>No matching records</h3>
             <p>Try another keyword or switch to a different filter.</p>
           </div>
@@ -1529,15 +1658,16 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="scroll-content">
         <div class="section">
           <!-- Mock image -->
-          <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#2d5a30,#4a8b4e);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:13px;position:relative;overflow:hidden">
-            <div style="text-align:center"><div style="font-size:36px;margin-bottom:4px">🌾</div><div>Sugarcane photo — Brgy. Wawa</div></div>
+          <div style="aspect-ratio:16/9;background:var(--surface2);border-radius:var(--radius);margin-bottom:16px;position:relative;overflow:hidden">
+            <img class="report-photo" src="sugarcane_smut.jpg" alt="Submitted sugarcane photo showing possible smut">
+            <div class="report-photo-caption">Sugarcane photo - Brgy. Wawa</div>
             <span class="chip chip-smut" style="position:absolute;top:12px;right:12px">Possible Smut</span>
           </div>
 
           <div class="card">
-            <div class="section-title">Detection Info</div>
+            <div class="section-title">AI Prediction Info</div>
             <table style="width:100%;font-size:13px;border-collapse:collapse">
-              <tr><td style="padding:6px 0;color:var(--muted);width:40%">Date</td><td style="font-weight:600">July 12, 2025 · 10:23 AM</td></tr>
+              <tr><td style="padding:6px 0;color:var(--muted);width:40%">Date</td><td style="font-weight:600">Jul 12, 2025 · 10:23 AM</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Barangay</td><td style="font-weight:600">Brgy. Wawa</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Farmer</td><td style="font-weight:600">Ronel Lance</td></tr>
               <tr><td style="padding:6px 0;color:var(--muted)">Status</td><td><span id="record-status-chip" class="chip chip-queued">Queued</span></td></tr>
@@ -1546,7 +1676,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
 
           <div class="card">
-            <div class="section-title">Symptoms Reported</div>
+            <div class="section-title">Manual Symptom Check Result</div>
+            <div class="text-xs text-muted mb-8">Shown separately from the AI prediction for comparison.</div>
             <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth</span></div>
             <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying or unusual discoloration</span></div>
           </div>
@@ -1558,7 +1689,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div style="display:flex;flex-direction:column;gap:10px">
             <button id="submit-to-mao-btn" class="btn btn-primary" onclick="submitToMao(this)">Submit to MAO</button>
-            <button class="btn btn-ghost btn-sm" onclick="confirmDelete()">🗑 Delete Record</button>
+            <button class="btn btn-ghost btn-sm" onclick="confirmDelete()">Delete Record</button>
           </div>
         </div>
       </div>
@@ -1573,15 +1704,15 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="scroll-content">
         <div class="section">
           <div class="card" style="background:var(--primary);color:#fff">
-            <div style="font-size:16px;font-weight:800;margin-bottom:4px">📸 How to Take a Good Photo</div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px">How to Take a Good Photo</div>
             <div style="font-size:12px;opacity:.85;line-height:1.6">Hold your phone 20–30 cm from the plant in good natural light. Focus on the affected leaf or stalk. Avoid shadows and blurry shots.</div>
           </div>
 
           <div class="section-title mt-12">Frequently Asked Questions</div>
 
           <div class="card" onclick="this.querySelector('.faq-ans').style.display=this.querySelector('.faq-ans').style.display=='block'?'none':'block'" style="cursor:pointer">
-            <div class="flex justify-between items-center"><div class="text-sm font-bold">What does "Possible disease detected" mean?</div><span>▾</span></div>
-            <div class="faq-ans" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">It means the app found indicators that could suggest a disease — but this is not a confirmed diagnosis. Always consult an agricultural technician before taking major action.</div>
+            <div class="flex justify-between items-center"><div class="text-sm font-bold">What does "AI Prediction" mean?</div><span>▾</span></div>
+            <div class="faq-ans" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">It means the app found photo signs that may match a disease. It is not a confirmed diagnosis. The manual symptom check is shown separately so farmers and technicians can compare.</div>
           </div>
 
           <div class="card" onclick="this.querySelector('.faq-ans').style.display=this.querySelector('.faq-ans').style.display=='block'?'none':'block'" style="cursor:pointer">
@@ -1596,13 +1727,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
           <div class="section-title mt-16">Disease Glossary</div>
 
-          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🌫️</span><div class="text-sm font-bold">Downy Mildew</div></div><div class="text-xs text-muted">Caused by Peronosclerospora sacchari. Shows white downy growth on underside of leaves, yellow stripes on top surface.</div></div>
-          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🖤</span><div class="text-sm font-bold">Sugarcane Smut</div></div><div class="text-xs text-muted">Caused by Sporisorium scitamineum. Infected stalks produce a black whip-like structure. Spreads via infected seed canes.</div></div>
-          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🎨</span><div class="text-sm font-bold">Mosaic Disease</div></div><div class="text-xs text-muted">Caused by Sugarcane mosaic virus (SCMV). Creates alternating green and yellow patches on leaves. Spread by aphids.</div></div>
-          <div class="card"><div class="flex gap-12 items-center mb-8"><span style="font-size:20px">🔶</span><div class="text-sm font-bold">Sugarcane Rust</div></div><div class="text-xs text-muted">Caused by Puccinia melanocephala. Shows rust-colored or brown pustules on leaves, mainly in cool and humid conditions.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><img class="disease-mini-img" src="sugarcane_downey_mildew.jpg" alt="Downy mildew"/><div class="text-sm font-bold">Downy Mildew</div></div><div class="text-xs text-muted">Caused by Peronosclerospora sacchari. Shows white downy growth on underside of leaves, yellow stripes on top surface.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><img class="disease-mini-img" src="sugarcane_smut.jpg" alt="Sugarcane smut"/><div class="text-sm font-bold">Sugarcane Smut</div></div><div class="text-xs text-muted">Caused by Sporisorium scitamineum. Infected stalks produce a black whip-like structure. Spreads via infected seed canes.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><img class="disease-mini-img" src="sugarcane_mosaic.jpg" alt="Mosaic disease"/><div class="text-sm font-bold">Mosaic Disease</div></div><div class="text-xs text-muted">Caused by Sugarcane mosaic virus (SCMV). Creates alternating green and yellow patches on leaves. Spread by aphids.</div></div>
+          <div class="card"><div class="flex gap-12 items-center mb-8"><img class="disease-mini-img" src="sugarcane_rust.jpg" alt="Sugarcane rust"/><div class="text-sm font-bold">Sugarcane Rust</div></div><div class="text-xs text-muted">Caused by Puccinia melanocephala. Shows rust-colored or brown pustules on leaves, mainly in cool and humid conditions.</div></div>
 
           <div class="card" style="background:var(--surface2)">
-            <div class="text-sm font-bold mb-8">📞 Need more help?</div>
+            <div class="text-sm font-bold mb-8">Need more help?</div>
             <div class="text-xs text-muted">Contact the Municipal Agriculture Office of Nasugbu, Batangas at (043) 416-XXXX or visit Brgy. Poblacion.</div>
           </div>
         </div>
@@ -1747,6 +1878,20 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     </div>
   </div>
 
+  <div id="tutorial-overlay" class="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+    <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
+    <div id="tutorial-arrow" class="tutorial-arrow up"></div>
+    <div class="tutorial-card">
+      <div id="tutorial-target" class="tutorial-target">Step 1 of 5</div>
+      <div id="tutorial-title" style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px">Start Scan</div>
+      <div id="tutorial-body" class="text-sm text-muted" style="line-height:1.6;margin-bottom:14px">Use Start Scan to begin the photo guide, camera capture, AI prediction, and manual symptom comparison.</div>
+      <div class="flex gap-10">
+        <button class="btn btn-primary btn-sm" onclick="nextTutorialStep()">Next</button>
+        <button class="btn btn-ghost btn-sm" onclick="hideTutorial()">Skip</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end #device -->
 
 
@@ -1760,7 +1905,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     </div>
     <div class="right">
       <span style="opacity:.7">Municipal Agriculture Office · Nasugbu, Batangas</span>
-      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">LR</div>
     </div>
   </div>
 
@@ -1872,7 +2017,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       </div>
       <div id="mao-nav-analytics" class="mao-nav-item" onclick="maoTab('analytics')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Analytics
+        Decision Reports
       </div>
       <div id="mao-nav-users" class="mao-nav-item" onclick="maoTab('users')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1881,6 +2026,10 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div id="mao-nav-advisory" class="mao-nav-item" onclick="maoTab('advisory')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         Advisory Panel
+      </div>
+      <div id="mao-nav-admin" class="mao-nav-item" onclick="maoTab('admin')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.03.03a2 2 0 0 1-2.83 2.83l-.03-.03A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.05a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.03.03a2 2 0 0 1-2.83-2.83l.03-.03A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.05A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.03-.03a2 2 0 0 1 2.83-2.83l.03.03A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.05a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.03-.03a2 2 0 0 1 2.83 2.83l-.03.03A1.7 1.7 0 0 0 19.4 9c.36.6.93 1 1.6 1h.05a2 2 0 0 1 0 4H21a1.7 1.7 0 0 0-1.6 1z"/></svg>
+        Admin Tools
       </div>
       <div id="mao-nav-profile" class="mao-nav-item" onclick="maoTab('profile')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1902,27 +2051,38 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <!-- OVERVIEW -->
       <div class="mao-panel active" id="mao-overview">
         <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Dashboard Overview</div>
-          <div style="font-size:13px;color:var(--muted)">Nasugbu, Batangas · July 2025</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Command Center</div>
+          <div style="font-size:13px;color:var(--muted)">Operational snapshot · Nasugbu, Batangas · Jul 2025</div>
+        </div>
+
+        <div style="background:#F7F9F7;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px">
+          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px">MAO Decision Reports</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px">Configured for daily, weekly, monthly, and annual views so MAO staff can prioritize barangays, field checks, and advisories.</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Daily</div><div class="text-xs text-muted mt-8">New reports and urgent visits</div></div>
+            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Weekly</div><div class="text-xs text-muted mt-8">Barangay hotspots</div></div>
+            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Monthly</div><div class="text-xs text-muted mt-8">Disease trend and response</div></div>
+            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Annual</div><div class="text-xs text-muted mt-8">Planning and budget support</div></div>
+          </div>
         </div>
 
         <div class="stat-grid">
-          <div class="stat-card"><div class="value">47</div><div class="label">Total Reports</div></div>
-          <div class="stat-card"><div class="value" style="color:var(--warning)">12</div><div class="label">Queued / Unreviewed</div></div>
-          <div class="stat-card"><div class="value" style="color:var(--danger)">18</div><div class="label">Possible Disease Cases</div></div>
-          <div class="stat-card"><div class="value" style="color:var(--success)">29</div><div class="label">Reviewed</div></div>
+          <div class="stat-card" tabindex="0" data-tip="All farmer and field personnel reports received for the selected period."><div class="value">47</div><div class="label">Total Reports</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports submitted but not yet reviewed by MAO staff."><div class="value" style="color:var(--primary-dark)">12</div><div class="label">Queued / Unreviewed</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports where the AI prediction suggests a possible disease. These are not confirmed diagnoses."><div class="value" style="color:var(--primary)">18</div><div class="label">Possible Disease Cases</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports that MAO staff have checked or marked as reviewed."><div class="value" style="color:var(--success)">29</div><div class="label">Reviewed</div></div>
         </div>
 
-        <!-- Most reported diseases -->
+        <!-- Operational priorities -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Disease Breakdown</div>
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Priority Work Queue</div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div><div class="flex justify-between text-sm mb-8"><span>Sugarcane Smut</span><span class="font-bold">14</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:78%;background:#7B1FA2"></div></div></div>
-              <div><div class="flex justify-between text-sm mb-8"><span>Downy Mildew</span><span class="font-bold">10</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:56%;background:#1565C0"></div></div></div>
-              <div><div class="flex justify-between text-sm mb-8"><span>Mosaic Disease</span><span class="font-bold">8</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:44%;background:#F57F17"></div></div></div>
-              <div><div class="flex justify-between text-sm mb-8"><span>Sugarcane Rust</span><span class="font-bold">6</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:33%;background:#BF360C"></div></div></div>
-              <div><div class="flex justify-between text-sm mb-8"><span>Healthy</span><span class="font-bold">9</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:50%;background:#2E7D32"></div></div></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Review queued reports</div><div class="text-xs text-muted">12 reports waiting</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('reports')">Open</button></div>
+              <div class="divider"></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Plan field checks</div><div class="text-xs text-muted">Wawa and Cogunan first</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('map')">Map</button></div>
+              <div class="divider"></div>
+              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Update advisories</div><div class="text-xs text-muted">Smut guidance needs review</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('advisory')">Edit</button></div>
             </div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
@@ -1939,23 +2099,10 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
         </div>
 
-        <div class="analytics-grid">
-          <div class="chart-card">
-            <div class="chart-title">Weekly Case Volume</div>
-            <div class="chart-bars">
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:34%;background:#6E8B74"></div></div><div class="chart-meta">Wk1</div><div class="chart-val">9</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:52%;background:#5E7A65"></div></div><div class="chart-meta">Wk2</div><div class="chart-val">14</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:86%;background:#B94040"></div></div><div class="chart-meta">Wk3</div><div class="chart-val">23</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:62%;background:#445D48"></div></div><div class="chart-meta">Wk4</div><div class="chart-val">17</div></div>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">Processing Performance</div>
-            <div class="trend-row"><div class="trend-label">Same-day review</div><div class="trend-track"><div class="trend-fill" style="width:61%;background:var(--success)"></div></div><div class="chart-val">61%</div></div>
-            <div class="trend-row"><div class="trend-label">2-3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--warning)"></div></div><div class="chart-val">27%</div></div>
-            <div class="trend-row"><div class="trend-label">Backlog over 3d</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--danger)"></div></div><div class="chart-val">12%</div></div>
-            <div class="divider"></div>
-            <div class="text-xs text-muted">Peak inflow: Tuesday and Friday morning uploads from Brgy. Wawa and Brgy. Cogunan.</div>
+        <div class="card" style="padding:16px">
+          <div class="flex justify-between items-center">
+            <div><div class="text-sm font-bold">Detailed charts moved to Decision Reports</div><div class="text-xs text-muted mt-8">Overview now focuses on actions. Use Decision Reports for trends, legends, and period-based analysis.</div></div>
+            <button class="btn btn-primary btn-sm btn-fit" onclick="maoTab('analytics')">Open Decision Reports</button>
           </div>
         </div>
 
@@ -1982,39 +2129,43 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="flex justify-between items-center mb-16" style="flex-wrap:wrap;gap:12px">
           <div><div style="font-size:22px;font-weight:800;color:var(--text)">All Reports</div><div style="font-size:13px;color:var(--muted)">47 total · Nasugbu, Batangas</div></div>
           <div class="flex gap-12">
-            <input id="mao-report-search" type="text" oninput="applyMaoFilters()" placeholder="🔍 Search…" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none;min-width:180px"/>
-            <button class="btn btn-ghost btn-sm btn-fit">Export ↓</button>
+            <input id="mao-report-search" type="text" oninput="applyMaoFilters()" placeholder="Search reports..." style="padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none;min-width:180px"/>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="exportMaoReports()">Export CSV</button>
           </div>
         </div>
 
-        <!-- Filter chips -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-          <button class="btn btn-primary btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('all', this)">All</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('smut', this)">Smut</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('mildew', this)">Mildew</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('rust', this)">Rust</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('mosaic', this)">Mosaic</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('healthy', this)">Healthy</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('queued', this)">Queued</button>
-          <button class="btn btn-ghost btn-sm mao-filter-btn filter-pill-sm" onclick="setMaoFilter('reviewed', this)">Reviewed</button>
+        <div class="mao-filter-panel">
+          <div class="flex justify-between items-center mb-12">
+            <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Filters & Sorting</div>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="resetMaoReportFilters()">Reset</button>
+          </div>
+          <div class="mao-filter-grid">
+            <div class="field"><label>Year</label><select id="mao-filter-year" onchange="applyMaoFilters()"><option value="all">All years</option><option value="2025">2025</option><option value="2024">2024</option></select></div>
+            <div class="field"><label>Barangay</label><select id="mao-filter-barangay" onchange="applyMaoFilters()"><option value="all">All barangays</option><option value="wawa">Brgy. Wawa</option><option value="cogunan">Brgy. Cogunan</option><option value="bilaran">Brgy. Bilaran</option><option value="mataas">Brgy. Mataas na Lupa</option><option value="looc">Brgy. Looc</option><option value="balaytigue">Brgy. Balaytigue</option></select></div>
+            <div class="field"><label>Disease</label><select id="mao-filter-disease" onchange="applyMaoFilters()"><option value="all">All disease types</option><option value="smut">Smut</option><option value="mildew">Downy Mildew</option><option value="rust">Rust</option><option value="mosaic">Mosaic</option><option value="healthy">Healthy</option></select></div>
+            <div class="field"><label>Status</label><select id="mao-filter-status" onchange="applyMaoFilters()"><option value="all">All statuses</option><option value="queued">Queued</option><option value="reviewed">Reviewed</option></select></div>
+            <div class="field"><label>Sort</label><select id="mao-sort-order" onchange="applyMaoFilters()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="barangay">Barangay A-Z</option></select></div>
+            <div class="field"><label>From</label><input id="mao-filter-from" type="date" value="2025-07-01" onchange="applyMaoFilters()"/></div>
+            <div class="field"><label>To</label><input id="mao-filter-to" type="date" value="2025-07-31" onchange="applyMaoFilters()"/></div>
+          </div>
         </div>
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
           <table class="mao-table">
             <thead><tr><th>#</th><th>Date</th><th>Barangay</th><th>Reporter</th><th>Disease</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="mao-reports-body">
-              <tr class="mao-report-row" data-disease="smut" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-047</td><td>Jul 12</td><td>Brgy. Wawa</td><td>Maria S.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="mildew" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-046</td><td>Jul 11</td><td>Brgy. Cogunan</td><td>Jose R.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="healthy" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-045</td><td>Jul 10</td><td>Brgy. Bilaran</td><td>Ana L.</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="rust" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-044</td><td>Jul 9</td><td>Brgy. Mataas na Lupa</td><td>Pedro M.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="mosaic" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-043</td><td>Jul 8</td><td>Brgy. Looc</td><td>Maria S.</td><td><span class="chip chip-mosaic">Possible Mosaic</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="smut" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-042</td><td>Jul 7</td><td>Brgy. Wawa</td><td>Jose R.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-disease="mildew" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-041</td><td>Jul 6</td><td>Brgy. Balaytigue</td><td>Ana L.</td><td><span class="chip chip-unclear">Needs Review</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-12" data-year="2025" data-barangay="wawa" data-disease="smut" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-047</td><td>Jul 12, 2025</td><td>Brgy. Wawa</td><td>Maria S.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-11" data-year="2025" data-barangay="cogunan" data-disease="mildew" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-046</td><td>Jul 11, 2025</td><td>Brgy. Cogunan</td><td>Jose R.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-10" data-year="2025" data-barangay="bilaran" data-disease="healthy" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-045</td><td>Jul 10, 2025</td><td>Brgy. Bilaran</td><td>Ana L.</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-09" data-year="2025" data-barangay="mataas" data-disease="rust" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-044</td><td>Jul 9, 2025</td><td>Brgy. Mataas na Lupa</td><td>Pedro M.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-08" data-year="2025" data-barangay="looc" data-disease="mosaic" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-043</td><td>Jul 8, 2025</td><td>Brgy. Looc</td><td>Maria S.</td><td><span class="chip chip-mosaic">Possible Mosaic</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-07" data-year="2025" data-barangay="wawa" data-disease="smut" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-042</td><td>Jul 7, 2025</td><td>Brgy. Wawa</td><td>Jose R.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-06" data-year="2025" data-barangay="balaytigue" data-disease="mildew" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-041</td><td>Jul 6, 2025</td><td>Brgy. Balaytigue</td><td>Ana L.</td><td><span class="chip chip-unclear">Needs Review</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
             </tbody>
           </table>
         </div>
         <div id="mao-reports-empty" class="empty-state" style="display:none;padding:24px 10px">
-          <div class="icon">🗂️</div>
+          <div class="icon">RPT</div>
           <h3>No reports found</h3>
           <p>Try different filters or update your search keyword.</p>
         </div>
@@ -2024,17 +2175,19 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="mao-panel" id="mao-report-detail">
         <div class="flex items-center gap-12 mb-20">
           <button onclick="maoTab('reports')" class="btn btn-ghost btn-sm btn-fit">← Back</button>
-          <div><div style="font-size:20px;font-weight:800;color:var(--text)">Report RPT-047</div><div style="font-size:13px;color:var(--muted)">Submitted July 12, 2025 · 10:23 AM</div></div>
+          <div><div style="font-size:20px;font-weight:800;color:var(--text)">Report RPT-047</div><div style="font-size:13px;color:var(--muted)">Submitted Jul 12, 2025 · 10:23 AM</div></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div>
             <!-- Mock image -->
-            <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#2d5a30,#4a8b4e);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5)">
-              <div style="text-align:center"><div style="font-size:48px">🌾</div><div style="font-size:13px">Submitted photo — Brgy. Wawa</div></div>
+            <div style="aspect-ratio:4/3;background:var(--surface2);border-radius:var(--radius);margin-bottom:16px;position:relative;overflow:hidden">
+              <img class="report-photo" src="sugarcane_smut.jpg" alt="Submitted sugarcane report photo showing possible smut">
+              <div class="report-photo-caption">Submitted photo - Brgy. Wawa</div>
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
-              <div class="section-title">Symptoms Reported</div>
+              <div class="section-title">Manual Symptom Check</div>
+              <div class="text-xs text-muted mb-8">Farmer-entered symptoms, kept separate from AI output.</div>
               <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Black whip-like growth</span></div>
               <div class="flex items-center gap-8 mb-8"><span style="color:var(--success)">✓</span><span class="text-sm">Drying or unusual discoloration</span></div>
               <div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">Yellow or white stripes observed</span></div>
@@ -2042,10 +2195,10 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
           <div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
-              <div class="section-title">Detection Summary</div>
+              <div class="section-title">AI Prediction Summary</div>
               <div class="flex items-center justify-between mb-12">
                 <span style="font-size:16px;font-weight:800">Sugarcane Smut</span>
-                <span class="chip chip-smut">Possible</span>
+                <span class="chip chip-smut">58% confidence</span>
               </div>
               <table style="width:100%;font-size:13px;border-collapse:collapse">
                 <tr><td style="padding:5px 0;color:var(--muted);width:45%">Barangay</td><td class="font-bold">Brgy. Wawa</td></tr>
@@ -2056,6 +2209,14 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               </table>
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+              <div class="section-title">Manual Check Result</div>
+              <div class="flex items-center justify-between mb-8">
+                <span class="text-sm font-bold">Sugarcane Smut likely from symptoms</span>
+                <span class="chip chip-unclear">Manual</span>
+              </div>
+              <div class="text-xs text-muted">This comparison helps MAO decide if a field visit is needed.</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
               <div class="section-title">Notes from Field</div>
               <div class="text-sm text-muted">North side of the field, row 3. Several affected stalks observed. Farmer reports symptoms appeared within the last 2 weeks.</div>
             </div>
@@ -2064,9 +2225,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <div class="text-sm" style="color:#7F4000">Isolate affected stalks. Do not use seed canes from this area. Recommend field verification by an agricultural technician within 3–5 days.</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <button class="btn btn-primary btn-sm" onclick="showMAOToast('Report marked as reviewed')">✅ Mark as Reviewed</button>
-              <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Flagged for field check')">🚩 Flag for Field Check</button>
-              <button class="btn btn-ghost btn-sm" onclick="showMAOToast('Summary downloaded (mock)')">⬇ Download Summary</button>
+              <button class="btn btn-primary btn-sm" onclick="showMAOToast('Report marked as reviewed')">Mark as Reviewed</button>
+              <button class="btn btn-secondary btn-sm" onclick="showMAOToast('Flagged for field check')">Flag for Field Check</button>
+              <button class="btn btn-ghost btn-sm" onclick="downloadReportSummary()">Download Summary</button>
             </div>
           </div>
         </div>
@@ -2075,8 +2236,8 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <!-- MAP MODULE -->
       <div class="mao-panel" id="mao-map">
         <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Map</div>
-          <div style="font-size:13px;color:var(--muted)">Geographical disease scan locations · Nasugbu, Batangas · July 2025</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Barangay Heat Map</div>
+          <div style="font-size:13px;color:var(--muted)">Disease spread and severity by barangay · Nasugbu, Batangas · Jul 2025</div>
         </div>
 
         <!-- Map filter bar -->
@@ -2090,10 +2251,10 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <button data-filter="mildew" class="btn btn-ghost btn-sm mao-map-filter-btn filter-pill-sm" onclick="setMapFilter('mildew',this)">Mildew Only</button>
         </div>
 
-        <!-- SVG mock map of Nasugbu barangays -->
+        <!-- SVG mock heat map of Nasugbu barangays -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;position:relative">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:13px;font-weight:700">Scan Location Hotspot Map</span>
+            <span style="font-size:13px;font-weight:700">Disease Severity Heat Map</span>
             <span style="font-size:11px;color:var(--muted)">Nasugbu, Batangas</span>
           </div>
           <div style="position:relative;background:linear-gradient(160deg,#c8e6c9 0%,#a5d6a7 40%,#81c784 100%);height:340px;overflow:hidden">
@@ -2109,6 +2270,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <line x1="300" y1="0" x2="300" y2="340" stroke="#2e7d32" stroke-width="1"/>
               <line x1="450" y1="0" x2="450" y2="340" stroke="#2e7d32" stroke-width="1"/>
             </svg>
+            <!-- Heat layer: larger and warmer areas mean more reports and higher severity -->
+            <div class="heat-spot heat-high" style="left:22%;top:30%;width:150px;height:150px"></div>
+            <div class="heat-spot heat-medium" style="left:38%;top:50%;width:128px;height:128px"></div>
+            <div class="heat-spot heat-medium" style="left:52%;top:32%;width:112px;height:112px"></div>
+            <div class="heat-spot heat-low" style="left:34%;top:70%;width:92px;height:92px"></div>
+            <div class="heat-spot heat-low" style="left:58%;top:63%;width:84px;height:84px"></div>
+            <div class="heat-spot heat-low" style="left:18%;top:61%;width:74px;height:74px"></div>
             <!-- Hotspot pins -->
             <!-- Brgy. Wawa - HIGH (11 reports) -->
             <div class="map-pin" data-barangay="wawa" data-disease="smut" style="position:absolute;left:22%;top:28%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Wawa — 11 reports · Smut x8')">
@@ -2129,19 +2297,19 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#C97B2E"></div>
             </div>
             <!-- Brgy. Mataas na Lupa - LOW (6 reports) -->
-            <div class="map-pin" data-barangay="mataas" style="position:absolute;left:34%;top:70%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Mataas na Lupa — 6 reports · Rust x4')">
+            <div class="map-pin" data-barangay="mataas" data-disease="rust" style="position:absolute;left:34%;top:70%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Mataas na Lupa — 6 reports · Rust x4')">
               <div style="width:34px;height:34px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800">6</div>
               <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Mataas na Lupa</div>
               <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
             </div>
             <!-- Brgy. Looc - LOW (5 reports) -->
-            <div class="map-pin" data-barangay="looc" style="position:absolute;left:58%;top:62%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Looc — 5 reports · Mosaic x3')">
+            <div class="map-pin" data-barangay="looc" data-disease="mosaic" style="position:absolute;left:58%;top:62%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Looc — 5 reports · Mosaic x3')">
               <div style="width:32px;height:32px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">5</div>
               <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Brgy. Looc</div>
               <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
             </div>
             <!-- Brgy. Balaytigue - LOW (4 reports) -->
-            <div class="map-pin" data-barangay="balaytigue" style="position:absolute;left:18%;top:60%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Balaytigue — 4 reports · Unclear x2')">
+            <div class="map-pin" data-barangay="balaytigue" data-disease="unclear,mildew" style="position:absolute;left:18%;top:60%;transform:translate(-50%,-100%);cursor:pointer" onclick="showMAOToast('Brgy. Balaytigue — 4 reports · Unclear x2')">
               <div style="width:30px;height:30px;border-radius:50%;background:#445D48;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">4</div>
               <div style="position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:700;color:#1F2A21;background:rgba(255,255,255,.9);padding:2px 6px;border-radius:4px">Balaytigue</div>
               <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);width:2px;height:8px;background:#445D48"></div>
@@ -2149,14 +2317,14 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <!-- Legend -->
             <div style="position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,.92);border-radius:8px;padding:8px 12px;font-size:10px;line-height:1.8">
               <div style="font-weight:700;margin-bottom:4px;font-size:11px">Legend</div>
-              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#B94040;border:1px solid #fff"></span>High (10+)</div>
-              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#C97B2E;border:1px solid #fff"></span>Medium (6–9)</div>
-              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#445D48;border:1px solid #fff"></span>Low (1–5)</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#B94040;border:1px solid #fff"></span>High severity (10+)</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#C97B2E;border:1px solid #fff"></span>Medium severity (6-9)</div>
+              <div class="flex items-center gap-6"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#445D48;border:1px solid #fff"></span>Low severity (1-5)</div>
             </div>
             <!-- Compass -->
-            <div style="position:absolute;top:12px;right:72px;background:rgba(255,255,255,.85);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,.2)">🧭</div>
+            <div style="position:absolute;top:12px;right:72px;background:rgba(255,255,255,.85);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.2)">N</div>
           </div>
-          <div style="padding:10px 16px;font-size:11px;color:var(--muted);text-align:center">Tap a pin to see barangay details · Numbers indicate total scan reports</div>
+          <div style="padding:10px 16px;font-size:11px;color:var(--muted);text-align:center">Tap a barangay marker to filter details · Heat size and color show report volume and severity</div>
         </div>
 
         <!-- Barangay detail cards below map -->
@@ -2166,55 +2334,56 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div style="background:var(--surface);border:2px solid var(--danger);border-radius:var(--radius);padding:16px;position:relative">
             <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--danger)"></div>
             <div class="font-bold" style="font-size:15px">Brgy. Wawa</div>
-            <div class="text-xs text-muted mb-8">11 reports · 🔴 High priority</div>
+            <div class="text-xs text-muted mb-8">11 reports · High priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:92%;background:var(--danger)"></div></div>
             <div style="margin-top:8px"><span class="chip chip-smut" style="font-size:10px">Smut x8</span></div>
           </div>
           <div style="background:var(--surface);border:2px solid var(--warning);border-radius:var(--radius);padding:16px;position:relative">
             <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--warning)"></div>
             <div class="font-bold" style="font-size:15px">Brgy. Cogunan</div>
-            <div class="text-xs text-muted mb-8">9 reports · 🟡 Medium priority</div>
+            <div class="text-xs text-muted mb-8">9 reports · Medium priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:75%;background:var(--warning)"></div></div>
             <div style="margin-top:8px"><span class="chip chip-mildew" style="font-size:10px">Mildew x6</span></div>
           </div>
           <div style="background:var(--surface);border:2px solid var(--warning);border-radius:var(--radius);padding:16px;position:relative">
             <div style="position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:var(--warning)"></div>
             <div class="font-bold" style="font-size:15px">Brgy. Bilaran</div>
-            <div class="text-xs text-muted mb-8">7 reports · 🟡 Medium priority</div>
+            <div class="text-xs text-muted mb-8">7 reports · Medium priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:58%;background:var(--warning)"></div></div>
             <div style="margin-top:8px"><span class="chip chip-mosaic" style="font-size:10px">Mosaic x5</span></div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
             <div class="font-bold" style="font-size:15px">Brgy. Mataas na Lupa</div>
-            <div class="text-xs text-muted mb-8">6 reports · 🟢 Low priority</div>
+            <div class="text-xs text-muted mb-8">6 reports · Low priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:50%"></div></div>
             <div style="margin-top:8px"><span class="chip chip-rust" style="font-size:10px">Rust x4</span></div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
             <div class="font-bold" style="font-size:15px">Brgy. Looc</div>
-            <div class="text-xs text-muted mb-8">5 reports · 🟢 Low priority</div>
+            <div class="text-xs text-muted mb-8">5 reports · Low priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:42%"></div></div>
             <div style="margin-top:8px"><span class="chip chip-mosaic" style="font-size:10px">Mosaic x3</span></div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
             <div class="font-bold" style="font-size:15px">Brgy. Balaytigue</div>
-            <div class="text-xs text-muted mb-8">4 reports · 🟢 Low priority</div>
+            <div class="text-xs text-muted mb-8">4 reports · Low priority</div>
             <div class="mini-bar"><div class="mini-bar-fill" style="width:33%"></div></div>
             <div style="margin-top:8px"><span class="chip chip-unclear" style="font-size:10px">Unclear x2</span></div>
           </div>
         </div>
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
-          <div style="font-size:14px;font-weight:700;margin-bottom:4px">📊 Monthly Trend (Mock)</div>
-          <div class="text-xs text-muted mb-16">Weekly reports vs resolved cases — July 2025</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px">Monthly Barangay Report Trend</div>
+          <div class="text-xs text-muted mb-16">Weekly reports vs resolved cases · Jul 2025</div>
           <div class="chart-bars" style="height:150px;margin-bottom:10px">
             <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:35%;background:var(--primary-light)"></div></div><div class="chart-meta">Wk1</div><div class="chart-val">11</div></div>
             <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:56%;background:var(--primary)"></div></div><div class="chart-meta">Wk2</div><div class="chart-val">17</div></div>
-            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:91%;background:var(--danger)"></div></div><div class="chart-meta">Wk3</div><div class="chart-val">28</div></div>
+            <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:91%;background:var(--primary-dark)"></div></div><div class="chart-meta">Wk3</div><div class="chart-val">28</div></div>
             <div class="chart-col"><div class="chart-track" style="max-width:36px"><div class="chart-fill" style="height:63%;background:#3A7D44"></div></div><div class="chart-meta">Wk4</div><div class="chart-val">19</div></div>
           </div>
           <div class="trend-row"><div class="trend-label">Resolved in week</div><div class="trend-track"><div class="trend-fill" style="width:68%;background:var(--success)"></div></div><div class="chart-val">68%</div></div>
           <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center">Week 3 peaked strongly, then cases dropped after targeted advisories in Brgy. Wawa.</div>
+          <div class="chart-legend"><span class="legend-key"><span class="legend-swatch" style="background:var(--primary)"></span>Reported cases</span><span class="legend-key"><span class="legend-swatch" style="background:var(--success)"></span>Reviewed / resolved</span></div>
         </div>
       </div>
 
@@ -2291,37 +2460,38 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <!-- ANALYTICS PANEL -->
       <div class="mao-panel" id="mao-analytics">
         <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Analytics</div>
-          <div style="font-size:13px;color:var(--muted)">Disease occurrence trends · Nasugbu, Batangas</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Decision Reports</div>
+          <div style="font-size:13px;color:var(--muted)">Barangay disease reports for MAO planning · Nasugbu, Batangas</div>
         </div>
 
         <!-- Timeframe selector -->
         <div style="display:flex;gap:8px;margin-bottom:24px;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Timeframe:</span>
-          <button data-filter="week" class="btn btn-primary btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('week',this)">This Week</button>
-          <button data-filter="month" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('month',this)">This Month</button>
-          <button data-filter="quarter" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('quarter',this)">3 Months</button>
+          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Report period:</span>
+          <button data-filter="day" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('day',this)">Daily</button>
+          <button data-filter="week" class="btn btn-primary btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('week',this)">Weekly</button>
+          <button data-filter="month" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('month',this)">Monthly</button>
+          <button data-filter="year" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('year',this)">Annual</button>
         </div>
 
         <!-- KPI strip -->
         <div class="stat-grid" style="margin-bottom:24px">
-          <div class="stat-card">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total Scans</div>
+          <div class="stat-card" tabindex="0" data-tip="All submitted field reports included in the selected report period.">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total Reports</div>
             <div style="font-size:28px;font-weight:800;color:var(--text)">63</div>
             <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 18% vs last period</div>
           </div>
-          <div class="stat-card">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Disease Rate</div>
-            <div style="font-size:28px;font-weight:800;color:var(--danger)">74%</div>
-            <div style="font-size:11px;color:var(--danger);margin-top:2px">↑ 9% vs last period</div>
+          <div class="stat-card" tabindex="0" data-tip="Reports where the AI prediction suggests a possible disease. These require review or field validation.">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Possible Disease</div>
+            <div style="font-size:28px;font-weight:800;color:var(--primary)">47</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">AI-predicted reports</div>
           </div>
-          <div class="stat-card">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Resolved</div>
+          <div class="stat-card" tabindex="0" data-tip="Reports already checked by MAO staff.">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Reviewed</div>
             <div style="font-size:28px;font-weight:800;color:var(--success)">41</div>
             <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 12% vs last period</div>
           </div>
-          <div class="stat-card">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Active Farmers</div>
+          <div class="stat-card" tabindex="0" data-tip="Barangays with reports in the selected period.">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Active Barangays</div>
             <div style="font-size:28px;font-weight:800;color:var(--info)">12</div>
             <div style="font-size:11px;color:var(--muted);margin-top:2px">No change</div>
           </div>
@@ -2330,36 +2500,39 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="analytics-grid" style="margin-bottom:24px">
           <!-- Weekly trend chart -->
           <div class="chart-card">
-            <div class="chart-title">Weekly Disease Occurrence Trend</div>
+            <div class="chart-title">Disease Report Trend</div>
+            <div class="chart-note">Bars show submitted reports with possible disease predictions for the selected period.</div>
             <div class="chart-bars" style="height:180px;margin-bottom:10px">
               <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:24%;background:#6E8B74"></div></div><div class="chart-meta">W1</div><div class="chart-val">6</div></div>
               <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:40%;background:#5E7A65"></div></div><div class="chart-meta">W2</div><div class="chart-val">10</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:72%;background:#C97B2E"></div></div><div class="chart-meta">W3</div><div class="chart-val">18</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:92%;background:#B94040"></div></div><div class="chart-meta">W4</div><div class="chart-val">23</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:72%;background:#445D48"></div></div><div class="chart-meta">W3</div><div class="chart-val">18</div></div>
+              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:92%;background:#2E4031"></div></div><div class="chart-meta">W4</div><div class="chart-val">23</div></div>
               <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:60%;background:#445D48"></div></div><div class="chart-meta">W5</div><div class="chart-val">15</div></div>
               <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:44%;background:#6E8B74"></div></div><div class="chart-meta">W6</div><div class="chart-val">11</div></div>
             </div>
             <div style="font-size:11px;color:var(--muted);text-align:center">Week 4 peak followed by decline after MAO advisories issued</div>
+            <div class="chart-legend"><span class="legend-key"><span class="legend-swatch" style="background:#6E8B74"></span>Reported possible cases</span><span class="legend-key"><span class="legend-swatch" style="background:#2E4031"></span>Peak period</span></div>
           </div>
           <!-- Disease breakdown -->
           <div class="chart-card">
             <div class="chart-title">Disease Type Breakdown</div>
+            <div class="chart-note">Bars show predicted disease categories among submitted reports, not confirmed diagnoses.</div>
             <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
               <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Smut</span><span class="text-sm font-bold" style="color:#4A148C">14 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:37%;background:#7B1FA2"></div></div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Smut</span><span class="text-sm font-bold" style="color:var(--primary)">14 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:37%;background:#2E4031"></div></div>
               </div>
               <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Downy Mildew</span><span class="text-sm font-bold" style="color:#0D47A1">10 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:26%;background:#1565C0"></div></div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Downy Mildew</span><span class="text-sm font-bold" style="color:var(--primary)">10 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:26%;background:#445D48"></div></div>
               </div>
               <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Mosaic Disease</span><span class="text-sm font-bold" style="color:#F57F17">8 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:21%;background:#F9A825"></div></div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Mosaic Disease</span><span class="text-sm font-bold" style="color:var(--primary)">8 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:21%;background:#6E8B74"></div></div>
               </div>
               <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Rust</span><span class="text-sm font-bold" style="color:#BF360C">5 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:13%;background:#E64A19"></div></div>
+                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Rust</span><span class="text-sm font-bold" style="color:var(--primary)">5 cases</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:13%;background:#8AA390"></div></div>
               </div>
               <div>
                 <div class="flex justify-between mb-4"><span class="text-sm font-bold">Healthy / Unclear</span><span class="text-sm font-bold" style="color:var(--muted)">3 cases</span></div>
@@ -2369,16 +2542,34 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
         </div>
 
+        <div class="chart-card" style="margin-bottom:24px">
+          <div class="chart-title">Disease Distribution Summary</div>
+          <div class="chart-note">Pie-style summary of AI-predicted disease categories in Nasugbu reports for the selected period.</div>
+          <div class="flex items-center gap-20" style="flex-wrap:wrap">
+            <div class="pie-chart" aria-label="Disease distribution pie chart"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-width:260px">
+              <div class="legend-key"><span class="legend-swatch" style="background:#2E4031"></span><span>Smut · 14 reports</span></div>
+              <div class="legend-key"><span class="legend-swatch" style="background:#445D48"></span><span>Downy Mildew · 10</span></div>
+              <div class="legend-key"><span class="legend-swatch" style="background:#6E8B74"></span><span>Mosaic · 8</span></div>
+              <div class="legend-key"><span class="legend-swatch" style="background:#8AA390"></span><span>Rust · 5</span></div>
+              <div class="legend-key"><span class="legend-swatch" style="background:#C8D5CB"></span><span>Healthy / unclear · 3</span></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Resolution performance -->
         <div class="chart-card" style="margin-bottom:0">
-          <div class="chart-title">Response &amp; Resolution Performance</div>
+          <div class="chart-title">Review Status by Time</div>
+          <div class="chart-note">Percentages show reviewed reports grouped by MAO response time.</div>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
             <div class="trend-row"><div class="trend-label">Same-day review</div><div class="trend-track"><div class="trend-fill" style="width:61%;background:var(--success)"></div></div><div class="chart-val">61%</div></div>
-            <div class="trend-row"><div class="trend-label">2–3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--warning)"></div></div><div class="chart-val">27%</div></div>
-            <div class="trend-row"><div class="trend-label">Backlog (&gt;3 days)</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--danger)"></div></div><div class="chart-val">12%</div></div>
+            <div class="trend-row"><div class="trend-label">2-3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--primary-light)"></div></div><div class="chart-val">27%</div></div>
+            <div class="trend-row"><div class="trend-label">Backlog (&gt;3 days)</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--primary-dark)"></div></div><div class="chart-val">12%</div></div>
           </div>
+          <div class="chart-legend"><span class="legend-key"><span class="legend-swatch" style="background:var(--success)"></span>Reviewed same day</span><span class="legend-key"><span class="legend-swatch" style="background:var(--primary-dark)"></span>Needs follow-up</span></div>
           <div style="margin-top:12px;font-size:11px;color:var(--muted)">Peak inflow: Tuesday and Friday morning uploads from Brgy. Wawa and Brgy. Cogunan.</div>
         </div>
+
       </div>
 
       <!-- USERS PANEL -->
@@ -2390,7 +2581,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
         <!-- Search and actions -->
         <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-          <input id="users-search" type="text" oninput="applyUsersFilter()" placeholder="🔍 Search by name or barangay…" style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
+          <input id="users-search" type="text" oninput="applyUsersFilter()" placeholder="Search by name or barangay..." style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none"/>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost btn-sm filter-pill-sm users-role-btn btn-primary" onclick="setUsersRole('all',this)" style="background:var(--primary);color:#fff">All</button>
             <button class="btn btn-ghost btn-sm filter-pill-sm users-role-btn" onclick="setUsersRole('farmer',this)">Farmers</button>
@@ -2472,7 +2663,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </table>
         </div>
         <div id="users-empty" class="empty-state" style="display:none;padding:24px 10px">
-          <div class="icon">👤</div>
+          <div class="icon">USR</div>
           <h3>No users found</h3>
           <p>Try a different name or barangay keyword.</p>
         </div>
@@ -2482,44 +2673,181 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="mao-panel" id="mao-advisory">
         <div style="margin-bottom:20px">
           <div style="font-size:22px;font-weight:800;color:var(--text)">Advisory Panel</div>
-          <div style="font-size:13px;color:var(--muted)">Disease-based recommendations for field response</div>
+          <div style="font-size:13px;color:var(--muted)">Configurable disease recommendations for field response</div>
+        </div>
+
+        <div class="card guideline-editor" style="padding:20px">
+          <div class="flex justify-between items-center mb-12">
+            <div>
+              <div style="font-size:15px;font-weight:800;color:var(--text)">MAO Guideline Library</div>
+              <div class="text-xs text-muted mt-8">Admins can update treatment and prevention advice when agricultural guidelines change.</div>
+            </div>
+            <span class="chip chip-online">Editable</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field" style="margin-bottom:0;grid-column:1/-1;max-width:280px">
+              <label>Disease</label>
+              <select id="guideline-disease"><option>Sugarcane Smut</option><option>Downy Mildew</option><option>Mosaic Disease</option><option>Sugarcane Rust</option></select>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Treatment Advice</label>
+              <textarea id="guideline-treatment">Separate affected stalks, avoid using seed canes from affected rows, and request field verification.</textarea>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Prevention Advice</label>
+              <textarea id="guideline-prevention">Use clean planting material, monitor nearby fields weekly, and report new cases to MAO.</textarea>
+            </div>
+          </div>
+          <div class="flex gap-10 mt-12">
+            <button class="btn btn-primary btn-sm btn-fit" onclick="saveAdvisoryGuidelines()">Save Guideline Update</button>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="showMAOToast('Draft preview opened (mock)')">Preview Farmer Message</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px">
+          <div class="flex justify-between items-center mb-12">
+            <div>
+              <div style="font-size:15px;font-weight:800;color:var(--text)">SMS Advisory Support</div>
+              <div class="text-xs text-muted mt-8">Prototype option for farmers who may not receive app notifications while offline.</div>
+            </div>
+            <span class="chip chip-queued">Optional</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field" style="margin-bottom:0">
+              <label>Send To</label>
+              <select id="sms-target"><option>Farmers in Brgy. Wawa</option><option>All registered farmers</option><option>Field personnel only</option><option>Nasugbu Sugar Planters Agriculture Cooperative</option></select>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>SMS Message</label>
+              <textarea id="sms-message">MAO advisory: Possible sugarcane smut reports in Brgy. Wawa. Please check affected rows and avoid using seed cane from symptomatic plants.</textarea>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm btn-fit mt-12" onclick="sendSmsAdvisory()">Send SMS Advisory</button>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="card advisory-card" data-status="high" role="region" aria-label="High urgency — Sugarcane Smut" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
-              <div class="flex items-center gap-12"><span style="font-size:20px">🖤</span><span style="font-size:15px;font-weight:800">Sugarcane Smut</span></div>
+              <div class="flex items-center gap-12"><img class="disease-mini-img" src="sugarcane_smut.jpg" alt="Sugarcane smut"/><span style="font-size:15px;font-weight:800">Sugarcane Smut</span></div>
               <div class="flex items-center gap-8"><span class="status-pill">High</span><span class="chip chip-smut">14 active cases</span></div>
             </div>
             <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Isolate infected stalks immediately. Do not use seed canes from affected areas. Conduct field verification and destroy infected materials through burning or burial.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Wawa, Brgy. Cogunan</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Smut (mock)')">Issue Advisory</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Sugarcane Smut')">Edit Guideline</button>
             </div>
           </div>
 
           <div class="card advisory-card" data-status="medium" role="region" aria-label="Medium urgency — Downy Mildew" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
-              <div class="flex items-center gap-12"><span style="font-size:20px">🌫️</span><span style="font-size:15px;font-weight:800">Downy Mildew</span></div>
+              <div class="flex items-center gap-12"><img class="disease-mini-img" src="sugarcane_downey_mildew.jpg" alt="Downy mildew"/><span style="font-size:15px;font-weight:800">Downy Mildew</span></div>
               <div class="flex items-center gap-8"><span class="status-pill">Medium</span><span class="chip chip-mildew">10 active cases</span></div>
             </div>
             <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Remove and destroy infected plant material. Apply recommended fungicide if available. Monitor surrounding fields. Improve drainage in affected areas.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Cogunan, Brgy. Bilaran</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mildew (mock)')">Issue Advisory</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Downy Mildew')">Edit Guideline</button>
             </div>
           </div>
 
           <div class="card advisory-card" data-status="low" role="region" aria-label="Low urgency — Mosaic Disease" style="padding:20px">
             <div class="flex justify-between items-center mb-8">
-              <div class="flex items-center gap-12"><span style="font-size:20px">🎨</span><span style="font-size:15px;font-weight:800">Mosaic Disease</span></div>
+              <div class="flex items-center gap-12"><img class="disease-mini-img" src="sugarcane_mosaic.jpg" alt="Mosaic disease"/><span style="font-size:15px;font-weight:800">Mosaic Disease</span></div>
               <div class="flex items-center gap-8"><span class="status-pill">Low</span><span class="chip chip-mosaic">8 active cases</span></div>
             </div>
             <div class="text-sm" style="color:var(--text);margin-bottom:12px;line-height:1.6">Control aphid vectors with appropriate pesticide. Remove and destroy infected plant material. Avoid planting susceptible varieties in affected areas.</div>
             <div class="text-xs text-muted">Priority areas: Brgy. Bilaran, Brgy. Looc</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mosaic (mock)')">Issue Advisory</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Mosaic Disease')">Edit Guideline</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN TOOLS PANEL -->
+      <div class="mao-panel" id="mao-admin">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--text)">Admin Tools</div>
+          <div style="font-size:13px;color:var(--muted)">Technical settings, report templates, and partner coordination</div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="chart-card">
+            <div class="chart-title">Technical Validation</div>
+            <div class="chart-note">Admin-only notes. Hidden from regular MAO monitoring views to avoid confusing daily operations.</div>
+            <div style="display:grid;grid-template-columns:1fr;gap:10px">
+              <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+                <div class="text-sm font-bold">Verified Images</div>
+                <div class="text-xs text-muted mt-8">Collect farmer photos with MAO-confirmed labels before deployment.</div>
+              </div>
+              <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+                <div class="text-sm font-bold">Field Test Set</div>
+                <div class="text-xs text-muted mt-8">Include dark, blurry, distant, and close-up samples from real farms.</div>
+              </div>
+              <div style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)">
+                <div class="text-sm font-bold">Model Selection</div>
+                <div class="text-xs text-muted mt-8">Compare candidate models and deploy only the best validated performer.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Report Template Alignment</div>
+            <div class="chart-note">Prototype placeholder for adapting exports to the MAO or cooperative's official report format.</div>
+            <div class="field">
+              <label>Template</label>
+              <select id="report-template">
+                <option>MAO Monthly Field Monitoring Report</option>
+                <option>Barangay Disease Incident Summary</option>
+                <option>Cooperative Advisory Summary</option>
+              </select>
+            </div>
+            <div class="template-preview">
+              Header: Municipality, barangay, report period<br/>
+              Body: report count, disease prediction, review status, field notes<br/>
+              Sign-off: MAO reviewer and date reviewed
+            </div>
+            <button class="btn btn-primary btn-sm btn-fit mt-12" onclick="saveReportTemplate()">Save Template Preference</button>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Cooperative Integration</div>
+            <div class="chart-note">Adds a local beneficiary/admin group for coordination without changing the farmer-facing scan flow.</div>
+            <div class="field">
+              <label>Partner Group</label>
+              <select id="coop-group">
+                <option>Nasugbu Sugar Planters Agriculture Cooperative</option>
+                <option>Barangay Farmer Association</option>
+                <option>Municipal Agriculture Office only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Access Role</label>
+              <select id="coop-role">
+                <option>Read-only reports and advisories</option>
+                <option>Advisory co-reviewer</option>
+                <option>Field validation coordinator</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-sm btn-fit" onclick="saveCoopIntegration()">Save Partner Setup</button>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">Export Settings</div>
+            <div class="chart-note">Controls what the working Export CSV button includes.</div>
+            <div class="field">
+              <label>Export Format</label>
+              <select id="export-format">
+                <option>Filtered table rows</option>
+                <option>Monthly MAO template</option>
+                <option>Cooperative summary</option>
+              </select>
+            </div>
+            <div class="text-xs text-muted">Exports use the active filters from the Reports page in this prototype.</div>
+            <button class="btn btn-ghost btn-sm btn-fit mt-12" onclick="exportMaoReports()">Export Current Reports</button>
           </div>
         </div>
       </div>
@@ -2543,6 +2871,44 @@ let historyFilter = 'all';
 let maoFilter = 'all';
 let maoLoggedIn = false;
 let mockUploadIv = null;
+let analysisIv = null;
+let manualCheckCompleted = false;
+let manualCheckSkipped = false;
+let photoAnalysisComplete = false;
+let tutorialStep = 0;
+let tutorialResizeHandler = null;
+const tutorialSteps = [
+  {
+    title: 'Start Scan',
+    body: 'Use Start Scan to begin the photo guide, camera capture, AI prediction, and manual symptom comparison.',
+    screen: 's-home',
+    selector: '#tutorial-start-scan'
+  },
+  {
+    title: 'Bottom Menu',
+    body: 'Use Home, Scan, Records, Settings, and Reports to move around without getting lost.',
+    screen: 's-home',
+    selector: '#tutorial-bottom-nav'
+  },
+  {
+    title: 'Photo Quality',
+    body: 'The camera screen shows green when the photo is acceptable and red when it should be retaken.',
+    screen: 's-capture',
+    selector: '#capture-quality'
+  },
+  {
+    title: 'Manual Check',
+    body: 'When AI confidence is low, answer simple symptom questions. The manual result stays separate from the AI prediction.',
+    screen: 's-manual-prompt',
+    selector: '#tutorial-manual-check'
+  },
+  {
+    title: 'Reports',
+    body: 'Saved reports can be stored offline, queued, and submitted to the MAO when internet is available.',
+    screen: 's-home',
+    selector: '#tutorial-reports-nav'
+  }
+];
 
 function go(screenId) {
   const prevScreen = currentScreen;
@@ -2571,11 +2937,115 @@ function go(screenId) {
 
   // Special: start analysis animation
   if (screenId === 's-analyzing') startAnalysis();
+  // Special: refresh comparison card
+  if (screenId === 's-result') updateManualResult();
   // Special: restore save form
   if (screenId === 's-save') {
     document.getElementById('save-form-view').style.display = 'block';
     document.getElementById('save-success-view').style.display = 'none';
   }
+  if (screenId === 's-home') maybeShowFirstTimeTutorial();
+}
+
+function beginPhotoAnalysis() {
+  manualCheckCompleted = false;
+  manualCheckSkipped = false;
+  photoAnalysisComplete = false;
+  go('s-analyzing');
+}
+
+function showTutorial() {
+  tutorialStep = 0;
+  const overlay = document.getElementById('tutorial-overlay');
+  if (overlay) overlay.classList.add('active');
+  if (!tutorialResizeHandler) {
+    tutorialResizeHandler = () => positionTutorialHighlight();
+    window.addEventListener('resize', tutorialResizeHandler);
+  }
+  renderTutorialStep();
+}
+
+function renderTutorialStep() {
+  const step = tutorialSteps[tutorialStep] || tutorialSteps[0];
+  const target = document.getElementById('tutorial-target');
+  const titleEl = document.getElementById('tutorial-title');
+  const bodyEl = document.getElementById('tutorial-body');
+  if (step.screen && currentScreen !== step.screen) go(step.screen);
+  if (target) target.textContent = `Step ${tutorialStep + 1} of ${tutorialSteps.length}`;
+  if (titleEl) titleEl.textContent = step.title;
+  if (bodyEl) bodyEl.textContent = step.body;
+  const screenEl = step.screen ? document.getElementById(step.screen) : null;
+  const scrollArea = screenEl?.querySelector('.scroll-content');
+  if (scrollArea) scrollArea.scrollTop = 0;
+  positionTutorialHighlight();
+  requestAnimationFrame(positionTutorialHighlight);
+  setTimeout(positionTutorialHighlight, 260);
+}
+
+function positionTutorialHighlight() {
+  const overlay = document.getElementById('tutorial-overlay');
+  const spotlight = document.getElementById('tutorial-spotlight');
+  const arrow = document.getElementById('tutorial-arrow');
+  const card = overlay?.querySelector('.tutorial-card');
+  const step = tutorialSteps[tutorialStep] || tutorialSteps[0];
+  const targetEl = step.selector ? document.querySelector(step.selector) : null;
+  if (!overlay || !spotlight || !card || !arrow || !targetEl) return;
+
+  const overlayRect = overlay.getBoundingClientRect();
+  const targetRect = targetEl.getBoundingClientRect();
+  const pad = 8;
+  const left = Math.max(10, targetRect.left - overlayRect.left - pad);
+  const top = Math.max(10, targetRect.top - overlayRect.top - pad);
+  const width = Math.min(overlayRect.width - 20, targetRect.width + pad * 2);
+  const height = Math.min(overlayRect.height - 20, targetRect.height + pad * 2);
+
+  spotlight.style.left = left + 'px';
+  spotlight.style.top = top + 'px';
+  spotlight.style.width = width + 'px';
+  spotlight.style.height = height + 'px';
+
+  const cardHeight = card.offsetHeight || 170;
+  const spaceBelow = overlayRect.height - (top + height);
+  const placeBelow = spaceBelow > cardHeight + 34;
+  const cardTop = placeBelow
+    ? Math.min(top + height + 18, overlayRect.height - cardHeight - 18)
+    : Math.max(18, top - cardHeight - 18);
+
+  card.style.top = cardTop + 'px';
+  card.style.bottom = 'auto';
+
+  const arrowLeft = Math.max(26, Math.min(left + width / 2 - 10, overlayRect.width - 46));
+  arrow.style.left = arrowLeft + 'px';
+  arrow.classList.toggle('up', placeBelow);
+  arrow.classList.toggle('down', !placeBelow);
+  arrow.style.top = placeBelow ? (cardTop - 10) + 'px' : (cardTop + cardHeight) + 'px';
+}
+
+function nextTutorialStep() {
+  tutorialStep++;
+  if (tutorialStep >= tutorialSteps.length) {
+    hideTutorial();
+    showToast('Tutorial complete');
+    return;
+  }
+  renderTutorialStep();
+}
+
+function hideTutorial() {
+  const overlay = document.getElementById('tutorial-overlay');
+  if (overlay) overlay.classList.remove('active');
+  if (tutorialResizeHandler) {
+    window.removeEventListener('resize', tutorialResizeHandler);
+    tutorialResizeHandler = null;
+  }
+}
+
+function maybeShowFirstTimeTutorial() {
+  try {
+    if (localStorage.getItem('caneguardTutorialSeen')) return;
+    localStorage.setItem('caneguardTutorialSeen', '1');
+    setTimeout(showTutorial, 700);
+  } catch (e) { /* tutorial remains available through button */ }
 }
 
 function goTab(tab) {
@@ -2766,7 +3236,7 @@ function mobileRegister() {
   if (!name || !email || !pw) { showToast('Please fill in all fields'); return; }
   if (pw !== conf)   { showToast('Passwords do not match'); return; }
   if (pw.length < 8) { showToast('Password must be at least 8 characters'); return; }
-  showToast('Account created! Welcome to CaneGuard 🌿');
+  showToast('Account created. Welcome to CaneGuard');
   // Reset onboarding slides back to slide 1 before showing them
   resetOnboarding();
   go('s-onboard');
@@ -2846,21 +3316,44 @@ function setMaoFilter(filter, btn) {
 
 function applyMaoFilters() {
   const query = (document.getElementById('mao-report-search')?.value || '').trim().toLowerCase();
-  const rows = document.querySelectorAll('.mao-report-row');
+  const rows = Array.from(document.querySelectorAll('.mao-report-row'));
+  const yearFilter = document.getElementById('mao-filter-year')?.value || 'all';
+  const barangayFilter = document.getElementById('mao-filter-barangay')?.value || 'all';
+  const diseaseFilter = document.getElementById('mao-filter-disease')?.value || 'all';
+  const statusFilter = document.getElementById('mao-filter-status')?.value || 'all';
+  const from = document.getElementById('mao-filter-from')?.value || '';
+  const to = document.getElementById('mao-filter-to')?.value || '';
+  const sort = document.getElementById('mao-sort-order')?.value || 'newest';
   let visible = 0;
+
+  rows.sort((a, b) => {
+    if (sort === 'oldest') return (a.dataset.date || '').localeCompare(b.dataset.date || '');
+    if (sort === 'barangay') return (a.dataset.barangay || '').localeCompare(b.dataset.barangay || '');
+    return (b.dataset.date || '').localeCompare(a.dataset.date || '');
+  }).forEach(row => row.parentElement.appendChild(row));
 
   rows.forEach(row => {
     const disease = row.dataset.disease || '';
     const status = row.dataset.status || '';
+    const year = row.dataset.year || '';
+    const barangay = row.dataset.barangay || '';
+    const date = row.dataset.date || '';
     const text = row.textContent.toLowerCase();
     const stateFilter = maoFilter === 'queued' || maoFilter === 'reviewed';
-    const filterMatch = maoFilter === 'all'
+    const chipFilterMatch = maoFilter === 'all'
       ? true
       : stateFilter
         ? status === maoFilter
         : disease === maoFilter;
+    const structuredMatch =
+      (yearFilter === 'all' || year === yearFilter) &&
+      (barangayFilter === 'all' || barangay === barangayFilter) &&
+      (diseaseFilter === 'all' || disease === diseaseFilter) &&
+      (statusFilter === 'all' || status === statusFilter) &&
+      (!from || date >= from) &&
+      (!to || date <= to);
     const searchMatch = !query || text.includes(query);
-    const show = filterMatch && searchMatch;
+    const show = chipFilterMatch && structuredMatch && searchMatch;
 
     row.style.display = show ? '' : 'none';
     if (show) visible++;
@@ -2868,6 +3361,19 @@ function applyMaoFilters() {
 
   const empty = document.getElementById('mao-reports-empty');
   if (empty) empty.style.display = visible === 0 ? 'flex' : 'none';
+}
+
+function resetMaoReportFilters() {
+  maoFilter = 'all';
+  ['mao-filter-year','mao-filter-barangay','mao-filter-disease','mao-filter-status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = 'all';
+  });
+  const sort = document.getElementById('mao-sort-order'); if (sort) sort.value = 'newest';
+  const from = document.getElementById('mao-filter-from'); if (from) from.value = '2025-07-01';
+  const to = document.getElementById('mao-filter-to'); if (to) to.value = '2025-07-31';
+  const search = document.getElementById('mao-report-search'); if (search) search.value = '';
+  applyMaoFilters();
 }
 
 // ─── ONBOARDING ───────────────────────────────────────────────
@@ -2920,6 +3426,7 @@ function mockCapture() {
   previewOverlay.style.display = 'flex';
   preview.style.background = 'linear-gradient(135deg, #2d5a30, #4a8b4e)';
   retake.style.display = 'block';
+  setCaptureQuality('good', 'Photo acceptable', 'Clear enough for AI analysis.');
   // ensure retake button is visible (it may have been hidden after a previous upload)
   const retBtn = document.getElementById('retake-btn'); if (retBtn) { retBtn.style.display = 'block'; retBtn.disabled = false; retBtn.style.opacity = ''; }
 }
@@ -2946,6 +3453,7 @@ function retakePhoto() {
 
   const retakeSection = document.getElementById('retake-section');
   if (retakeSection) retakeSection.style.display = 'none';
+  setCaptureQuality('bad', 'Photo not ready', 'Make sure the image is clear, bright, and close enough.');
 
   // reset upload progress UI
   const up = document.getElementById('upload-progress'); if (up) up.style.width = '0%';
@@ -2973,9 +3481,37 @@ function handleFileSelect(e) {
   placeholder.style.display = 'none';
   if (previewOverlay) previewOverlay.style.display = 'none';
   if (retake) retake.style.display = 'block';
+  setCaptureQuality('good', 'Uploaded photo acceptable', 'The selected image is ready for AI analysis.');
 
   // begin simulated upload automatically for prototype
   startMockUpload(file);
+}
+
+function setCaptureQuality(state, title, desc) {
+  const box = document.getElementById('capture-quality');
+  const titleEl = document.getElementById('capture-quality-title');
+  const descEl = document.getElementById('capture-quality-desc');
+  const labelEl = document.getElementById('capture-quality-label');
+  const warn = document.getElementById('quality-warn');
+  const useBtn = document.getElementById('use-photo-btn');
+  if (!box || !labelEl) return;
+
+  box.classList.remove('good', 'bad');
+  box.classList.add(state === 'good' ? 'good' : 'bad');
+  if (titleEl) titleEl.textContent = title;
+  if (descEl) descEl.textContent = desc;
+  labelEl.className = state === 'good' ? 'chip chip-sent' : 'chip chip-failed';
+  labelEl.textContent = state === 'good' ? 'Good' : 'Needs retake';
+  if (warn) warn.style.display = state === 'good' ? 'none' : 'block';
+  if (useBtn) {
+    useBtn.style.opacity = state === 'good' ? '1' : '.55';
+    useBtn.style.pointerEvents = state === 'good' ? 'auto' : 'none';
+  }
+}
+
+function simulateBadPhoto() {
+  setCaptureQuality('bad', 'Photo not acceptable', 'Too dark, blurry, or too far. Retake before analysis.');
+  showToast('Photo quality: needs retake');
 }
 
 function startMockUpload(file) {
@@ -3067,13 +3603,85 @@ function toggleSymptom(el) {
   }
 }
 
+function startManualCheck() {
+  manualCheckSkipped = false;
+  go('s-symptoms');
+}
+
+function skipManualCheck() {
+  manualCheckSkipped = true;
+  manualCheckCompleted = false;
+  go('s-result');
+}
+
+function finishManualCheck() {
+  manualCheckCompleted = true;
+  manualCheckSkipped = false;
+  go('s-result');
+}
+
+function getManualSymptomSummary() {
+  const selected = Array.from(document.querySelectorAll('.symptom-card.selected'));
+  if (!selected.length) return { label: 'Not completed', symptoms: [], likely: 'No manual result' };
+
+  const counts = {};
+  selected.forEach(card => {
+    const disease = card.dataset.disease || 'Unclear';
+    counts[disease] = (counts[disease] || 0) + 1;
+  });
+  const likely = Object.entries(counts).sort((a,b) => b[1] - a[1])[0]?.[0] || 'Unclear';
+  const symptoms = selected.map(card => card.dataset.symptom || card.querySelector('.label')?.textContent?.trim() || 'Selected symptom');
+  return { label: likely, symptoms, likely };
+}
+
+function updateManualResult() {
+  const body = document.getElementById('manual-result-body');
+  if (!body) return;
+
+  if (!manualCheckCompleted) {
+    body.className = 'manual-result-empty';
+    body.innerHTML = manualCheckSkipped
+      ? '<div class="text-sm font-bold">Skipped by user</div><div class="text-xs text-muted mt-8">Manual checking was skipped, so only the AI prediction is available.</div>'
+      : '<div class="text-sm font-bold">Not completed</div><div class="text-xs text-muted mt-8">No manual symptom check was recorded. The AI prediction is shown by itself.</div>';
+    return;
+  }
+
+  const summary = getManualSymptomSummary();
+  const symptomHtml = summary.symptoms.map(s => `<div class="flex items-center gap-8"><span style="color:var(--success)">✓</span><span class="text-sm">${s}</span></div>`).join('');
+  body.className = '';
+  body.innerHTML = `
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <div class="text-sm font-bold">${summary.label}</div>
+        <div class="text-xs text-muted mt-8">Based only on farmer-entered symptoms</div>
+      </div>
+      <span class="chip chip-unclear">Manual Check</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">${symptomHtml}</div>
+  `;
+}
+
 // ─── ANALYSIS ─────────────────────────────────────────────────
 function startAnalysis() {
   const bar = document.getElementById('analysis-progress');
+  if (analysisIv) clearInterval(analysisIv);
   let w = 0;
-  const iv = setInterval(() => {
+  analysisIv = setInterval(() => {
+    if (currentScreen !== 's-analyzing') {
+      clearInterval(analysisIv);
+      analysisIv = null;
+      return;
+    }
     w += Math.random() * 15 + 5;
-    if (w >= 100) { w = 100; clearInterval(iv); setTimeout(() => go('s-result'), 500); }
+    if (w >= 100) {
+      w = 100;
+      clearInterval(analysisIv);
+      analysisIv = null;
+      photoAnalysisComplete = true;
+      setTimeout(() => {
+        if (currentScreen === 's-analyzing') go('s-manual-prompt');
+      }, 500);
+    }
     bar.style.width = w + '%';
   }, 300);
 }
@@ -3115,6 +3723,9 @@ function resetScanFlow() {
     const chk = el.querySelector('.check-circle'); if (chk) chk.innerHTML = '';
   });
   symptomsSelected = 0;
+  manualCheckCompleted = false;
+  manualCheckSkipped = false;
+  photoAnalysisComplete = false;
   const symptomBtn = document.getElementById('symptom-next');
   if (symptomBtn) { symptomBtn.style.opacity = '.5'; symptomBtn.style.pointerEvents = 'none'; }
 
@@ -3123,6 +3734,7 @@ function resetScanFlow() {
 
   // Reset analysis progress
   const bar = document.getElementById('analysis-progress'); if (bar) bar.style.width = '0%';
+  if (analysisIv) { clearInterval(analysisIv); analysisIv = null; }
 
   // Reset save form inputs
   const saveSection = document.getElementById('s-save');
@@ -3310,6 +3922,99 @@ function saveMaoProfile() {
   showMAOToast('Profile updated (mock)');
 }
 
+function loadGuidelineDraft(disease) {
+  const diseaseEl = document.getElementById('guideline-disease');
+  const treatmentEl = document.getElementById('guideline-treatment');
+  const preventionEl = document.getElementById('guideline-prevention');
+  if (diseaseEl) diseaseEl.value = disease;
+
+  const drafts = {
+    'Sugarcane Smut': [
+      'Separate affected stalks, avoid using seed canes from affected rows, and request field verification.',
+      'Use clean planting material, monitor nearby fields weekly, and report new black whip growth to MAO.'
+    ],
+    'Downy Mildew': [
+      'Remove badly affected leaves or plants and ask MAO for approved fungicide guidance if spread continues.',
+      'Improve drainage, avoid overcrowding, and monitor nearby fields after rainy days.'
+    ],
+    'Mosaic Disease': [
+      'Remove plants showing strong patchy leaf color and monitor aphid presence in nearby rows.',
+      'Use clean planting material and coordinate vector control with MAO before wide pesticide use.'
+    ],
+    'Sugarcane Rust': [
+      'Monitor rust-colored spots and ask MAO for variety-specific advice before chemical treatment.',
+      'Improve field airflow and avoid moving infected leaves to other areas.'
+    ]
+  };
+  const draft = drafts[disease] || drafts['Sugarcane Smut'];
+  if (treatmentEl) treatmentEl.value = draft[0];
+  if (preventionEl) preventionEl.value = draft[1];
+  showMAOToast('Loaded guideline draft for ' + disease);
+}
+
+function saveAdvisoryGuidelines() {
+  const disease = document.getElementById('guideline-disease')?.value || 'selected disease';
+  showMAOToast('Guideline update saved for ' + disease + ' (mock)');
+}
+
+function exportMaoReports() {
+  applyMaoFilters();
+  const rows = Array.from(document.querySelectorAll('.mao-report-row')).filter(row => row.style.display !== 'none');
+  const header = ['Report ID','Date','Barangay','Reporter','Disease','Status'];
+  const body = rows.map(row => {
+    const cells = Array.from(row.querySelectorAll('td')).slice(0, 6).map(td => td.innerText.trim().replace(/\s+/g, ' '));
+    return cells.map(value => `"${value.replace(/"/g, '""')}"`).join(',');
+  });
+  const csv = [header.join(','), ...body].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'caneguard-filtered-reports.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showMAOToast('Exported ' + rows.length + ' report rows');
+}
+
+function downloadReportSummary() {
+  const text = [
+    'CaneGuard Report Summary',
+    'Report ID: RPT-047',
+    'Date: Jul 12, 2025 · 10:23 AM',
+    'Barangay: Brgy. Wawa',
+    'AI Prediction: Sugarcane Smut, 58% confidence',
+    'Manual Symptom Check: Sugarcane Smut likely from symptoms',
+    'Recommended Action: Field verification by MAO within 3-5 days'
+  ].join('\r\n');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'RPT-047-summary.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showMAOToast('Report summary downloaded');
+}
+
+function sendSmsAdvisory() {
+  const target = document.getElementById('sms-target')?.value || 'selected recipients';
+  showMAOToast('SMS advisory queued for ' + target + ' (mock)');
+}
+
+function saveReportTemplate() {
+  const template = document.getElementById('report-template')?.value || 'selected template';
+  showMAOToast('Report template set to: ' + template);
+}
+
+function saveCoopIntegration() {
+  const group = document.getElementById('coop-group')?.value || 'selected cooperative';
+  showMAOToast('Partner setup saved for ' + group);
+}
+
 // ─── TOAST ────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -3401,32 +4106,41 @@ function updateAnalytics(tf) {
   if (!panel) return;
 
   const datasets = {
+    day: {
+      stats: [9, '6', 4, 3],
+      weekly: [1,2,1,3,1,1],
+      weeklyColors: ['#6E8B74','#5E7A65','#6E8B74','#2E4031','#445D48','#6E8B74'],
+      trend: [44,33,23],
+      breakdown: [3,2,1,1,2],
+      breakdownWidths: ['33%','22%','11%','11%','22%'],
+      breakdownColors: ['#2E4031','#445D48','#6E8B74','#8AA390','var(--muted)']
+    },
     week: {
-      stats: [63, '74%', 41, 12],
+      stats: [63, 47, 41, 8],
       weekly: [6,10,18,23,15,11],
-      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+      weeklyColors: ['#6E8B74','#5E7A65','#445D48','#2E4031','#445D48','#6E8B74'],
       trend: [61,27,12],
       breakdown: [14,10,8,5,3],
       breakdownWidths: ['37%','26%','21%','13%','8%'],
-      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+      breakdownColors: ['#2E4031','#445D48','#6E8B74','#8AA390','var(--muted)']
     },
     month: {
-      stats: [240, '68%', 160, 18],
+      stats: [240, 163, 160, 14],
       weekly: [28,40,65,90,55,42],
-      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+      weeklyColors: ['#6E8B74','#5E7A65','#445D48','#2E4031','#445D48','#6E8B74'],
       trend: [64,22,14],
       breakdown: [70,45,32,22,11],
       breakdownWidths: ['31%','20%','14%','10%','5%'],
-      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+      breakdownColors: ['#2E4031','#445D48','#6E8B74','#8AA390','var(--muted)']
     },
-    quarter: {
-      stats: [720, '62%', 520, 30],
-      weekly: [80,120,200,300,250,170],
-      weeklyColors: ['#6E8B74','#5E7A65','#C97B2E','#B94040','#445D48','#6E8B74'],
+    year: {
+      stats: [2880, 1785, 2104, 28],
+      weekly: [260,340,520,680,610,470],
+      weeklyColors: ['#6E8B74','#5E7A65','#445D48','#2E4031','#445D48','#6E8B74'],
       trend: [68,20,12],
-      breakdown: [210,150,110,60,40],
+      breakdown: [610,420,300,220,235],
       breakdownWidths: ['29%','21%','15%','8%','6%'],
-      breakdownColors: ['#7B1FA2','#1565C0','#F9A825','#E64A19','var(--muted)']
+      breakdownColors: ['#2E4031','#445D48','#6E8B74','#8AA390','var(--muted)']
     }
   };
 
@@ -3438,10 +4152,10 @@ function updateAnalytics(tf) {
     const divs = card.querySelectorAll('div');
     if (!divs[1]) return;
     switch(i) {
-      case 0: divs[1].innerText = ds.stats[0]; break; // Total Scans
-      case 1: divs[1].innerText = ds.stats[1]; break; // Disease Rate
-      case 2: divs[1].innerText = ds.stats[2]; break; // Resolved
-      case 3: divs[1].innerText = ds.stats[3]; break; // Active Farmers
+      case 0: divs[1].innerText = ds.stats[0]; break; // Total reports
+      case 1: divs[1].innerText = ds.stats[1]; break; // Possible disease reports
+      case 2: divs[1].innerText = ds.stats[2]; break; // Reviewed reports
+      case 3: divs[1].innerText = ds.stats[3]; break; // Active barangays
     }
   });
 
