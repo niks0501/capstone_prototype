@@ -297,6 +297,32 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 }
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary)}
 .field textarea{resize:none;height:80px}
+/* Enhanced Dropdown Select */
+.field select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23445D48' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;cursor:pointer;transition:all .2s ease;padding-right:36px
+}
+.field select:hover,.field input[type="date"]:hover{border-color:var(--primary-dark);background-color:var(--surface2);transform:translateY(-1px)}
+.field select:focus,.field input[type="date"]:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(68,93,72,.15);background-color:#fff}
+.field select:active,.field input[type="date"]:active{border-color:var(--primary-dark);transform:scale(.995)}
+.field select:disabled,.field input[type="date"]:disabled{background-color:var(--surface);color:var(--muted);cursor:not-allowed;opacity:.7}
+.field select option{padding:12px 16px;background-color:#fff;color:var(--text)}
+.field select option:checked{background-color:var(--surface2);color:var(--primary)}
+/* Enhanced Date Input (Calendar) */
+.field input[type="date"]{
+  background-image:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1' y='1' width='12' height='12' rx='2' stroke='%23445D48' stroke-width='1.5'/%3E%3Cpath d='M3 5h8M3 9h8' stroke='%23445D48' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:14px 14px;cursor:pointer;transition:all .2s ease;padding-right:12px
+}
+/* Small selects (settings etc) */
+.field select.sm{
+  padding:6px 10px;font-size:12px;border-radius:var(--radius-xs);
+  background-image:url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.5 1L4 4.5L7.5 1' stroke='%23445D48' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position:right 8px center;background-size:8px 5px
+}
+.field select:focus-visible,.field input[type="date"]:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@keyframes dropdownFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.field select option{animation:dropdownFadeIn .15s ease forwards}
 
 /* ─── DIVIDER ────────────────────────────────────────────────── */
 .divider{height:1px;background:var(--border);margin:12px 0}
@@ -634,7 +660,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .tutorial-arrow.down{border-top:10px solid var(--bg)}
 .tutorial-arrow.up{border-bottom:10px solid var(--bg)}
 .mao-filter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px}
-.mao-filter-grid{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;align-items:end}
+.mao-filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end}
+@media (max-width:900px){.mao-filter-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.mao-filter-grid{grid-template-columns:1fr}}
 .mao-filter-grid .field{margin-bottom:0}
 .chart-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:-4px;margin-bottom:10px}
 .chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--muted)}
@@ -856,14 +884,14 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div style="font-size:24px;font-weight:800;color:var(--text)">Who are you?</div>
           <div style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.6">Select your role to get the right experience. This prototype supports assisted use by agricultural personnel.</div>
         </div>
-        <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div onclick="selectRoleAndGoHome('farmer')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--primary);flex-shrink:0">FR</div>
           <div>
             <div style="font-size:16px;font-weight:700;color:var(--text)">Farmer</div>
             <div style="font-size:12px;color:var(--muted);margin-top:2px">Scan sugarcane plants and save reports from your farm.</div>
           </div>
         </div>
-        <div onclick="go('s-home')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div onclick="selectRoleAndGoHome('field')" style="border:2px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="width:52px;height:52px;background:var(--surface2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--primary);flex-shrink:0">FP</div>
           <div>
             <div style="font-size:16px;font-weight:700;color:var(--text)">Field Personnel</div>
@@ -1751,13 +1779,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           <div class="card mb-0" style="border-radius:var(--radius) var(--radius) 0 0;margin-bottom:1px">
             <div class="flex items-center justify-between">
               <div><div class="text-sm font-bold">Language / Wika</div><div class="text-xs text-muted mt-8">English / Filipino</div></div>
-              <select style="border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:6px 10px;font-family:var(--font);font-size:12px;background:var(--bg)"><option>English</option><option>Filipino</option></select>
+              <select class="sm" style="border:1.5px solid var(--border);background:var(--bg)"><option>English</option><option>Filipino</option></select>
             </div>
           </div>
           <div class="card mb-0" style="border-radius:0;margin-bottom:1px">
             <div class="flex items-center justify-between">
               <div><div class="text-sm font-bold">Text Size</div><div class="text-xs text-muted mt-8">Normal</div></div>
-              <select style="border:1.5px solid var(--border);border-radius:var(--radius-xs);padding:6px 10px;font-family:var(--font);font-size:12px;background:var(--bg)"><option>Normal</option><option>Large</option><option>Extra Large</option></select>
+              <select class="sm" style="border:1.5px solid var(--border);background:var(--bg)"><option>Normal</option><option>Large</option><option>Extra Large</option></select>
             </div>
           </div>
           <div class="card" style="border-radius:0 0 var(--radius) var(--radius)">
@@ -2979,7 +3007,7 @@ function renderTutorialStep() {
   if (scrollArea) scrollArea.scrollTop = 0;
   positionTutorialHighlight();
   requestAnimationFrame(positionTutorialHighlight);
-  setTimeout(positionTutorialHighlight, 260);
+  setTimeout(positionTutorialHighlight, 500);
 }
 
 function positionTutorialHighlight() {
@@ -3051,6 +3079,12 @@ function maybeShowFirstTimeTutorial() {
 function goTab(tab) {
   const map = {home:'s-home', scan:'s-guide', history:'s-history', settings:'s-settings', 'farmer-reports':'s-farmer-reports'};
   if (map[tab]) go(map[tab]);
+}
+
+function selectRoleAndGoHome(role) {
+  localStorage.setItem('selectedRole', role);
+  go('s-home');
+  setTimeout(() => maybeShowFirstTimeTutorial(), 700);
 }
 
 // ─── AUTH + PROFILE ──────────────────────────────────────────
@@ -3236,8 +3270,8 @@ function mobileRegister() {
   if (!name || !email || !pw) { showToast('Please fill in all fields'); return; }
   if (pw !== conf)   { showToast('Passwords do not match'); return; }
   if (pw.length < 8) { showToast('Password must be at least 8 characters'); return; }
-  showToast('Account created. Welcome to CaneGuard');
-  // Reset onboarding slides back to slide 1 before showing them
+showToast('Account created. Welcome to CaneGuard');
+  localStorage.removeItem('caneguardTutorialSeen');
   resetOnboarding();
   go('s-onboard');
 }
@@ -4276,6 +4310,14 @@ document.addEventListener('DOMContentLoaded', () => {
   applyHistoryFilters();
   applyMaoFilters();
   initMapPinClicks();
+  // Make all date inputs show picker on click anywhere in the field
+  document.querySelectorAll('input[type="date"]').forEach(dateInput => {
+    dateInput.addEventListener('click', function() {
+      if (this.showPicker) {
+        this.showPicker();
+      }
+    });
+  });
   // attach upload input handler for prototype upload flow
   const upIn = document.getElementById('upload-input');
   if (upIn) upIn.addEventListener('change', handleFileSelect);
