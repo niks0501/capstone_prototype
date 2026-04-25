@@ -662,7 +662,6 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
   position:absolute;inset:0;z-index:1800;background:rgba(31,42,33,.50);
   display:none;padding:18px;pointer-events:auto;
 }
-#s-onboard,#tutorial-overlay{display:none !important}
 .tutorial-overlay.active{display:flex}
 .tutorial-card{background:var(--bg);border-radius:var(--radius);padding:18px;border:1px solid var(--border);box-shadow:var(--shadow-md);width:calc(100% - 36px);position:absolute;left:18px;z-index:2}
 .tutorial-target{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;background:#E8F5E9;color:var(--primary);font-size:11px;font-weight:800;margin-bottom:8px}
@@ -702,6 +701,66 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 .disease-mini-img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--border);background:var(--surface2);flex-shrink:0}
 .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .template-preview{background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text);line-height:1.6}
+
+/* --- MAO revision helpers: modals, filters, report generation, profile validation --- */
+.as-of{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.mao-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.mao-section-head h1{font-size:22px;font-weight:800;color:var(--text);line-height:1.2}
+.mao-filter-toggle{width:auto;padding:9px 14px;border-radius:999px;font-size:12px}
+.overview-filter-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px}
+.overview-filter-panel.active{display:block}
+.summary-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted)}
+.kpi-delta{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.priority-list{display:flex;flex-direction:column;gap:10px}
+.priority-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.priority-item:last-child{border-bottom:none}
+.municipal-summary{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:center}
+.report-preview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.report-preview-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.report-preview-card .num{font-size:24px;font-weight:800;color:var(--primary)}
+.report-preview-card .cap{font-size:11px;color:var(--muted);margin-top:2px}
+.report-chart-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.report-chart-label{width:130px;font-size:12px;font-weight:700;color:var(--text)}
+.report-chart-track{flex:1;height:10px;border-radius:999px;background:var(--surface2);overflow:hidden}
+.report-chart-fill{height:100%;border-radius:999px;background:var(--primary)}
+.report-chart-val{width:70px;text-align:right;font-size:11px;color:var(--muted);font-weight:700}
+.password-rule-list{margin-top:8px;display:grid;gap:5px;font-size:11px;color:var(--muted);line-height:1.35}
+.password-rule{display:flex;align-items:center;gap:6px}
+.password-rule::before{content:'-';width:14px;height:14px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);font-weight:800;flex-shrink:0}
+.password-rule.pass{color:var(--success);font-weight:700}
+.password-rule.pass::before{content:'✓';background:#E8F5E9;color:var(--success)}
+.password-match-hint{font-size:11px;margin-top:7px;color:var(--muted);font-weight:600}
+.password-match-hint.ok{color:var(--success)}
+.password-match-hint.bad{color:var(--danger)}
+.profile-status{display:none;margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;line-height:1.4}
+.profile-status.show{display:block}
+.profile-status.ok{background:#E8F5E9;color:var(--success);border:1px solid rgba(58,125,68,.2)}
+.profile-status.warn{background:#FFF3E0;color:#7F4000;border:1px solid #FFD0A0}
+.mao-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2500;padding:24px}
+.mao-modal-overlay.active{display:flex}
+.mao-modal{width:min(720px,100%);max-height:88vh;overflow:auto;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md)}
+.mao-modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border)}
+.mao-modal-title{font-size:18px;font-weight:800;color:var(--text)}
+.mao-modal-subtitle{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+.mao-modal-body{padding:20px}
+.mao-modal-actions{display:flex;justify-content:flex-end;gap:10px;padding:0 20px 20px;flex-wrap:wrap}
+.modal-close{width:34px;height:34px;border:none;background:var(--surface);border-radius:50%;cursor:pointer;font-size:18px;color:var(--muted)}
+.modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-info-cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.modal-info-cell .label{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.modal-info-cell .value{font-size:13px;font-weight:700;color:var(--text);line-height:1.35}
+.modal-error{display:none;background:#FFEBEE;color:var(--danger);border:1px solid rgba(185,64,64,.22);border-radius:var(--radius-sm);padding:9px 10px;font-size:12px;font-weight:700;margin-bottom:12px}
+.modal-error.show{display:block}
+.disease-detail-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2300;padding:18px}
+.disease-detail-overlay.active{display:flex}
+.disease-detail-card{width:100%;max-width:350px;max-height:90%;overflow:auto;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md)}
+.disease-detail-card img{width:100%;height:150px;object-fit:cover;background:var(--surface2);display:block}
+.disease-detail-body{padding:16px}
+.disease-detail-body h3{font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px}
+.disease-detail-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.disease-detail-section .label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+@media (max-width:900px){.report-preview-grid{grid-template-columns:repeat(2,1fr)}.municipal-summary{grid-template-columns:1fr}.modal-info-grid{grid-template-columns:1fr}}
+
 
 </style>
 </head>
@@ -988,28 +1047,28 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <div class="section">
           <div class="section-title">Common Diseases - Photo Examples</div>
           <div class="disease-photo-grid">
-            <div class="card disease-photo-card mb-0" onclick="showToast('Downy Mildew photo example - see Glossary')">
+            <div class="card disease-photo-card mb-0" onclick="openDiseaseDetail('mildew')">
               <img src="sugarcane_downey_mildew.jpg" alt="Sugarcane downy mildew example"/>
               <div class="disease-copy">
                 <div style="font-size:12px;font-weight:700;color:var(--text)">Downy Mildew</div>
                 <div style="font-size:10px;color:var(--muted);margin-top:2px">White fuzz, yellow stripes</div>
               </div>
             </div>
-            <div class="card disease-photo-card mb-0" onclick="showToast('Sugarcane Smut photo example - see Glossary')">
+            <div class="card disease-photo-card mb-0" onclick="openDiseaseDetail('smut')">
               <img src="sugarcane_smut.jpg" alt="Sugarcane smut example"/>
               <div class="disease-copy">
                 <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Smut</div>
                 <div style="font-size:10px;color:var(--muted);margin-top:2px">Black whip-like growth</div>
               </div>
             </div>
-            <div class="card disease-photo-card mb-0" onclick="showToast('Mosaic Disease photo example - see Glossary')">
+            <div class="card disease-photo-card mb-0" onclick="openDiseaseDetail('mosaic')">
               <img src="sugarcane_mosaic.jpg" alt="Sugarcane mosaic disease example"/>
               <div class="disease-copy">
                 <div style="font-size:12px;font-weight:700;color:var(--text)">Mosaic Disease</div>
                 <div style="font-size:10px;color:var(--muted);margin-top:2px">Patchy green-yellow leaves</div>
               </div>
             </div>
-            <div class="card disease-photo-card mb-0" onclick="showToast('Sugarcane Rust photo example - see Glossary')">
+            <div class="card disease-photo-card mb-0" onclick="openDiseaseDetail('rust')">
               <img src="sugarcane_rust.jpg" alt="Sugarcane rust example"/>
               <div class="disease-copy">
                 <div style="font-size:12px;font-weight:700;color:var(--text)">Sugarcane Rust</div>
@@ -1925,6 +1984,38 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
     </div>
   </div>
 
+
+  <div id="disease-detail-overlay" class="disease-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="disease-detail-title" onclick="if(event.target===this) closeDiseaseDetail()">
+    <div class="disease-detail-card" role="document">
+      <img id="disease-detail-img" src="sugarcane_smut.jpg" alt="Sugarcane disease sample image">
+      <div class="disease-detail-body">
+        <div class="flex justify-between items-start gap-12">
+          <div>
+            <h3 id="disease-detail-title">Sugarcane Smut</h3>
+            <div id="disease-detail-sub" class="text-xs text-muted">Quick disease guide</div>
+          </div>
+          <button class="modal-close" onclick="closeDiseaseDetail()" aria-label="Close disease detail">x</button>
+        </div>
+        <div class="disease-detail-section">
+          <div class="label">Visible symptoms</div>
+          <div id="disease-detail-symptoms" class="text-sm text-muted" style="line-height:1.6"></div>
+        </div>
+        <div class="disease-detail-section">
+          <div class="label">Short description</div>
+          <div id="disease-detail-desc" class="text-sm text-muted" style="line-height:1.6"></div>
+        </div>
+        <div class="disease-detail-section">
+          <div class="label">Possible action</div>
+          <div id="disease-detail-action" class="text-sm text-muted" style="line-height:1.6"></div>
+        </div>
+        <div class="action-row mt-16">
+          <button class="btn btn-ghost btn-sm" onclick="closeDiseaseDetail()">Close</button>
+          <button class="btn btn-primary btn-sm" onclick="closeDiseaseDetail(); go('s-help')">Open Glossary</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="tutorial-overlay" class="tutorial-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
     <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
     <div id="tutorial-arrow" class="tutorial-arrow up"></div>
@@ -1951,7 +2042,11 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <span>CaneGuard - MAO Dashboard</span>
     </div>
     <div class="right">
-      <span style="opacity:.7">Municipal Agriculture Office · Nasugbu, Batangas</span>
+      <span style="opacity:.7">Municipal Agriculture Office - Nasugbu, Batangas</span>
+      <select id="mao-language-select" onchange="setAppLanguage(this.value)" style="border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:6px 10px;font-family:var(--font);font-size:12px;font-weight:700;outline:none">
+        <option value="en" style="color:#1F2A21">English</option>
+        <option value="tl" style="color:#1F2A21">Tagalog</option>
+      </select>
       <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">LR</div>
     </div>
   </div>
@@ -2062,9 +2157,9 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
         Map
       </div>
-      <div id="mao-nav-analytics" class="mao-nav-item" onclick="maoTab('analytics')">
-        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Decision Reports
+      <div id="mao-nav-report-generation" class="mao-nav-item" onclick="maoTab('report-generation')">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h5"/></svg>
+        Report Generation
       </div>
       <div id="mao-nav-users" class="mao-nav-item" onclick="maoTab('users')">
         <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -2097,76 +2192,81 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
       <!-- OVERVIEW -->
       <div class="mao-panel active" id="mao-overview">
-        <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Command Center</div>
-          <div style="font-size:13px;color:var(--muted)">Operational snapshot · Nasugbu, Batangas · Jul 2025</div>
+        <div class="mao-section-head">
+          <div>
+            <h1>Command Center</h1>
+            <div style="font-size:13px;color:var(--muted)">Operational snapshot for disease monitoring in Nasugbu, Batangas</div>
+            <div class="as-of">As of <span id="overview-asof">Jul 12, 2025 - 11:04 AM</span></div>
+          </div>
+          <div class="flex gap-10 items-center" style="flex-wrap:wrap">
+            <span id="overview-active-summary" class="summary-pill">All 2025 reports</span>
+            <button class="btn btn-secondary btn-sm mao-filter-toggle" onclick="toggleOverviewFilters()">Filter Overview</button>
+          </div>
         </div>
 
-        <div style="background:#F7F9F7;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px">
-          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px">MAO Decision Reports</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px">Configured for daily, weekly, monthly, and annual views so MAO staff can prioritize barangays, field checks, and advisories.</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Daily</div><div class="text-xs text-muted mt-8">New reports and urgent visits</div></div>
-            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Weekly</div><div class="text-xs text-muted mt-8">Barangay hotspots</div></div>
-            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Monthly</div><div class="text-xs text-muted mt-8">Disease trend and response</div></div>
-            <div style="padding:10px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border)"><div class="text-xs font-bold">Annual</div><div class="text-xs text-muted mt-8">Planning and budget support</div></div>
+        <div id="overview-filter-panel" class="overview-filter-panel">
+          <div class="flex justify-between items-center mb-12" style="gap:12px;flex-wrap:wrap">
+            <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Overview Filters</div>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="resetOverviewFilters()">Reset</button>
+          </div>
+          <div class="mao-filter-grid">
+            <div class="field"><label>Year</label><select id="overview-filter-year" onchange="applyOverviewFilters()"><option value="all">All years</option><option value="2025" selected>2025</option><option value="2024">2024</option></select></div>
+            <div class="field"><label>Category</label><select id="overview-filter-category" onchange="applyOverviewFilters()"><option value="all">All categories</option><option value="disease">Possible disease</option><option value="healthy">Healthy / unclear</option><option value="field-check">Field check priority</option></select></div>
+            <div class="field"><label>Disease Type</label><select id="overview-filter-disease" onchange="applyOverviewFilters()"><option value="all">All disease types</option><option value="smut">Sugarcane Smut</option><option value="mildew">Downy Mildew</option><option value="mosaic">Mosaic Disease</option><option value="rust">Sugarcane Rust</option><option value="healthy">Healthy / unclear</option></select></div>
+            <div class="field"><label>Barangay</label><select id="overview-filter-barangay" onchange="applyOverviewFilters()"><option value="all">All barangays</option><option value="wawa">Brgy. Wawa</option><option value="cogunan">Brgy. Cogunan</option><option value="bilaran">Brgy. Bilaran</option><option value="mataas">Brgy. Mataas na Lupa</option><option value="looc">Brgy. Looc</option><option value="balaytigue">Brgy. Balaytigue</option></select></div>
+            <div class="field"><label>Report Status</label><select id="overview-filter-status" onchange="applyOverviewFilters()"><option value="all">All statuses</option><option value="queued">Queued</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged for field check</option></select></div>
           </div>
         </div>
 
         <div class="stat-grid">
-          <div class="stat-card" tabindex="0" data-tip="All farmer and field personnel reports received for the selected period."><div class="value">47</div><div class="label">Total Reports</div></div>
-          <div class="stat-card" tabindex="0" data-tip="Reports submitted but not yet reviewed by MAO staff."><div class="value" style="color:var(--primary-dark)">12</div><div class="label">Queued / Unreviewed</div></div>
-          <div class="stat-card" tabindex="0" data-tip="Reports where the AI prediction suggests a possible disease. These are not confirmed diagnoses."><div class="value" style="color:var(--primary)">18</div><div class="label">Possible Disease Cases</div></div>
-          <div class="stat-card" tabindex="0" data-tip="Reports that MAO staff have checked or marked as reviewed."><div class="value" style="color:var(--success)">29</div><div class="label">Reviewed</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Filtered farmer and field personnel reports."><div id="overview-total" class="value">47</div><div class="label">Total Reports</div><div class="kpi-delta">Filtered command-center count</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports submitted but not yet reviewed by MAO staff."><div id="overview-queued" class="value" style="color:var(--primary-dark)">12</div><div class="label">Queued / Unreviewed</div><div class="kpi-delta">Needs MAO action</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports where the AI prediction suggests a possible disease."><div id="overview-disease" class="value" style="color:var(--primary)">18</div><div class="label">Possible Disease Cases</div><div class="kpi-delta">Not confirmed diagnoses</div></div>
+          <div class="stat-card" tabindex="0" data-tip="Reports already checked or marked as reviewed."><div id="overview-reviewed" class="value" style="color:var(--success)">29</div><div class="label">Reviewed</div><div class="kpi-delta">Completed review flow</div></div>
         </div>
 
-        <!-- Operational priorities -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Priority Work Queue</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Review queued reports</div><div class="text-xs text-muted">12 reports waiting</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('reports')">Open</button></div>
-              <div class="divider"></div>
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Plan field checks</div><div class="text-xs text-muted">Wawa and Cogunan first</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('map')">Map</button></div>
-              <div class="divider"></div>
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Update advisories</div><div class="text-xs text-muted">Smut guidance needs review</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('advisory')">Edit</button></div>
+            <div class="chart-title">Command Center Actions</div>
+            <div class="priority-list">
+              <div class="priority-item"><div><div class="text-sm font-bold">Review queued reports</div><div id="overview-action-queued" class="text-xs text-muted">12 reports waiting</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('reports')">Open</button></div>
+              <div class="priority-item"><div><div class="text-sm font-bold">Plan field checks</div><div id="overview-action-hotspot" class="text-xs text-muted">Start with Brgy. Wawa</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="maoTab('map')">Map</button></div>
+              <div class="priority-item"><div><div class="text-sm font-bold">Generate official summary</div><div class="text-xs text-muted">Use current filters for a report preview</div></div><button class="btn btn-ghost btn-sm btn-fit" onclick="syncReportGenWithOverview(); maoTab('report-generation')">Generate</button></div>
             </div>
           </div>
+
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Top Barangays Reporting</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Wawa</div><div class="text-xs text-muted">11 reports</div></div><span class="chip chip-smut">High: Smut</span></div>
-              <div class="divider"></div>
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Cogunan</div><div class="text-xs text-muted">9 reports</div></div><span class="chip chip-mildew">High: Mildew</span></div>
-              <div class="divider"></div>
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Bilaran</div><div class="text-xs text-muted">7 reports</div></div><span class="chip chip-mosaic">High: Mosaic</span></div>
-              <div class="divider"></div>
-              <div class="flex justify-between items-center"><div><div class="text-sm font-bold">Brgy. Mataas na Lupa</div><div class="text-xs text-muted">6 reports</div></div><span class="chip chip-rust">High: Rust</span></div>
+            <div class="chart-title">Quick Insights</div>
+            <div id="overview-insights" style="display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+        </div>
+
+        <div class="chart-card" style="margin-bottom:20px">
+          <div class="flex justify-between items-center mb-12" style="gap:12px;flex-wrap:wrap">
+            <div>
+              <div class="chart-title" style="margin-bottom:4px">Municipality-Level Visual Summary</div>
+              <div class="chart-note" style="margin:0">Disease distribution across Nasugbu for the selected filter. Percentages are based on visible prototype reports.</div>
+            </div>
+            <span class="summary-pill">Total: <span id="overview-pie-total">47</span> reports</span>
+          </div>
+          <div class="municipal-summary">
+            <div class="pie-chart" id="overview-municipality-pie" aria-label="Municipality disease distribution pie chart"></div>
+            <div>
+              <div id="overview-pie-legend" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
+              <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Top affected barangays</div>
+              <div id="overview-top-barangays" style="display:flex;flex-direction:column;gap:8px"></div>
             </div>
           </div>
         </div>
 
-        <div class="card" style="padding:16px">
-          <div class="flex justify-between items-center">
-            <div><div class="text-sm font-bold">Detailed charts moved to Decision Reports</div><div class="text-xs text-muted mt-8">Overview now focuses on actions. Use Decision Reports for trends, legends, and period-based analysis.</div></div>
-            <button class="btn btn-primary btn-sm btn-fit" onclick="maoTab('analytics')">Open Decision Reports</button>
-          </div>
-        </div>
-
-        <!-- Recent reports -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
           <div class="flex justify-between items-center mb-16">
-            <div style="font-size:14px;font-weight:700">Recent Reports</div>
+            <div><div style="font-size:14px;font-weight:700">Important Reports</div><div class="as-of">As of <span id="overview-table-asof">Jul 12, 2025 - 11:04 AM</span></div></div>
             <button class="btn btn-secondary btn-sm btn-fit" onclick="maoTab('reports')">View All</button>
           </div>
           <table class="mao-table">
-            <thead><tr><th>Date</th><th>Barangay</th><th>Disease</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr onclick="maoTab('report-detail')"><td>Jul 12, 2025</td><td>Brgy. Wawa</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td></tr>
-              <tr onclick="maoTab('report-detail')"><td>Jul 11, 2025</td><td>Brgy. Cogunan</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td></tr>
-              <tr onclick="maoTab('report-detail')"><td>Jul 10, 2025</td><td>Brgy. Bilaran</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td></tr>
-              <tr onclick="maoTab('report-detail')"><td>Jul 9, 2025</td><td>Brgy. Mataas na Lupa</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td></tr>
-            </tbody>
+            <thead><tr><th>Date</th><th>Barangay</th><th>Disease</th><th>Severity</th><th>Status</th></tr></thead>
+            <tbody id="overview-recent-body"></tbody>
           </table>
         </div>
       </div>
@@ -2174,7 +2274,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <!-- REPORTS LIST -->
       <div class="mao-panel" id="mao-reports">
         <div class="flex justify-between items-center mb-16" style="flex-wrap:wrap;gap:12px">
-          <div><div style="font-size:22px;font-weight:800;color:var(--text)">All Reports</div><div style="font-size:13px;color:var(--muted)">47 total · Nasugbu, Batangas</div></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--text)">All Reports</div><div style="font-size:13px;color:var(--muted)">Filtered disease monitoring reports - Nasugbu, Batangas</div><div class="as-of">As of <span id="reports-asof">Jul 12, 2025 - 11:04 AM</span></div></div>
           <div class="flex gap-12">
             <input id="mao-report-search" type="text" oninput="applyMaoFilters()" placeholder="Search reports..." style="padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;outline:none;min-width:180px"/>
             <button class="btn btn-ghost btn-sm btn-fit" onclick="exportMaoReports()">Export CSV</button>
@@ -2187,11 +2287,13 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <button class="btn btn-ghost btn-sm btn-fit" onclick="resetMaoReportFilters()">Reset</button>
           </div>
           <div class="mao-filter-grid">
-            <div class="field"><label>Year</label><select id="mao-filter-year" onchange="applyMaoFilters()"><option value="all">All years</option><option value="2025">2025</option><option value="2024">2024</option></select></div>
+            <div class="field"><label>Year</label><select id="mao-filter-year" onchange="applyMaoFilters()"><option value="all">All years</option><option value="2025" selected>2025</option><option value="2024">2024</option></select></div>
+            <div class="field"><label>Category</label><select id="mao-filter-category" onchange="applyMaoFilters()"><option value="all">All categories</option><option value="disease">Possible disease</option><option value="healthy">Healthy / unclear</option><option value="field-check">Field check priority</option></select></div>
             <div class="field"><label>Barangay</label><select id="mao-filter-barangay" onchange="applyMaoFilters()"><option value="all">All barangays</option><option value="wawa">Brgy. Wawa</option><option value="cogunan">Brgy. Cogunan</option><option value="bilaran">Brgy. Bilaran</option><option value="mataas">Brgy. Mataas na Lupa</option><option value="looc">Brgy. Looc</option><option value="balaytigue">Brgy. Balaytigue</option></select></div>
-            <div class="field"><label>Disease</label><select id="mao-filter-disease" onchange="applyMaoFilters()"><option value="all">All disease types</option><option value="smut">Smut</option><option value="mildew">Downy Mildew</option><option value="rust">Rust</option><option value="mosaic">Mosaic</option><option value="healthy">Healthy</option></select></div>
-            <div class="field"><label>Status</label><select id="mao-filter-status" onchange="applyMaoFilters()"><option value="all">All statuses</option><option value="queued">Queued</option><option value="reviewed">Reviewed</option></select></div>
-            <div class="field"><label>Sort</label><select id="mao-sort-order" onchange="applyMaoFilters()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="barangay">Barangay A-Z</option></select></div>
+            <div class="field"><label>Disease</label><select id="mao-filter-disease" onchange="applyMaoFilters()"><option value="all">All disease types</option><option value="smut">Smut</option><option value="mildew">Downy Mildew</option><option value="rust">Rust</option><option value="mosaic">Mosaic</option><option value="healthy">Healthy / unclear</option></select></div>
+            <div class="field"><label>Status</label><select id="mao-filter-status" onchange="applyMaoFilters()"><option value="all">All statuses</option><option value="queued">Queued</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></div>
+            <div class="field"><label>Severity</label><select id="mao-filter-severity" onchange="applyMaoFilters()"><option value="all">All severity levels</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option><option value="none">None</option></select></div>
+            <div class="field"><label>Sort</label><select id="mao-sort-order" onchange="applyMaoFilters()"><option value="date-desc">Date submitted - newest</option><option value="date-asc">Date submitted - oldest</option><option value="barangay">Barangay A-Z</option><option value="disease">Disease type A-Z</option><option value="severity">Severity high-low</option><option value="status">Report status A-Z</option></select></div>
             <div class="field"><label>From</label><input id="mao-filter-from" type="date" value="2025-07-01" onchange="applyMaoFilters()"/></div>
             <div class="field"><label>To</label><input id="mao-filter-to" type="date" value="2025-07-31" onchange="applyMaoFilters()"/></div>
           </div>
@@ -2199,20 +2301,20 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
           <table class="mao-table">
-            <thead><tr><th>#</th><th>Date</th><th>Barangay</th><th>Reporter</th><th>Disease</th><th>Status</th><th>Action</th></tr></thead>
+            <thead><tr><th>#</th><th>Date</th><th>Barangay</th><th>Reporter</th><th>Disease</th><th>Severity</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="mao-reports-body">
-              <tr class="mao-report-row" data-date="2025-07-12" data-year="2025" data-barangay="wawa" data-disease="smut" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-047</td><td>Jul 12, 2025</td><td>Brgy. Wawa</td><td>Maria S.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-11" data-year="2025" data-barangay="cogunan" data-disease="mildew" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-046</td><td>Jul 11, 2025</td><td>Brgy. Cogunan</td><td>Jose R.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-10" data-year="2025" data-barangay="bilaran" data-disease="healthy" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-045</td><td>Jul 10, 2025</td><td>Brgy. Bilaran</td><td>Ana L.</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-09" data-year="2025" data-barangay="mataas" data-disease="rust" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-044</td><td>Jul 9, 2025</td><td>Brgy. Mataas na Lupa</td><td>Pedro M.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-08" data-year="2025" data-barangay="looc" data-disease="mosaic" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-043</td><td>Jul 8, 2025</td><td>Brgy. Looc</td><td>Maria S.</td><td><span class="chip chip-mosaic">Possible Mosaic</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-07" data-year="2025" data-barangay="wawa" data-disease="smut" data-status="reviewed" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-042</td><td>Jul 7, 2025</td><td>Brgy. Wawa</td><td>Jose R.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
-              <tr class="mao-report-row" data-date="2025-07-06" data-year="2025" data-barangay="balaytigue" data-disease="mildew" data-status="queued" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-041</td><td>Jul 6, 2025</td><td>Brgy. Balaytigue</td><td>Ana L.</td><td><span class="chip chip-unclear">Needs Review</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View →</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-12" data-year="2025" data-category="field-check" data-barangay="wawa" data-disease="smut" data-status="queued" data-severity="high" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-047</td><td>Jul 12, 2025</td><td>Brgy. Wawa</td><td>Maria S.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-failed">High</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-11" data-year="2025" data-category="disease" data-barangay="cogunan" data-disease="mildew" data-status="reviewed" data-severity="medium" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-046</td><td>Jul 11, 2025</td><td>Brgy. Cogunan</td><td>Jose R.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-queued">Medium</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-10" data-year="2025" data-category="healthy" data-barangay="bilaran" data-disease="healthy" data-status="reviewed" data-severity="none" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-045</td><td>Jul 10, 2025</td><td>Brgy. Bilaran</td><td>Ana L.</td><td><span class="chip chip-healthy">Healthy</span></td><td><span class="chip chip-healthy">None</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-09" data-year="2025" data-category="field-check" data-barangay="mataas" data-disease="rust" data-status="queued" data-severity="medium" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-044</td><td>Jul 9, 2025</td><td>Brgy. Mataas na Lupa</td><td>Pedro M.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-queued">Medium</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-08" data-year="2025" data-category="disease" data-barangay="looc" data-disease="mosaic" data-status="reviewed" data-severity="low" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-043</td><td>Jul 8, 2025</td><td>Brgy. Looc</td><td>Maria S.</td><td><span class="chip chip-mosaic">Possible Mosaic</span></td><td><span class="chip chip-online">Low</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-07" data-year="2025" data-category="field-check" data-barangay="wawa" data-disease="smut" data-status="flagged" data-severity="high" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-042</td><td>Jul 7, 2025</td><td>Brgy. Wawa</td><td>Jose R.</td><td><span class="chip chip-smut">Possible Smut</span></td><td><span class="chip chip-failed">High</span></td><td><span class="chip chip-queued">Flagged</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2025-07-06" data-year="2025" data-category="disease" data-barangay="balaytigue" data-disease="mildew" data-status="queued" data-severity="low" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-041</td><td>Jul 6, 2025</td><td>Brgy. Balaytigue</td><td>Ana L.</td><td><span class="chip chip-mildew">Possible Mildew</span></td><td><span class="chip chip-online">Low</span></td><td><span class="chip chip-queued">Queued</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
+              <tr class="mao-report-row" data-date="2024-11-18" data-year="2024" data-category="disease" data-barangay="cogunan" data-disease="rust" data-status="reviewed" data-severity="low" onclick="maoTab('report-detail')"><td style="font-family:var(--mono);font-size:11px">RPT-028</td><td>Nov 18, 2024</td><td>Brgy. Cogunan</td><td>Rosa G.</td><td><span class="chip chip-rust">Possible Rust</span></td><td><span class="chip chip-online">Low</span></td><td><span class="chip chip-sent">Reviewed</span></td><td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer">View</span></td></tr>
             </tbody>
           </table>
         </div>
         <div id="mao-reports-empty" class="empty-state" style="display:none;padding:24px 10px">
-          <div class="icon">RPT</div>
           <h3>No reports found</h3>
           <p>Try different filters or update your search keyword.</p>
         </div>
@@ -2222,7 +2324,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
       <div class="mao-panel" id="mao-report-detail">
         <div class="flex items-center gap-12 mb-20">
           <button onclick="maoTab('reports')" class="btn btn-ghost btn-sm btn-fit">← Back</button>
-          <div><div style="font-size:20px;font-weight:800;color:var(--text)">Report RPT-047</div><div style="font-size:13px;color:var(--muted)">Submitted Jul 12, 2025 · 10:23 AM</div></div>
+          <div><div style="font-size:20px;font-weight:800;color:var(--text)">Report RPT-047</div><div style="font-size:13px;color:var(--muted)">Submitted Jul 12, 2025 - 10:23 AM</div><div class="as-of">Report detail as of <span id="report-detail-asof">Jul 12, 2025 - 11:04 AM</span></div></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -2464,7 +2566,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
               <select id="mao-role"><option>MAO Admin</option><option>MAO Analyst</option><option>Field Coordinator</option></select>
               <div class="error-text" id="mao-role-err"></div>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="saveMaoProfile()">Save Profile</button>
+            <div id="mao-profile-status" class="profile-status"></div>
           </div>
 
           <div class="chart-card account-form">
@@ -2475,7 +2577,6 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <input id="mao-cur-pw" type="password" placeholder="Current password"/>
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-cur-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
-              <div class="pw-strength" id="mao-cur-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
               <div class="error-text" id="mao-cur-pw-err"></div>
             </div>
             <div class="field">
@@ -2485,6 +2586,11 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-new-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
               <div class="pw-strength" id="mao-new-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+              <div id="mao-new-pw-rules" class="password-rule-list">
+                <div class="password-rule" data-rule="length">At least 8 characters</div>
+                <div class="password-rule" data-rule="uppercase">At least 1 uppercase letter</div>
+                <div class="password-rule" data-rule="number">At least 1 number</div>
+              </div>
               <div class="error-text" id="mao-new-pw-err"></div>
             </div>
             <div class="field">
@@ -2494,129 +2600,83 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <button type="button" class="pw-eye" onclick="togglePwEye('mao-conf-pw',this)" aria-label="Show or hide password" tabindex="-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
               </div>
               <div class="pw-strength" id="mao-conf-pw-str"><div class="pw-strength-icon"><div class="pw-spinner"></div></div><span class="pw-strength-text"></span></div>
+              <div id="mao-conf-pw-match" class="password-match-hint">Confirm password must match the new password.</div>
               <div class="error-text" id="mao-conf-pw-err"></div>
             </div>
-            <div class="account-actions">
-              <button class="btn btn-secondary btn-sm" onclick="changeMaoPassword()">Change Password</button>
-              <button class="btn btn-danger btn-sm" onclick="maoLogout()">Logout</button>
-            </div>
+            <button class="btn btn-danger btn-sm" onclick="maoLogout()">Logout</button>
           </div>
+        </div>
+        <div class="screen-footer" style="margin-top:16px;border:1px solid var(--border);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div><div class="text-sm font-bold">Profile Save State</div><div class="text-xs text-muted mt-8">Save Profile is disabled until a saved field changes and all edited password fields are valid.</div></div>
+          <button id="mao-profile-save-btn" class="btn btn-primary btn-sm btn-fit" onclick="saveMaoProfile()" disabled>Save Profile</button>
         </div>
       </div>
 
-      <!-- ANALYTICS PANEL -->
-      <div class="mao-panel" id="mao-analytics">
-        <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:800;color:var(--text)">Decision Reports</div>
-          <div style="font-size:13px;color:var(--muted)">Barangay disease reports for MAO planning · Nasugbu, Batangas</div>
-        </div>
-
-        <!-- Timeframe selector -->
-        <div style="display:flex;gap:8px;margin-bottom:24px;align-items:center">
-          <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Report period:</span>
-          <button data-filter="day" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('day',this)">Daily</button>
-          <button data-filter="week" class="btn btn-primary btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('week',this)">Weekly</button>
-          <button data-filter="month" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('month',this)">Monthly</button>
-          <button data-filter="year" class="btn btn-ghost btn-sm filter-pill-sm analytics-tf-btn" onclick="setAnalyticsTf('year',this)">Annual</button>
-        </div>
-
-        <!-- KPI strip -->
-        <div class="stat-grid" style="margin-bottom:24px">
-          <div class="stat-card" tabindex="0" data-tip="All submitted field reports included in the selected report period.">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total Reports</div>
-            <div style="font-size:28px;font-weight:800;color:var(--text)">63</div>
-            <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 18% vs last period</div>
+      <!-- REPORT GENERATION PANEL -->
+      <div class="mao-panel" id="mao-report-generation">
+        <div class="mao-section-head">
+          <div>
+            <h1>Report Generation</h1>
+            <div style="font-size:13px;color:var(--muted)">Generate, preview, and export MAO monitoring summaries for capstone defense workflows</div>
+            <div class="as-of">Report data as of <span id="reportgen-asof">Jul 12, 2025 - 11:04 AM</span></div>
           </div>
-          <div class="stat-card" tabindex="0" data-tip="Reports where the AI prediction suggests a possible disease. These require review or field validation.">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Possible Disease</div>
-            <div style="font-size:28px;font-weight:800;color:var(--primary)">47</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">AI-predicted reports</div>
-          </div>
-          <div class="stat-card" tabindex="0" data-tip="Reports already checked by MAO staff.">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Reviewed</div>
-            <div style="font-size:28px;font-weight:800;color:var(--success)">41</div>
-            <div style="font-size:11px;color:var(--success);margin-top:2px">↑ 12% vs last period</div>
-          </div>
-          <div class="stat-card" tabindex="0" data-tip="Barangays with reports in the selected period.">
-            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Active Barangays</div>
-            <div style="font-size:28px;font-weight:800;color:var(--info)">12</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">No change</div>
+          <div class="flex gap-10" style="flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm btn-fit" onclick="generateMaoReportPreview(true)">Generate Report</button>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="exportGeneratedReport()">Export Preview</button>
           </div>
         </div>
 
-        <div class="analytics-grid" style="margin-bottom:24px">
-          <!-- Weekly trend chart -->
-          <div class="chart-card">
-            <div class="chart-title">Disease Report Trend</div>
-            <div class="chart-note">Bars show submitted reports with possible disease predictions for the selected period.</div>
-            <div class="chart-bars" style="height:180px;margin-bottom:10px">
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:24%;background:#6E8B74"></div></div><div class="chart-meta">W1</div><div class="chart-val">6</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:40%;background:#5E7A65"></div></div><div class="chart-meta">W2</div><div class="chart-val">10</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:72%;background:#445D48"></div></div><div class="chart-meta">W3</div><div class="chart-val">18</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:92%;background:#2E4031"></div></div><div class="chart-meta">W4</div><div class="chart-val">23</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:60%;background:#445D48"></div></div><div class="chart-meta">W5</div><div class="chart-val">15</div></div>
-              <div class="chart-col"><div class="chart-track"><div class="chart-fill" style="height:44%;background:#6E8B74"></div></div><div class="chart-meta">W6</div><div class="chart-val">11</div></div>
+        <div class="mao-filter-panel">
+          <div class="flex justify-between items-center mb-12" style="gap:12px;flex-wrap:wrap">
+            <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Report Parameters</div>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="resetReportGenerationFilters()">Reset</button>
+          </div>
+          <div class="mao-filter-grid">
+            <div class="field"><label>Report Type</label><select id="reportgen-type"><option value="municipal-summary">Municipality Disease Summary</option><option value="barangay-hotspots">Barangay Hotspot Report</option><option value="advisory-action">Advisory Action Report</option><option value="field-check">Field Check Priority List</option></select></div>
+            <div class="field"><label>Year</label><select id="reportgen-year"><option value="all">All years</option><option value="2025" selected>2025</option><option value="2024">2024</option></select></div>
+            <div class="field"><label>Category</label><select id="reportgen-category"><option value="all">All categories</option><option value="disease">Possible disease</option><option value="healthy">Healthy / unclear</option><option value="field-check">Field check priority</option></select></div>
+            <div class="field"><label>Disease Type</label><select id="reportgen-disease"><option value="all">All disease types</option><option value="smut">Sugarcane Smut</option><option value="mildew">Downy Mildew</option><option value="mosaic">Mosaic Disease</option><option value="rust">Sugarcane Rust</option><option value="healthy">Healthy / unclear</option></select></div>
+            <div class="field"><label>Barangay</label><select id="reportgen-barangay"><option value="all">All barangays</option><option value="wawa">Brgy. Wawa</option><option value="cogunan">Brgy. Cogunan</option><option value="bilaran">Brgy. Bilaran</option><option value="mataas">Brgy. Mataas na Lupa</option><option value="looc">Brgy. Looc</option><option value="balaytigue">Brgy. Balaytigue</option></select></div>
+            <div class="field"><label>Report Status</label><select id="reportgen-status"><option value="all">All statuses</option><option value="queued">Queued</option><option value="reviewed">Reviewed</option><option value="flagged">Flagged</option></select></div>
+            <div class="field"><label>Date From</label><input id="reportgen-from" type="date" value="2025-07-01"/></div>
+            <div class="field"><label>Date To</label><input id="reportgen-to" type="date" value="2025-07-31"/></div>
+            <div class="field"><label>Sort Preview</label><select id="reportgen-sort"><option value="date-desc">Date submitted - newest</option><option value="barangay">Barangay A-Z</option><option value="disease">Disease type A-Z</option><option value="severity">Severity high-low</option><option value="status">Report status A-Z</option></select></div>
+          </div>
+          <button class="btn btn-primary btn-sm btn-fit mt-12" onclick="generateMaoReportPreview(true)">Generate Report</button>
+        </div>
+
+        <div id="reportgen-preview" class="chart-card" style="padding:20px">
+          <div class="flex justify-between items-start mb-16" style="gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:17px;font-weight:800;color:var(--text)">Generated Report Preview</div>
+              <div class="as-of">Generated on <span id="reportgen-generated-at">Jul 12, 2025 - 11:04 AM</span></div>
             </div>
-            <div style="font-size:11px;color:var(--muted);text-align:center">Week 4 peak followed by decline after MAO advisories issued</div>
-            <div class="chart-legend"><span class="legend-key"><span class="legend-swatch" style="background:#6E8B74"></span>Reported possible cases</span><span class="legend-key"><span class="legend-swatch" style="background:#2E4031"></span>Peak period</span></div>
+            <span id="reportgen-preview-label" class="summary-pill">Municipality Disease Summary</span>
           </div>
-          <!-- Disease breakdown -->
-          <div class="chart-card">
-            <div class="chart-title">Disease Type Breakdown</div>
-            <div class="chart-note">Bars show predicted disease categories among submitted reports, not confirmed diagnoses.</div>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-              <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Smut</span><span class="text-sm font-bold" style="color:var(--primary)">14 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:37%;background:#2E4031"></div></div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Downy Mildew</span><span class="text-sm font-bold" style="color:var(--primary)">10 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:26%;background:#445D48"></div></div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Mosaic Disease</span><span class="text-sm font-bold" style="color:var(--primary)">8 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:21%;background:#6E8B74"></div></div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Sugarcane Rust</span><span class="text-sm font-bold" style="color:var(--primary)">5 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:13%;background:#8AA390"></div></div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-4"><span class="text-sm font-bold">Healthy / Unclear</span><span class="text-sm font-bold" style="color:var(--muted)">3 cases</span></div>
-                <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:8%;background:var(--muted)"></div></div>
-              </div>
+
+          <div class="report-preview-grid">
+            <div class="report-preview-card"><div id="rg-total" class="num">47</div><div class="cap">Filtered reports</div></div>
+            <div class="report-preview-card"><div id="rg-disease" class="num">37</div><div class="cap">Possible disease cases</div></div>
+            <div class="report-preview-card"><div id="rg-reviewed" class="num" style="color:var(--success)">29</div><div class="cap">Reviewed reports</div></div>
+            <div class="report-preview-card"><div id="rg-high" class="num" style="color:var(--danger)">14</div><div class="cap">High severity / flagged</div></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:center;margin-bottom:18px">
+            <div class="pie-chart" id="reportgen-pie" aria-label="Generated report disease distribution pie chart"></div>
+            <div>
+              <div class="chart-title">Chart Preview</div>
+              <div id="reportgen-chart-bars"></div>
+              <div id="reportgen-chart-note" class="chart-note" style="margin-top:10px">Distribution reflects current report-generation filters.</div>
             </div>
           </div>
-        </div>
 
-        <div class="chart-card" style="margin-bottom:24px">
-          <div class="chart-title">Disease Distribution Summary</div>
-          <div class="chart-note">Pie-style summary of AI-predicted disease categories in Nasugbu reports for the selected period.</div>
-          <div class="flex items-center gap-20" style="flex-wrap:wrap">
-            <div class="pie-chart" aria-label="Disease distribution pie chart"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-width:260px">
-              <div class="legend-key"><span class="legend-swatch" style="background:#2E4031"></span><span>Smut · 14 reports</span></div>
-              <div class="legend-key"><span class="legend-swatch" style="background:#445D48"></span><span>Downy Mildew · 10</span></div>
-              <div class="legend-key"><span class="legend-swatch" style="background:#6E8B74"></span><span>Mosaic · 8</span></div>
-              <div class="legend-key"><span class="legend-swatch" style="background:#8AA390"></span><span>Rust · 5</span></div>
-              <div class="legend-key"><span class="legend-swatch" style="background:#C8D5CB"></span><span>Healthy / unclear · 3</span></div>
-            </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <table class="mao-table">
+              <thead><tr><th>Report</th><th>Date</th><th>Barangay</th><th>Disease</th><th>Severity</th><th>Status</th></tr></thead>
+              <tbody id="reportgen-table-body"></tbody>
+            </table>
           </div>
         </div>
-
-        <!-- Resolution performance -->
-        <div class="chart-card" style="margin-bottom:0">
-          <div class="chart-title">Review Status by Time</div>
-          <div class="chart-note">Percentages show reviewed reports grouped by MAO response time.</div>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
-            <div class="trend-row"><div class="trend-label">Same-day review</div><div class="trend-track"><div class="trend-fill" style="width:61%;background:var(--success)"></div></div><div class="chart-val">61%</div></div>
-            <div class="trend-row"><div class="trend-label">2-3 day review</div><div class="trend-track"><div class="trend-fill" style="width:27%;background:var(--primary-light)"></div></div><div class="chart-val">27%</div></div>
-            <div class="trend-row"><div class="trend-label">Backlog (&gt;3 days)</div><div class="trend-track"><div class="trend-fill" style="width:12%;background:var(--primary-dark)"></div></div><div class="chart-val">12%</div></div>
-          </div>
-          <div class="chart-legend"><span class="legend-key"><span class="legend-swatch" style="background:var(--success)"></span>Reviewed same day</span><span class="legend-key"><span class="legend-swatch" style="background:var(--primary-dark)"></span>Needs follow-up</span></div>
-          <div style="margin-top:12px;font-size:11px;color:var(--muted)">Peak inflow: Tuesday and Friday morning uploads from Brgy. Wawa and Brgy. Cogunan.</div>
-        </div>
-
       </div>
 
       <!-- USERS PANEL -->
@@ -2650,7 +2710,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">18</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 12, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Juan dela Cruz — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="farmer" data-name="Pedro Manalo Brgy. Cogunan">
                 <td><div style="font-weight:600">Pedro Manalo</div><div style="font-size:11px;color:var(--muted)">23-10002</div></td>
@@ -2659,7 +2719,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">12</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 10, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Pedro Manalo — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="farmer" data-name="Ana Lim Brgy. Bilaran">
                 <td><div style="font-weight:600">Ana Lim</div><div style="font-size:11px;color:var(--muted)">23-10003</div></td>
@@ -2668,7 +2728,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">9</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 9, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Ana Lim — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="personnel" data-name="Maria Santos Field Personnel">
                 <td><div style="font-weight:600">Maria Santos</div><div style="font-size:11px;color:var(--muted)">23-10004</div></td>
@@ -2677,7 +2737,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">22</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 12, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Maria Santos — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="farmer" data-name="Jose Reyes Brgy. Looc">
                 <td><div style="font-weight:600">Jose Reyes</div><div style="font-size:11px;color:var(--muted)">23-10005</div></td>
@@ -2686,7 +2746,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">7</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 7, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Jose Reyes — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="farmer" data-name="Rosa Garcia Brgy. Mataas na Lupa">
                 <td><div style="font-weight:600">Rosa Garcia</div><div style="font-size:11px;color:var(--muted)">23-10006</div></td>
@@ -2695,7 +2755,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">5</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 5, 2025</td>
                 <td><span class="chip chip-offline">Inactive</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Rosa Garcia — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
               <tr class="users-row" data-role="personnel" data-name="Charish Bea Field Personnel Balaytigue">
                 <td><div style="font-weight:600">Charish Bea</div><div style="font-size:11px;color:var(--muted)">23-10007</div></td>
@@ -2704,7 +2764,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
                 <td style="font-weight:700">11</td>
                 <td style="font-size:12px;color:var(--muted)">Jul 8, 2025</td>
                 <td><span class="chip chip-sent">Active</span></td>
-                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="showMAOToast('Viewing Charish Bea — mock')">View →</span></td>
+                <td><span style="color:var(--primary);font-size:12px;font-weight:700;cursor:pointer" onclick="openMaoUserModal(this)">View →</span></td>
               </tr>
             </tbody>
           </table>
@@ -2747,7 +2807,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
           </div>
           <div class="flex gap-10 mt-12">
             <button class="btn btn-primary btn-sm btn-fit" onclick="saveAdvisoryGuidelines()">Save Guideline Update</button>
-            <button class="btn btn-ghost btn-sm btn-fit" onclick="showMAOToast('Draft preview opened (mock)')">Preview Farmer Message</button>
+            <button class="btn btn-ghost btn-sm btn-fit" onclick="openFarmerMessagePreview()">Preview Farmer Message</button>
           </div>
         </div>
 
@@ -2782,7 +2842,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="text-xs text-muted">Priority areas: Brgy. Wawa, Brgy. Cogunan</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Smut (mock)')">Issue Advisory</button>
-              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Sugarcane Smut')">Edit Guideline</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="openGuidelineModal('Sugarcane Smut')">Edit Guideline</button>
             </div>
           </div>
 
@@ -2795,7 +2855,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="text-xs text-muted">Priority areas: Brgy. Cogunan, Brgy. Bilaran</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mildew (mock)')">Issue Advisory</button>
-              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Downy Mildew')">Edit Guideline</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="openGuidelineModal('Downy Mildew')">Edit Guideline</button>
             </div>
           </div>
 
@@ -2808,7 +2868,7 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
             <div class="text-xs text-muted">Priority areas: Brgy. Bilaran, Brgy. Looc</div>
             <div style="margin-top:12px">
               <button class="btn btn-primary btn-sm btn-inline" onclick="showMAOToast('Advisory issued for Mosaic (mock)')">Issue Advisory</button>
-              <button class="btn btn-ghost btn-sm btn-inline" onclick="loadGuidelineDraft('Mosaic Disease')">Edit Guideline</button>
+              <button class="btn btn-ghost btn-sm btn-inline" onclick="openGuidelineModal('Mosaic Disease')">Edit Guideline</button>
             </div>
           </div>
         </div>
@@ -2904,6 +2964,22 @@ body{font-family:var(--font);background:#1a1a1a;display:flex;justify-content:cen
 
   <!-- MAO Toast -->
   <div id="mao-toast" style="position:fixed;bottom:24px;right:24px;background:#1F2A21;color:#fff;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999">Saved</div>
+
+  <!-- MAO Modal Host -->
+  <div id="mao-modal-overlay" class="mao-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mao-modal-title" onclick="if(event.target===this) closeMaoModal()">
+    <div class="mao-modal" role="document">
+      <div class="mao-modal-header">
+        <div>
+          <div id="mao-modal-title" class="mao-modal-title">Preview</div>
+          <div id="mao-modal-subtitle" class="mao-modal-subtitle"></div>
+        </div>
+        <button class="modal-close" onclick="closeMaoModal()" aria-label="Close modal">x</button>
+      </div>
+      <div id="mao-modal-body" class="mao-modal-body"></div>
+      <div id="mao-modal-actions" class="mao-modal-actions"></div>
+    </div>
+  </div>
+
 </div><!-- end mao-shell -->
 
 <!-- Toast -->
@@ -2927,6 +3003,24 @@ let tutorialResizeHandler = null;
 let settingsBackScreen = 's-home';
 let currentLang = 'en';
 let mobileProfileOriginal = null;
+
+let maoProfileOriginal = null;
+let currentGuidelineDisease = 'Sugarcane Smut';
+const diseaseLabels = { smut:'Sugarcane Smut', mildew:'Downy Mildew', mosaic:'Mosaic Disease', rust:'Sugarcane Rust', healthy:'Healthy / unclear' };
+const barangayLabels = { wawa:'Brgy. Wawa', cogunan:'Brgy. Cogunan', bilaran:'Brgy. Bilaran', mataas:'Brgy. Mataas na Lupa', looc:'Brgy. Looc', balaytigue:'Brgy. Balaytigue' };
+const severityRank = { high:3, medium:2, low:1, none:0 };
+const maoDashboardRecords = [
+  {id:'RPT-047', date:'2025-07-12', barangay:'wawa', reporter:'Maria S.', farmer:'Juan dela Cruz', disease:'smut', category:'field-check', severity:'high', status:'queued', reports:18},
+  {id:'RPT-046', date:'2025-07-11', barangay:'cogunan', reporter:'Jose R.', farmer:'Pedro Manalo', disease:'mildew', category:'disease', severity:'medium', status:'reviewed', reports:12},
+  {id:'RPT-045', date:'2025-07-10', barangay:'bilaran', reporter:'Ana L.', farmer:'Ana Lim', disease:'healthy', category:'healthy', severity:'none', status:'reviewed', reports:9},
+  {id:'RPT-044', date:'2025-07-09', barangay:'mataas', reporter:'Pedro M.', farmer:'Rosa Garcia', disease:'rust', category:'field-check', severity:'medium', status:'queued', reports:5},
+  {id:'RPT-043', date:'2025-07-08', barangay:'looc', reporter:'Maria S.', farmer:'Jose Reyes', disease:'mosaic', category:'disease', severity:'low', status:'reviewed', reports:7},
+  {id:'RPT-042', date:'2025-07-07', barangay:'wawa', reporter:'Jose R.', farmer:'Juan dela Cruz', disease:'smut', category:'field-check', severity:'high', status:'flagged', reports:18},
+  {id:'RPT-041', date:'2025-07-06', barangay:'balaytigue', reporter:'Ana L.', farmer:'Charish Bea', disease:'mildew', category:'disease', severity:'low', status:'queued', reports:11},
+  {id:'RPT-040', date:'2025-07-04', barangay:'cogunan', reporter:'Field Team', farmer:'Pedro Manalo', disease:'smut', category:'disease', severity:'high', status:'reviewed', reports:12},
+  {id:'RPT-039', date:'2025-07-02', barangay:'bilaran', reporter:'Field Team', farmer:'Ana Lim', disease:'mosaic', category:'disease', severity:'medium', status:'reviewed', reports:9},
+  {id:'RPT-028', date:'2024-11-18', barangay:'cogunan', reporter:'Rosa G.', farmer:'Pedro Manalo', disease:'rust', category:'disease', severity:'low', status:'reviewed', reports:12}
+];
 const mobileOriginalText = new WeakMap();
 const mobileOriginalAttrs = new WeakMap();
 const tutorialSteps = [
@@ -3290,6 +3384,92 @@ const tl = {
   'e.g. North side of the field, row 3…':'hal. Hilagang bahagi ng bukid, row 3...'
 };
 
+
+Object.assign(tl, {
+  'CaneGuard - MAO Dashboard':'CaneGuard - Dashboard ng MAO',
+  'Municipal Agriculture Office - Nasugbu, Batangas':'Municipal Agriculture Office - Nasugbu, Batangas',
+  'Navigation':'Nabigasyon',
+  'Overview':'Pangkalahatan',
+  'Report Detail':'Detalye ng Ulat',
+  'Map':'Mapa',
+  'Report Generation':'Pagbuo ng Ulat',
+  'Users':'Mga User',
+  'Advisory Panel':'Panel ng Payo',
+  'Admin Tools':'Admin Tools',
+  'Profile':'Profile',
+  'Command Center':'Command Center',
+  'Operational snapshot for disease monitoring in Nasugbu, Batangas':'Buod ng operasyon para sa pagmamanman ng sakit sa Nasugbu, Batangas',
+  'Filter Overview':'I-filter ang Overview',
+  'Overview Filters':'Mga Filter ng Overview',
+  'Year':'Taon',
+  'Category':'Kategorya',
+  'Disease Type':'Uri ng Sakit',
+  'Barangay':'Barangay',
+  'Report Status':'Status ng Ulat',
+  'All years':'Lahat ng taon',
+  'All categories':'Lahat ng kategorya',
+  'Possible disease':'Posibleng sakit',
+  'Healthy / unclear':'Malusog / hindi tiyak',
+  'Field check priority':'Prayoridad sa field check',
+  'All disease types':'Lahat ng uri ng sakit',
+  'All barangays':'Lahat ng barangay',
+  'All statuses':'Lahat ng status',
+  'Queued':'Naka-queue',
+  'Reviewed':'Nasuri',
+  'Flagged for field check':'Na-flag para sa field check',
+  'Reset':'I-reset',
+  'Total Reports':'Kabuuang Ulat',
+  'Queued / Unreviewed':'Naka-queue / hindi pa nasusuri',
+  'Possible Disease Cases':'Posibleng Kaso ng Sakit',
+  'Reviewed':'Nasuri',
+  'Command Center Actions':'Mga Gawain ng Command Center',
+  'Review queued reports':'Suriin ang naka-queue na ulat',
+  'Plan field checks':'Magplano ng field check',
+  'Generate official summary':'Gumawa ng opisyal na buod',
+  'Open':'Buksan',
+  'Generate':'Gumawa',
+  'Quick Insights':'Mabilis na Insight',
+  'Municipality-Level Visual Summary':'Visual Summary ng Munisipyo',
+  'Top affected barangays':'Mga pinakaapektadong barangay',
+  'Important Reports':'Mahahalagang Ulat',
+  'View All':'Tingnan Lahat',
+  'All Reports':'Lahat ng Ulat',
+  'Filters & Sorting':'Mga Filter at Pag-aayos',
+  'Severity':'Antas ng Tindi',
+  'Sort':'Ayusin',
+  'From':'Mula',
+  'To':'Hanggang',
+  'No reports found':'Walang nahanap na ulat',
+  'Try different filters or update your search keyword.':'Subukan ang ibang filter o palitan ang search keyword.',
+  'Report Parameters':'Mga Parameter ng Ulat',
+  'Report Type':'Uri ng Ulat',
+  'Date From':'Petsa Mula',
+  'Date To':'Petsa Hanggang',
+  'Sort Preview':'Ayusin ang Preview',
+  'Generate Report':'Gumawa ng Ulat',
+  'Export Preview':'I-export ang Preview',
+  'Generated Report Preview':'Preview ng Nabuong Ulat',
+  'Filtered reports':'Na-filter na ulat',
+  'Chart Preview':'Preview ng Chart',
+  'Registered farmers and field personnel - Nasugbu, Batangas':'Rehistradong magsasaka at field personnel - Nasugbu, Batangas',
+  'Search by name or barangay...':'Maghanap ayon sa pangalan o barangay...',
+  'Farmers':'Mga Magsasaka',
+  'Personnel':'Personnel',
+  'Action':'Aksyon',
+  'View':'Tingnan',
+  'User Information':'Impormasyon ng User',
+  'Close':'Isara',
+  'Preview Farmer Message':'I-preview ang Mensahe sa Magsasaka',
+  'Send Simulation':'Simulate na Ipadala',
+  'Edit Guideline':'I-edit ang Gabay',
+  'Save Changes':'I-save ang Pagbabago',
+  'Save Profile':'I-save ang Profile',
+  'Profile saved successfully.':'Matagumpay na na-save ang profile.',
+  'Required fields cannot be empty.':'Hindi maaaring walang laman ang required fields.',
+  'Guideline updated successfully.':'Matagumpay na na-update ang guideline.',
+  'Farmer message simulation sent.':'Na-simulate ang pagpapadala ng mensahe sa magsasaka.'
+});
+
 function t(text) {
   if (currentLang !== 'tl') return text;
   return tl[text] || text;
@@ -3333,14 +3513,52 @@ function applyMobileTranslations() {
   });
 }
 
-function setMobileLanguage(lang) {
+function applyMaoTranslations() {
+  const root = document.getElementById('mao-shell');
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || ['SCRIPT','STYLE','SVG','OPTION'].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(translateTextNode);
+  root.querySelectorAll('input[placeholder], textarea[placeholder], button[aria-label], img[alt]').forEach(el => {
+    if (!mobileOriginalAttrs.has(el)) {
+      mobileOriginalAttrs.set(el, {
+        placeholder: el.getAttribute('placeholder'),
+        aria: el.getAttribute('aria-label'),
+        alt: el.getAttribute('alt')
+      });
+    }
+    const original = mobileOriginalAttrs.get(el);
+    if (original.placeholder !== null) el.setAttribute('placeholder', t(original.placeholder));
+    if (original.aria !== null) el.setAttribute('aria-label', t(original.aria));
+    if (original.alt !== null) el.setAttribute('alt', t(original.alt));
+  });
+}
+
+function setAppLanguage(lang) {
   currentLang = lang === 'tl' ? 'tl' : 'en';
-  const select = document.getElementById('mobile-language-select');
-  if (select) select.value = currentLang;
+  const mobileSelect = document.getElementById('mobile-language-select');
+  const maoSelect = document.getElementById('mao-language-select');
+  if (mobileSelect) mobileSelect.value = currentLang;
+  if (maoSelect) maoSelect.value = currentLang;
   document.documentElement.lang = currentLang === 'tl' ? 'tl' : 'en';
   updateManualResult();
   applyMobileTranslations();
-  showToast(currentLang === 'tl' ? 'Nakalipat sa Tagalog' : 'Language changed to English');
+  applyMaoTranslations();
+  const msg = currentLang === 'tl' ? 'Nakalipat sa Tagalog' : 'Language changed to English';
+  showToast(msg);
+  const maoShell = document.getElementById('mao-shell');
+  if (maoShell && maoShell.classList.contains('active')) showMAOToast(msg);
+}
+
+function setMobileLanguage(lang) {
+  setAppLanguage(lang);
 }
 
 function go(screenId) {
@@ -3393,7 +3611,19 @@ function beginPhotoAnalysis() {
 }
 
 function showTutorial() {
-  showToast('Quick tutorial is disabled in this prototype flow');
+  tutorialStep = 0;
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!overlay) return;
+
+  overlay.classList.add('active');
+  renderTutorialStep();
+
+  if (tutorialResizeHandler) {
+    window.removeEventListener('resize', tutorialResizeHandler);
+  }
+
+  tutorialResizeHandler = () => positionTutorialHighlight();
+  window.addEventListener('resize', tutorialResizeHandler);
 }
 
 function renderTutorialStep() {
@@ -3472,7 +3702,13 @@ function hideTutorial() {
 }
 
 function maybeShowFirstTimeTutorial() {
-  return;
+  const seen = localStorage.getItem('caneGuardTutorialSeen');
+  if (seen) return;
+
+  setTimeout(() => {
+    showTutorial();
+    localStorage.setItem('caneGuardTutorialSeen', '1');
+  }, 500);
 }
 
 function goTab(tab) {
@@ -3501,6 +3737,7 @@ function backFromResult() {
 function selectRoleAndGoHome(role) {
   localStorage.setItem('selectedRole', role);
   go('s-home');
+  maybeShowFirstTimeTutorial();
 }
 
 // ─── AUTH + PROFILE ──────────────────────────────────────────
@@ -3807,6 +4044,7 @@ function mobileRegister() {
   if (pw !== conf) { setFieldError('reg-confirm', 'Passwords do not match'); valid = false; }
   if (!valid) { showToast('Please correct the highlighted fields'); return; }
   showToast('Account created. Welcome to CaneGuard');
+  resetOnboarding();
   go('s-home');
 }
 
@@ -3882,47 +4120,103 @@ function setMaoFilter(filter, btn) {
   applyMaoFilters();
 }
 
+function getChipForDisease(disease) {
+  const cls = disease === 'smut' ? 'chip-smut' : disease === 'mildew' ? 'chip-mildew' : disease === 'mosaic' ? 'chip-mosaic' : disease === 'rust' ? 'chip-rust' : 'chip-healthy';
+  return `<span class="chip ${cls}">${diseaseLabels[disease] || disease}</span>`;
+}
+
+function getChipForStatus(status) {
+  if (status === 'reviewed') return '<span class="chip chip-sent">Reviewed</span>';
+  if (status === 'flagged') return '<span class="chip chip-queued">Flagged</span>';
+  return '<span class="chip chip-queued">Queued</span>';
+}
+
+function getChipForSeverity(severity) {
+  if (severity === 'high') return '<span class="chip chip-failed">High</span>';
+  if (severity === 'medium') return '<span class="chip chip-queued">Medium</span>';
+  if (severity === 'low') return '<span class="chip chip-online">Low</span>';
+  return '<span class="chip chip-healthy">None</span>';
+}
+
+function formatReportDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function formatDashboardDateTime(date = new Date()) {
+  return date.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }).replace(',', ' -');
+}
+
+function sortRecords(records, sort) {
+  const arr = [...records];
+  arr.sort((a,b) => {
+    if (sort === 'date-asc') return a.date.localeCompare(b.date);
+    if (sort === 'barangay') return (barangayLabels[a.barangay] || a.barangay).localeCompare(barangayLabels[b.barangay] || b.barangay);
+    if (sort === 'disease') return (diseaseLabels[a.disease] || a.disease).localeCompare(diseaseLabels[b.disease] || b.disease);
+    if (sort === 'severity') return (severityRank[b.severity] || 0) - (severityRank[a.severity] || 0) || b.date.localeCompare(a.date);
+    if (sort === 'status') return a.status.localeCompare(b.status);
+    return b.date.localeCompare(a.date);
+  });
+  return arr;
+}
+
+function getFilteredDashboardRecords(prefix) {
+  const year = document.getElementById(prefix + '-year')?.value || 'all';
+  const category = document.getElementById(prefix + '-category')?.value || 'all';
+  const barangay = document.getElementById(prefix + '-barangay')?.value || 'all';
+  const disease = document.getElementById(prefix + '-disease')?.value || 'all';
+  const status = document.getElementById(prefix + '-status')?.value || 'all';
+  const severity = document.getElementById(prefix + '-severity')?.value || 'all';
+  const from = document.getElementById(prefix + '-from')?.value || '';
+  const to = document.getElementById(prefix + '-to')?.value || '';
+  return maoDashboardRecords.filter(r =>
+    (year === 'all' || r.date.slice(0,4) === year) &&
+    (category === 'all' || r.category === category) &&
+    (barangay === 'all' || r.barangay === barangay) &&
+    (disease === 'all' || r.disease === disease) &&
+    (status === 'all' || r.status === status) &&
+    (severity === 'all' || r.severity === severity) &&
+    (!from || r.date >= from) &&
+    (!to || r.date <= to)
+  );
+}
+
 function applyMaoFilters() {
   const query = (document.getElementById('mao-report-search')?.value || '').trim().toLowerCase();
   const rows = Array.from(document.querySelectorAll('.mao-report-row'));
   const yearFilter = document.getElementById('mao-filter-year')?.value || 'all';
+  const categoryFilter = document.getElementById('mao-filter-category')?.value || 'all';
   const barangayFilter = document.getElementById('mao-filter-barangay')?.value || 'all';
   const diseaseFilter = document.getElementById('mao-filter-disease')?.value || 'all';
   const statusFilter = document.getElementById('mao-filter-status')?.value || 'all';
+  const severityFilter = document.getElementById('mao-filter-severity')?.value || 'all';
   const from = document.getElementById('mao-filter-from')?.value || '';
   const to = document.getElementById('mao-filter-to')?.value || '';
-  const sort = document.getElementById('mao-sort-order')?.value || 'newest';
+  const sort = document.getElementById('mao-sort-order')?.value || 'date-desc';
   let visible = 0;
 
   rows.sort((a, b) => {
-    if (sort === 'oldest') return (a.dataset.date || '').localeCompare(b.dataset.date || '');
+    if (sort === 'date-asc') return (a.dataset.date || '').localeCompare(b.dataset.date || '');
     if (sort === 'barangay') return (a.dataset.barangay || '').localeCompare(b.dataset.barangay || '');
+    if (sort === 'disease') return (a.dataset.disease || '').localeCompare(b.dataset.disease || '');
+    if (sort === 'severity') return (severityRank[b.dataset.severity] || 0) - (severityRank[a.dataset.severity] || 0);
+    if (sort === 'status') return (a.dataset.status || '').localeCompare(b.dataset.status || '');
     return (b.dataset.date || '').localeCompare(a.dataset.date || '');
   }).forEach(row => row.parentElement.appendChild(row));
 
   rows.forEach(row => {
-    const disease = row.dataset.disease || '';
-    const status = row.dataset.status || '';
-    const year = row.dataset.year || '';
-    const barangay = row.dataset.barangay || '';
-    const date = row.dataset.date || '';
     const text = row.textContent.toLowerCase();
-    const stateFilter = maoFilter === 'queued' || maoFilter === 'reviewed';
-    const chipFilterMatch = maoFilter === 'all'
-      ? true
-      : stateFilter
-        ? status === maoFilter
-        : disease === maoFilter;
-    const structuredMatch =
-      (yearFilter === 'all' || year === yearFilter) &&
-      (barangayFilter === 'all' || barangay === barangayFilter) &&
-      (diseaseFilter === 'all' || disease === diseaseFilter) &&
-      (statusFilter === 'all' || status === statusFilter) &&
-      (!from || date >= from) &&
-      (!to || date <= to);
-    const searchMatch = !query || text.includes(query);
-    const show = chipFilterMatch && structuredMatch && searchMatch;
-
+    const show =
+      (maoFilter === 'all' || row.dataset.status === maoFilter || row.dataset.disease === maoFilter) &&
+      (yearFilter === 'all' || row.dataset.year === yearFilter) &&
+      (categoryFilter === 'all' || row.dataset.category === categoryFilter) &&
+      (barangayFilter === 'all' || row.dataset.barangay === barangayFilter) &&
+      (diseaseFilter === 'all' || row.dataset.disease === diseaseFilter) &&
+      (statusFilter === 'all' || row.dataset.status === statusFilter) &&
+      (severityFilter === 'all' || row.dataset.severity === severityFilter) &&
+      (!from || row.dataset.date >= from) &&
+      (!to || row.dataset.date <= to) &&
+      (!query || text.includes(query));
     row.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -3933,11 +4227,11 @@ function applyMaoFilters() {
 
 function resetMaoReportFilters() {
   maoFilter = 'all';
-  ['mao-filter-year','mao-filter-barangay','mao-filter-disease','mao-filter-status'].forEach(id => {
+  ['mao-filter-year','mao-filter-category','mao-filter-barangay','mao-filter-disease','mao-filter-status','mao-filter-severity'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.value = 'all';
+    if (el) el.value = id === 'mao-filter-year' ? '2025' : 'all';
   });
-  const sort = document.getElementById('mao-sort-order'); if (sort) sort.value = 'newest';
+  const sort = document.getElementById('mao-sort-order'); if (sort) sort.value = 'date-desc';
   const from = document.getElementById('mao-filter-from'); if (from) from.value = '2025-07-01';
   const to = document.getElementById('mao-filter-to'); if (to) to.value = '2025-07-31';
   const search = document.getElementById('mao-report-search'); if (search) search.value = '';
@@ -4533,47 +4827,103 @@ function changeMaoPassword() {
   });
 }
 
+function getMaoProfileSnapshot() {
+  return {
+    name: document.getElementById('mao-fullname')?.value.trim() || '',
+    email: document.getElementById('mao-email')?.value.trim() || '',
+    contact: document.getElementById('mao-contact')?.value.trim() || '',
+    role: document.getElementById('mao-role')?.value || '',
+    cur: document.getElementById('mao-cur-pw')?.value || '',
+    nw: document.getElementById('mao-new-pw')?.value || '',
+    conf: document.getElementById('mao-conf-pw')?.value || ''
+  };
+}
+
+function initMaoProfileState() {
+  if (!maoProfileOriginal) maoProfileOriginal = getMaoProfileSnapshot();
+}
+
+function setProfileStatus(message, type) {
+  const box = document.getElementById('mao-profile-status');
+  if (!box) return;
+  box.textContent = message ? t(message) : '';
+  box.className = 'profile-status' + (message ? ' show ' + (type || 'warn') : '');
+}
+
+function passwordSectionTouched(snapshot) {
+  return Boolean(snapshot.cur || snapshot.nw || snapshot.conf);
+}
+
+function validateMaoProfile(showErrors=false) {
+  const s = getMaoProfileSnapshot();
+  const ids = ['mao-fullname','mao-email','mao-contact','mao-role','mao-cur-pw','mao-new-pw','mao-conf-pw'];
+  if (showErrors) clearFieldErrors(ids);
+  let valid = true;
+  if (!s.name) { if (showErrors) setFieldError('mao-fullname', 'Full name is required'); valid = false; }
+  if (!s.email) { if (showErrors) setFieldError('mao-email', 'Email is required'); valid = false; }
+  else if (!isValidEmail(s.email)) { if (showErrors) setFieldError('mao-email', 'Enter a valid email address'); valid = false; }
+  if (!s.contact) { if (showErrors) setFieldError('mao-contact', 'Contact number is required'); valid = false; }
+  if (!s.role) { if (showErrors) setFieldError('mao-role', 'Role is required'); valid = false; }
+  if (passwordSectionTouched(s)) {
+    const strong = s.nw.length >= 8 && /[A-Z]/.test(s.nw) && /\d/.test(s.nw);
+    if (!s.cur) { if (showErrors) setFieldError('mao-cur-pw', 'Current password is required'); valid = false; }
+    if (!strong) { if (showErrors) setFieldError('mao-new-pw', 'New password must be at least 8 characters'); valid = false; }
+    if (!s.conf || s.nw !== s.conf) { if (showErrors) setFieldError('mao-conf-pw', 'Passwords do not match'); valid = false; }
+  }
+  return valid;
+}
+
+function updateMaoPasswordVisuals() {
+  const nw = document.getElementById('mao-new-pw')?.value || '';
+  const conf = document.getElementById('mao-conf-pw')?.value || '';
+  const cur = document.getElementById('mao-cur-pw')?.value || '';
+  document.querySelectorAll('#mao-new-pw-rules .password-rule').forEach(rule => {
+    const key = rule.dataset.rule;
+    const pass = key === 'length' ? nw.length >= 8 : key === 'uppercase' ? /[A-Z]/.test(nw) : /\d/.test(nw);
+    rule.classList.toggle('pass', pass);
+  });
+  const match = document.getElementById('mao-conf-pw-match');
+  if (match) {
+    match.classList.remove('ok','bad');
+    if (!conf && !nw) match.textContent = t('Confirm password must match the new password.');
+    else if (conf && conf === nw) { match.textContent = t('Passwords match'); match.classList.add('ok'); }
+    else { match.textContent = t('Passwords do not match'); match.classList.add('bad'); }
+  }
+  const curStrength = document.getElementById('mao-cur-pw-str');
+  if (curStrength) curStrength.classList.toggle('visible', Boolean(cur));
+}
+
+function updateMaoProfileSaveState() {
+  initMaoProfileState();
+  updateMaoPasswordVisuals();
+  const btn = document.getElementById('mao-profile-save-btn');
+  if (!btn) return;
+  const current = getMaoProfileSnapshot();
+  const changed = Object.keys(current).some(key => current[key] !== maoProfileOriginal[key]);
+  const valid = validateMaoProfile(false);
+  btn.disabled = !changed || !valid;
+  if (!changed) setProfileStatus('', '');
+  else if (!valid) setProfileStatus('Complete the required fields before saving.', 'warn');
+  else setProfileStatus('Ready to save profile changes.', 'ok');
+}
+
 // Validate and save MAO profile (prototype)
 function saveMaoProfile() {
-  const nameEl = document.getElementById('mao-fullname');
-  const emailEl = document.getElementById('mao-email');
-  const contactEl = document.getElementById('mao-contact');
-  const roleEl = document.getElementById('mao-role');
-
-  // clear previous errors
-  [nameEl, emailEl, contactEl, roleEl].forEach(el => {
-    if (!el) return;
-    const wrap = el.closest('.field');
-    if (wrap) {
-      wrap.classList.remove('error');
-      const err = wrap.querySelector('.error-text'); if (err) err.textContent = '';
-    }
+  if (!validateMaoProfile(true)) {
+    setProfileStatus('Required fields cannot be empty.', 'warn');
+    showMAOToast('Please correct the highlighted fields');
+    updateMaoProfileSaveState();
+    return;
+  }
+  ['mao-cur-pw','mao-new-pw','mao-conf-pw'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
-
-  const name = (nameEl?.value || '').trim();
-  const email = (emailEl?.value || '').trim();
-  const contact = (contactEl?.value || '').trim();
-  const role = (roleEl?.value || '').trim();
-
-  if (!name || !email || !contact || !role) {
-    if (!name) { const wrap = nameEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
-    if (!email) { const wrap = emailEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
-    if (!contact) { const wrap = contactEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Required'; }
-    if (!role) { const wrap = roleEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Please select a role'; }
-    showMAOToast('Please fill in all profile fields');
-    return;
-  }
-
-  // basic email check
-  const emailValid = /\S+@\S+\.\S+/.test(email);
-  if (!emailValid) {
-    const wrap = emailEl.closest('.field'); wrap.classList.add('error'); const err = wrap.querySelector('.error-text'); if (err) err.textContent = 'Enter a valid email';
-    showMAOToast('Enter a valid email');
-    return;
-  }
-
-  // success (mock)
-  showMAOToast('Profile updated (mock)');
+  maoProfileOriginal = getMaoProfileSnapshot();
+  updateMaoPasswordVisuals();
+  updateMaoProfileSaveState();
+  setProfileStatus('Profile saved successfully.', 'ok');
+  showMAOToast('Profile saved successfully.');
 }
 
 function loadGuidelineDraft(disease) {
@@ -4669,6 +5019,333 @@ function saveCoopIntegration() {
   showMAOToast('Partner setup saved for ' + group);
 }
 
+
+function toggleOverviewFilters() {
+  const panel = document.getElementById('overview-filter-panel');
+  if (panel) panel.classList.toggle('active');
+}
+
+function resetOverviewFilters() {
+  const defaults = {
+    'overview-filter-year':'2025',
+    'overview-filter-category':'all',
+    'overview-filter-disease':'all',
+    'overview-filter-barangay':'all',
+    'overview-filter-status':'all'
+  };
+  Object.entries(defaults).forEach(([id,value]) => { const el = document.getElementById(id); if (el) el.value = value; });
+  applyOverviewFilters();
+}
+
+function getOverviewRecords() {
+  const year = document.getElementById('overview-filter-year')?.value || 'all';
+  const category = document.getElementById('overview-filter-category')?.value || 'all';
+  const barangay = document.getElementById('overview-filter-barangay')?.value || 'all';
+  const disease = document.getElementById('overview-filter-disease')?.value || 'all';
+  const status = document.getElementById('overview-filter-status')?.value || 'all';
+  return maoDashboardRecords.filter(r =>
+    (year === 'all' || r.date.slice(0,4) === year) &&
+    (category === 'all' || r.category === category) &&
+    (barangay === 'all' || r.barangay === barangay) &&
+    (disease === 'all' || r.disease === disease) &&
+    (status === 'all' || r.status === status)
+  );
+}
+
+function countBy(records, key) {
+  return records.reduce((acc, r) => { const k = r[key] || 'unknown'; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+}
+
+function buildPie(el, counts, colors) {
+  if (!el) return;
+  const entries = Object.entries(counts).filter(([,v]) => v > 0);
+  const total = entries.reduce((a,[,v]) => a + v, 0) || 1;
+  let cursor = 0;
+  const parts = entries.map(([key,val], idx) => {
+    const next = cursor + (val / total) * 100;
+    const segment = `${colors[key] || colors[idx] || '#6E8B74'} ${cursor.toFixed(2)}% ${next.toFixed(2)}%`;
+    cursor = next;
+    return segment;
+  });
+  el.style.background = parts.length ? `conic-gradient(${parts.join(',')})` : 'conic-gradient(#C8D5CB 0 100%)';
+}
+
+function applyOverviewFilters() {
+  const records = getOverviewRecords();
+  const total = records.length;
+  const queued = records.filter(r => r.status === 'queued').length;
+  const reviewed = records.filter(r => r.status === 'reviewed').length;
+  const disease = records.filter(r => r.disease !== 'healthy').length;
+  const high = records.filter(r => r.severity === 'high' || r.status === 'flagged').length;
+  const asOf = formatDashboardDateTime();
+  ['overview-asof','overview-table-asof','reports-asof','report-detail-asof'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = asOf; });
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  setText('overview-total', total);
+  setText('overview-queued', queued);
+  setText('overview-disease', disease);
+  setText('overview-reviewed', reviewed);
+  setText('overview-pie-total', total);
+  setText('overview-action-queued', queued + ' reports waiting');
+  const diseaseCounts = countBy(records, 'disease');
+  const barangayCounts = countBy(records.filter(r => r.disease !== 'healthy'), 'barangay');
+  const topBarangay = Object.entries(barangayCounts).sort((a,b) => b[1]-a[1])[0];
+  setText('overview-action-hotspot', topBarangay ? 'Start with ' + barangayLabels[topBarangay[0]] : 'No hotspot for this filter');
+  const activeSummary = document.getElementById('overview-active-summary');
+  if (activeSummary) {
+    const year = document.getElementById('overview-filter-year')?.value || 'all';
+    const cat = document.getElementById('overview-filter-category')?.selectedOptions[0]?.text || 'All categories';
+    activeSummary.textContent = `${year === 'all' ? 'All years' : year} - ${cat} - ${total} reports`;
+  }
+  const colors = { smut:'#2E4031', mildew:'#445D48', mosaic:'#6E8B74', rust:'#8AA390', healthy:'#C8D5CB' };
+  buildPie(document.getElementById('overview-municipality-pie'), diseaseCounts, colors);
+  const legend = document.getElementById('overview-pie-legend');
+  if (legend) {
+    legend.innerHTML = Object.entries(diseaseCounts).sort((a,b)=>b[1]-a[1]).map(([key,val]) => {
+      const pct = total ? Math.round((val/total)*100) : 0;
+      return `<div class="legend-key"><span class="legend-swatch" style="background:${colors[key] || '#6E8B74'}"></span><span>${diseaseLabels[key] || key} - ${val} (${pct}%)</span></div>`;
+    }).join('') || '<div class="text-xs text-muted">No matching distribution.</div>';
+  }
+  const top = document.getElementById('overview-top-barangays');
+  if (top) {
+    top.innerHTML = Object.entries(barangayCounts).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([key,val]) => {
+      const pct = disease ? Math.round((val/disease)*100) : 0;
+      return `<div class="trend-row" style="margin-bottom:0"><div class="trend-label">${barangayLabels[key] || key}</div><div class="trend-track"><div class="trend-fill" style="width:${pct}%;background:var(--primary)"></div></div><div class="chart-val">${val} (${pct}%)</div></div>`;
+    }).join('') || '<div class="text-xs text-muted">No affected barangay for this filter.</div>';
+  }
+  const insights = document.getElementById('overview-insights');
+  if (insights) {
+    const topDisease = Object.entries(diseaseCounts).sort((a,b)=>b[1]-a[1])[0];
+    insights.innerHTML = `
+      <div class="priority-item"><div><div class="text-sm font-bold">Main disease signal</div><div class="text-xs text-muted">${topDisease ? diseaseLabels[topDisease[0]] + ' - ' + topDisease[1] + ' reports' : 'No matching reports'}</div></div><span class="summary-pill">${total ? Math.round(((topDisease?.[1] || 0)/total)*100) : 0}%</span></div>
+      <div class="priority-item"><div><div class="text-sm font-bold">Field-check pressure</div><div class="text-xs text-muted">${high} high severity or flagged reports</div></div><span class="summary-pill">${high > 0 ? 'Action' : 'Stable'}</span></div>
+      <div class="priority-item"><div><div class="text-sm font-bold">Review progress</div><div class="text-xs text-muted">${reviewed} reviewed out of ${total}</div></div><span class="summary-pill">${total ? Math.round((reviewed/total)*100) : 0}%</span></div>`;
+  }
+  const body = document.getElementById('overview-recent-body');
+  if (body) {
+    body.innerHTML = sortRecords(records, 'severity').slice(0,5).map(r => `<tr onclick="maoTab('report-detail')"><td>${formatReportDate(r.date)}</td><td>${barangayLabels[r.barangay]}</td><td>${getChipForDisease(r.disease)}</td><td>${getChipForSeverity(r.severity)}</td><td>${getChipForStatus(r.status)}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:18px">No reports found</td></tr>';
+  }
+}
+
+function syncReportGenWithOverview() {
+  const map = {
+    'reportgen-year':'overview-filter-year',
+    'reportgen-category':'overview-filter-category',
+    'reportgen-disease':'overview-filter-disease',
+    'reportgen-barangay':'overview-filter-barangay',
+    'reportgen-status':'overview-filter-status'
+  };
+  Object.entries(map).forEach(([target,source]) => {
+    const tEl = document.getElementById(target);
+    const sEl = document.getElementById(source);
+    if (tEl && sEl) tEl.value = sEl.value;
+  });
+  generateMaoReportPreview(false);
+}
+
+function getReportGenerationRecords() {
+  return sortRecords(getFilteredDashboardRecords('reportgen'), document.getElementById('reportgen-sort')?.value || 'date-desc');
+}
+
+function resetReportGenerationFilters() {
+  const defaults = {
+    'reportgen-type':'municipal-summary', 'reportgen-year':'2025', 'reportgen-category':'all', 'reportgen-disease':'all', 'reportgen-barangay':'all', 'reportgen-status':'all', 'reportgen-sort':'date-desc'
+  };
+  Object.entries(defaults).forEach(([id,value]) => { const el = document.getElementById(id); if (el) el.value = value; });
+  const from = document.getElementById('reportgen-from'); if (from) from.value = '2025-07-01';
+  const to = document.getElementById('reportgen-to'); if (to) to.value = '2025-07-31';
+  generateMaoReportPreview(false);
+}
+
+function generateMaoReportPreview(showToastFlag=true) {
+  const records = getReportGenerationRecords();
+  const total = records.length;
+  const disease = records.filter(r => r.disease !== 'healthy').length;
+  const reviewed = records.filter(r => r.status === 'reviewed').length;
+  const high = records.filter(r => r.severity === 'high' || r.status === 'flagged').length;
+  const asOf = formatDashboardDateTime();
+  ['reportgen-asof','reportgen-generated-at'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = asOf; });
+  const typeEl = document.getElementById('reportgen-type');
+  const label = typeEl?.selectedOptions[0]?.text || 'Municipality Disease Summary';
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  setText('reportgen-preview-label', label);
+  setText('rg-total', total);
+  setText('rg-disease', disease);
+  setText('rg-reviewed', reviewed);
+  setText('rg-high', high);
+  const colors = { smut:'#2E4031', mildew:'#445D48', mosaic:'#6E8B74', rust:'#8AA390', healthy:'#C8D5CB' };
+  const counts = countBy(records, 'disease');
+  buildPie(document.getElementById('reportgen-pie'), counts, colors);
+  const bars = document.getElementById('reportgen-chart-bars');
+  if (bars) {
+    const max = Math.max(...Object.values(counts), 1);
+    bars.innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([key,val]) => {
+      const pct = total ? Math.round((val/total)*100) : 0;
+      return `<div class="report-chart-row"><div class="report-chart-label">${diseaseLabels[key] || key}</div><div class="report-chart-track"><div class="report-chart-fill" style="width:${Math.round((val/max)*100)}%;background:${colors[key] || '#6E8B74'}"></div></div><div class="report-chart-val">${val} (${pct}%)</div></div>`;
+    }).join('') || '<div class="text-xs text-muted">No chart data for the selected filters.</div>';
+  }
+  const table = document.getElementById('reportgen-table-body');
+  if (table) {
+    table.innerHTML = records.slice(0,8).map(r => `<tr><td style="font-family:var(--mono);font-size:11px">${r.id}</td><td>${formatReportDate(r.date)}</td><td>${barangayLabels[r.barangay]}</td><td>${getChipForDisease(r.disease)}</td><td>${getChipForSeverity(r.severity)}</td><td>${getChipForStatus(r.status)}</td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:18px">No reports found</td></tr>';
+  }
+  const note = document.getElementById('reportgen-chart-note');
+  if (note) note.textContent = `${label}: ${total} matching reports generated as of ${asOf}. Export is simulated in this prototype.`;
+  if (showToastFlag) showMAOToast('Generated report preview with ' + total + ' matching reports');
+}
+
+function exportGeneratedReport() {
+  const records = getReportGenerationRecords();
+  const label = document.getElementById('reportgen-type')?.selectedOptions[0]?.text || 'Generated Report';
+  const lines = [
+    'CaneGuard MAO Report Preview',
+    'Report Type: ' + label,
+    'Generated: ' + formatDashboardDateTime(),
+    'Matching Records: ' + records.length,
+    '',
+    'Report ID,Date,Barangay,Disease,Severity,Status',
+    ...records.map(r => [r.id, formatReportDate(r.date), barangayLabels[r.barangay], diseaseLabels[r.disease], r.severity, r.status].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))
+  ];
+  const blob = new Blob([lines.join('\r\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'caneguard-generated-report-preview.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showMAOToast('Generated report export simulated');
+}
+
+function openMaoModal(title, subtitle, bodyHtml, actionsHtml) {
+  const overlay = document.getElementById('mao-modal-overlay');
+  if (!overlay) return;
+  document.getElementById('mao-modal-title').textContent = t(title);
+  document.getElementById('mao-modal-subtitle').textContent = subtitle ? t(subtitle) : '';
+  document.getElementById('mao-modal-body').innerHTML = bodyHtml;
+  document.getElementById('mao-modal-actions').innerHTML = actionsHtml || `<button class="btn btn-ghost btn-sm btn-fit" onclick="closeMaoModal()">${t('Close')}</button>`;
+  overlay.classList.add('active');
+}
+
+function closeMaoModal() {
+  const overlay = document.getElementById('mao-modal-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
+function openMaoUserModal(actionEl) {
+  const row = actionEl.closest('tr');
+  if (!row) return;
+  const cells = Array.from(row.querySelectorAll('td'));
+  const name = cells[0]?.querySelector('div')?.textContent?.trim() || cells[0]?.textContent?.trim() || 'User';
+  const accountId = cells[0]?.querySelectorAll('div')[1]?.textContent?.trim() || '23-10000';
+  const role = cells[1]?.innerText?.trim() || 'Farmer';
+  const barangay = cells[2]?.innerText?.trim() || 'Brgy. Wawa';
+  const reports = cells[3]?.innerText?.trim() || '0';
+  const last = cells[4]?.innerText?.trim() || 'No activity';
+  const status = cells[5]?.innerText?.trim() || 'Active';
+  const email = name.toLowerCase().replace(/[^a-z]+/g,'.').replace(/^\.|\.$/g,'') + '@caneguard.local';
+  const phone = role.toLowerCase().includes('personnel') ? '0917-555-7788' : '0917-555-2121';
+  const body = `<div class="modal-info-grid">
+    <div class="modal-info-cell"><div class="label">Name</div><div class="value">${name}</div></div>
+    <div class="modal-info-cell"><div class="label">Role</div><div class="value">${role}</div></div>
+    <div class="modal-info-cell"><div class="label">Barangay</div><div class="value">${barangay}</div></div>
+    <div class="modal-info-cell"><div class="label">Contact</div><div class="value">${phone}<br>${email}</div></div>
+    <div class="modal-info-cell"><div class="label">Account Status</div><div class="value">${status}</div></div>
+    <div class="modal-info-cell"><div class="label">Submitted Reports</div><div class="value">${reports}</div></div>
+    <div class="modal-info-cell"><div class="label">Last Activity</div><div class="value">${last} - 3:45 PM</div></div>
+    <div class="modal-info-cell"><div class="label">Account ID</div><div class="value">${accountId}</div></div>
+  </div>`;
+  openMaoModal('User Information', 'MAO user information card', body, `<button class="btn btn-ghost btn-sm btn-fit" onclick="closeMaoModal()">${t('Close')}</button>`);
+}
+
+function openFarmerMessagePreview() {
+  const target = document.getElementById('sms-target')?.value || 'Farmers in Brgy. Wawa';
+  const message = document.getElementById('sms-message')?.value || 'MAO advisory message';
+  const disease = document.getElementById('guideline-disease')?.value || 'Sugarcane Smut';
+  const when = formatDashboardDateTime();
+  const body = `<div class="modal-info-grid">
+    <div class="modal-info-cell"><div class="label">Recipient Type</div><div class="value">${target}</div></div>
+    <div class="modal-info-cell"><div class="label">Advisory Title</div><div class="value">MAO Sugarcane Disease Advisory</div></div>
+    <div class="modal-info-cell"><div class="label">Disease / Barangay Context</div><div class="value">${disease} - ${target}</div></div>
+    <div class="modal-info-cell"><div class="label">Date and Time</div><div class="value">${when}</div></div>
+  </div>
+  <div class="modal-info-cell" style="margin-top:12px"><div class="label">Farmer-Facing Message Body</div><div class="value" style="font-weight:600;line-height:1.6">${message}</div></div>`;
+  openMaoModal('Preview Farmer Message', 'Review the exact farmer-facing advisory before sending.', body, `<button class="btn btn-ghost btn-sm btn-fit" onclick="closeMaoModal()">${t('Close')}</button><button class="btn btn-primary btn-sm btn-fit" onclick="sendFarmerMessageSimulation()">${t('Send Simulation')}</button>`);
+}
+
+function sendFarmerMessageSimulation() {
+  closeMaoModal();
+  showMAOToast('Farmer message simulation sent.');
+}
+
+const guidelineDrafts = {
+  'Sugarcane Smut': { title:'Sugarcane Smut Field Response', category:'Fungal disease', severity:'High', action:'Isolate affected stalks and avoid using seed cane from affected rows.', instructions:'Confirm black whip-like growth, remove infected stalks, and schedule field verification within 3-5 days.' },
+  'Downy Mildew': { title:'Downy Mildew Monitoring Guideline', category:'Fungal disease', severity:'Medium', action:'Improve drainage and monitor fields after rainy days.', instructions:'Check for white downy growth and yellow striping. Recommend follow-up if symptoms spread to nearby rows.' },
+  'Mosaic Disease': { title:'Mosaic Disease Vector Control', category:'Viral disease', severity:'Low', action:'Monitor aphids and remove strongly affected plants.', instructions:'Look for green-yellow mosaic patterns and coordinate vector control before wide treatment.' },
+  'Sugarcane Rust': { title:'Sugarcane Rust Monitoring', category:'Fungal disease', severity:'Low', action:'Monitor rust-colored spots and improve airflow.', instructions:'Document affected rows and request field advice before chemical treatment.' }
+};
+
+function openGuidelineModal(disease) {
+  currentGuidelineDisease = disease;
+  const g = guidelineDrafts[disease] || guidelineDrafts['Sugarcane Smut'];
+  const body = `<div id="guideline-modal-error" class="modal-error">${t('Required fields cannot be empty.')}</div>
+    <div class="mao-filter-grid">
+      <div class="field"><label>Guideline Title</label><input id="modal-guideline-title" type="text" value="${g.title}"></div>
+      <div class="field"><label>Disease or Category</label><select id="modal-guideline-disease"><option${disease==='Sugarcane Smut'?' selected':''}>Sugarcane Smut</option><option${disease==='Downy Mildew'?' selected':''}>Downy Mildew</option><option${disease==='Mosaic Disease'?' selected':''}>Mosaic Disease</option><option${disease==='Sugarcane Rust'?' selected':''}>Sugarcane Rust</option></select></div>
+      <div class="field"><label>Recommended Action</label><input id="modal-guideline-action" type="text" value="${g.action}"></div>
+      <div class="field"><label>Severity Level</label><select id="modal-guideline-severity"><option${g.severity==='High'?' selected':''}>High</option><option${g.severity==='Medium'?' selected':''}>Medium</option><option${g.severity==='Low'?' selected':''}>Low</option></select></div>
+      <div class="field" style="grid-column:1/-1"><label>Detailed Instructions</label><textarea id="modal-guideline-instructions" style="height:110px">${g.instructions}</textarea></div>
+    </div>`;
+  openMaoModal('Edit Guideline', 'Update MAO disease guidance shown in advisories.', body, `<button class="btn btn-ghost btn-sm btn-fit" onclick="closeMaoModal()">${t('Cancel')}</button><button class="btn btn-primary btn-sm btn-fit" onclick="saveGuidelineModal()">${t('Save Changes')}</button>`);
+}
+
+function saveGuidelineModal() {
+  const title = document.getElementById('modal-guideline-title')?.value.trim() || '';
+  const disease = document.getElementById('modal-guideline-disease')?.value || currentGuidelineDisease;
+  const action = document.getElementById('modal-guideline-action')?.value.trim() || '';
+  const severity = document.getElementById('modal-guideline-severity')?.value || 'Medium';
+  const instructions = document.getElementById('modal-guideline-instructions')?.value.trim() || '';
+  const err = document.getElementById('guideline-modal-error');
+  if (!title || !disease || !action || !instructions) {
+    if (err) err.classList.add('show');
+    return;
+  }
+  guidelineDrafts[disease] = { title, category:disease, severity, action, instructions };
+  const diseaseEl = document.getElementById('guideline-disease');
+  const treatmentEl = document.getElementById('guideline-treatment');
+  const preventionEl = document.getElementById('guideline-prevention');
+  if (diseaseEl) diseaseEl.value = disease;
+  if (treatmentEl) treatmentEl.value = action;
+  if (preventionEl) preventionEl.value = instructions;
+  closeMaoModal();
+  showMAOToast('Guideline updated successfully.');
+}
+
+const mobileDiseaseDetails = {
+  mildew: { title:'Downy Mildew', img:'sugarcane_downey_mildew.jpg', symptoms:'Yellow or white stripes on leaves, white downy growth under leaves, and moisture-related leaf discoloration.', desc:'A disease that can reduce plant vigor and yield when it spreads in wet or humid conditions.', action:'Improve drainage, monitor nearby rows, remove badly affected leaves or plants, and ask MAO for field guidance if symptoms spread.' },
+  smut: { title:'Sugarcane Smut', img:'sugarcane_smut.jpg', symptoms:'Black whip-like growth, drying center shoot, and weak or abnormal stalk growth.', desc:'A fungal disease that can spread through infected planting materials and spores from whip-like structures.', action:'Separate infected stalks, avoid using seed cane from affected rows, and request MAO field verification.' },
+  mosaic: { title:'Mosaic Disease', img:'sugarcane_mosaic.jpg', symptoms:'Patchy green and yellow leaf pattern, uneven leaf color, and weaker-looking plants.', desc:'A viral disease often associated with insect vectors such as aphids.', action:'Monitor aphids, remove strongly affected plants, and use clean planting material for future planting.' },
+  rust: { title:'Sugarcane Rust', img:'sugarcane_rust.jpg', symptoms:'Brown-orange or rust-colored spots, small pustules on leaves, and leaf drying when severe.', desc:'A fungal leaf disease that may appear more after rainy or humid weather.', action:'Monitor affected rows, improve airflow, and ask MAO before applying chemical treatment.' }
+};
+
+function openDiseaseDetail(key) {
+  const d = mobileDiseaseDetails[key] || mobileDiseaseDetails.smut;
+  const overlay = document.getElementById('disease-detail-overlay');
+  if (!overlay) return;
+  document.getElementById('disease-detail-title').textContent = t(d.title);
+  document.getElementById('disease-detail-sub').textContent = t('Disease detail outside glossary');
+  document.getElementById('disease-detail-img').src = d.img;
+  document.getElementById('disease-detail-img').alt = d.title + ' sample image';
+  document.getElementById('disease-detail-symptoms').textContent = d.symptoms;
+  document.getElementById('disease-detail-desc').textContent = d.desc;
+  document.getElementById('disease-detail-action').textContent = d.action;
+  overlay.classList.add('active');
+}
+
+function closeDiseaseDetail() {
+  const overlay = document.getElementById('disease-detail-overlay');
+  if (overlay) overlay.classList.remove('active');
+}
+
 // ─── TOAST ────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -4678,11 +5355,12 @@ function showToast(msg) {
 }
 
 function showMAOToast(msg) {
-  const t = document.getElementById('mao-toast');
-  t.textContent = msg;
-  t.style.opacity = '1';
-  t.style.transform = 'translateY(0)';
-  setTimeout(() => { t.style.opacity = '0'; }, 2500);
+  const toastEl = document.getElementById('mao-toast');
+  if (!toastEl) return;
+  toastEl.textContent = currentLang === 'tl' ? (tl[msg] || msg) : msg;
+  toastEl.style.opacity = '1';
+  toastEl.style.transform = 'translateY(0)';
+  setTimeout(() => { toastEl.style.opacity = '0'; }, 2500);
 }
 
 // ─── VIEW SWITCH ──────────────────────────────────────────────
@@ -4894,12 +5572,18 @@ function setMapFilter(key, btn) {
 
 
 function maoTab(panel) {
+  if (panel === 'analytics') panel = 'report-generation';
   document.querySelectorAll('.mao-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.mao-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('mao-'+panel).classList.add('active');
-  // Highlight nav (use id-based items for reliable selection)
+  const panelEl = document.getElementById('mao-'+panel);
+  if (panelEl) panelEl.classList.add('active');
   const navEl = document.getElementById('mao-nav-' + panel);
   if (navEl) navEl.classList.add('active');
+  if (panel === 'overview') applyOverviewFilters();
+  if (panel === 'reports') applyMaoFilters();
+  if (panel === 'report-generation') generateMaoReportPreview(false);
+  if (panel === 'profile') { initMaoProfileState(); updateMaoProfileSaveState(); }
+  applyMaoTranslations();
 }
 
 // Attach click handlers to map pins so clicking acts as a secondary filter.
@@ -4936,11 +5620,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('input', updateMobileProfileSaveState);
     if (el) el.addEventListener('change', updateMobileProfileSaveState);
   });
+  ['mao-fullname','mao-email','mao-contact','mao-role','mao-cur-pw','mao-new-pw','mao-conf-pw'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateMaoProfileSaveState);
+    if (el) el.addEventListener('change', updateMaoProfileSaveState);
+  });
+  ['reportgen-type','reportgen-year','reportgen-category','reportgen-disease','reportgen-barangay','reportgen-status','reportgen-from','reportgen-to','reportgen-sort'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => generateMaoReportPreview(false));
+  });
   updateAuthButtonStates();
   initMobileProfileState();
   updateMobileProfileSaveState();
+  initMaoProfileState();
+  updateMaoProfileSaveState();
   applyHistoryFilters();
   applyMaoFilters();
+  applyOverviewFilters();
+  generateMaoReportPreview(false);
   initMapPinClicks();
   // Make all date inputs show picker on click anywhere in the field
   document.querySelectorAll('input[type="date"]').forEach(dateInput => {
@@ -4953,9 +5650,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // attach upload input handler for prototype upload flow
   const upIn = document.getElementById('upload-input');
   if (upIn) upIn.addEventListener('change', handleFileSelect);
-  // initialize analytics charts to default timeframe
-  setAnalyticsTf('week');
   applyMobileTranslations();
+  applyMaoTranslations();
 });
 </script>
 </body>
